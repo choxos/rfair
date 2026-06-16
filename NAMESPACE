@@ -2,6 +2,7 @@
 
 S3method(as.data.frame,fair_assessment)
 S3method(format,fair_assessment)
+S3method(plot,fair_assessment)
 S3method(print,fair_assessment)
 S3method(summary,fair_assessment)
 export(as_fuji_json)

@@ -1,0 +1,149 @@
+---
+title: "Illustrating and interpreting a FAIR assessment"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Illustrating and interpreting a FAIR assessment}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width = 7,
+                      fig.height = 4.2, dpi = 96, fig.align = "center")
+library(rfuji)
+```
+
+This vignette shows how to *read* the output of an assessment: the scorecard
+plot, the score tables, the maturity levels, and the reuse/access context that
+`rfuji` adds on top of the F-UJI metrics. For how the scores are computed see
+`vignette("methodology")`; for a quick tour see `vignette("rfuji")`.
+
+So the vignette renders offline and deterministically, it uses the bundled
+example assessment `fair_example` (a real assessment of a Zenodo deposit,
+\doi{10.5281/zenodo.8347772}). You produce your own the same way:
+
+```{r eval = FALSE}
+# (needs network) assess any DOI / PID / URL:
+x <- assess_fair("https://doi.org/10.5281/zenodo.8347772")
+```
+
+```{r}
+data(fair_example)
+x <- fair_example
+x
+```
+
+The printed summary is the fastest read: an earned/total and percentage per
+FAIR category, the overall score, and any reuse/access/identifier flags.
+
+## 1. The scorecard plot
+
+`plot()` turns the assessment into a one-glance scorecard. Each bar is a FAIR
+category filled to its score, labeled with `earned/total` and its **maturity**
+level (the colored word on the right). The dark bar at the top is the overall
+FAIR score.
+
+```{r fig.alt = "FAIR scorecard: horizontal bars for Findable, Accessible, Interoperable and Reusable, plus an overall FAIR bar."}
+plot(x)
+```
+
+To see *which* of the 17 metrics drive each category, plot the per-metric
+breakdown. Bars are grouped and colored by category (F/A/I/R) and labeled with
+the metric identifier and its `earned/total`.
+
+```{r fig.height = 5.6, fig.alt = "Per-metric FAIR breakdown: one horizontal bar per metric, grouped by category."}
+plot(x, type = "metric")
+```
+
+## 2. Score tables
+
+`summary()` returns the per-category table behind the scorecard (handy for
+reports and further computation):
+
+```{r}
+summary(x)
+```
+
+`as.data.frame()` gives one row per metric, with its principle, category,
+score, maturity, and pass/fail status:
+
+```{r}
+df <- as.data.frame(x)
+head(df, 8)
+```
+
+Because it is a plain data frame you can slice it however you like, for example
+the metrics that did not earn full marks:
+
+```{r}
+df[df$earned < df$total, c("metric_identifier", "metric_name", "earned", "total")]
+```
+
+## 3. How to read the numbers
+
+* **Score (`earned`/`total`).** Each metric is worth a fixed number of points;
+  the category score is the sum of earned over total across its metrics, and the
+  overall FAIR score is the sum across all 17 metrics.
+* **Percent.** `earned / total * 100`, shown on each bar.
+* **Maturity (FAIR level).** A CMMI level from 0 to 3 (`incomplete`, `initial`,
+  `moderate`, `advanced`) summarizing *how far up* the testing ladder a metric
+  reached. A metric can earn points yet still sit at a low maturity if only its
+  easiest test passed. Maturity is the colored tag on the category scorecard.
+* **A low score is a finding, not a verdict.** A restricted-access or
+  unlicensed object can be perfectly legitimate; the score tells you what a
+  machine could and could not verify from the metadata.
+
+## 4. The context rfuji adds beyond the score
+
+A single FAIR percentage hides *why* an object is or is not reusable. `rfuji`
+surfaces that separately (see `vignette("beyond-fuji")`); the same information
+is in the assessment object and worth showing alongside the scorecard.
+
+License **reusability** (not merely presence): a license can be detected yet not
+actually permit reuse.
+
+```{r}
+x$reuse$licenses[[1]][c("license", "category", "rdp_category")]
+```
+
+Access level and sensitivity flags (a restricted object is not a FAIR failure,
+but you should know):
+
+```{r}
+x$access[c("access", "controlled_access", "sensitive")]
+```
+
+Identifier hygiene (does the persistent identifier resolve cleanly, no obvious
+problems):
+
+```{r}
+x$identifier_hygiene[c("scheme", "is_persistent", "hygiene_ok")]
+```
+
+## 5. Exporting the illustration
+
+The assessment serializes for downstream tools. `as_fuji_json()` emits a payload
+matching the upstream F-UJI `FAIRResults` schema:
+
+```{r}
+js <- as_fuji_json(x)
+substr(js, 1, 220)
+```
+
+`as_rdf()` emits a machine-readable rating (W3C DQV plus a schema.org `Rating`
+as JSON-LD), suitable for embedding in a landing page:
+
+```{r}
+rdf <- as_rdf(x)
+substr(rdf, 1, 220)
+```
+
+## Summary
+
+* `plot(x)` and `plot(x, type = "metric")` are the quickest way to see an
+  assessment.
+* `summary(x)` and `as.data.frame(x)` give the numbers as tidy tables.
+* Read score, percent, and maturity together; treat low scores as questions,
+  not verdicts.
+* The reuse, access, and identifier-hygiene elements explain the *why* behind
+  the number.

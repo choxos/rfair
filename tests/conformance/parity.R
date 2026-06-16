@@ -5,17 +5,26 @@
 # the metrics derivable from registry (DataCite/Crossref) metadata the two
 # engines AGREE, catching logic drift between the two implementations.
 #
-# Requires node + the web app deps (npm install in webapp/). Usage:
+# The web app lives on the separate `webapp` branch. Materialize it into ./webapp
+# and install its deps first:
+#   git worktree add webapp webapp && (cd webapp && npm install)
 #   Rscript tests/conformance/parity.R [<id> ...]
 
 suppressMessages(devtools::load_all(quiet = TRUE))
 
 webapp <- "webapp"
+if (!dir.exists(webapp)) {
+  stop("Check out the web app branch into ./webapp first:\n",
+       "  git worktree add webapp webapp && (cd webapp && npm install)",
+       call. = FALSE)
+}
 data_dir <- normalizePath(file.path(webapp, "public", "data"), mustWork = TRUE)
 bundle <- tempfile(fileext = ".mjs")
 message("Bundling TS engine...")
 esbuild <- file.path(webapp, "node_modules", ".bin", "esbuild")
-if (!file.exists(esbuild)) stop("Run `npm install` in webapp/ first.", call. = FALSE)
+if (!file.exists(esbuild)) {
+  stop("Install web app deps first: (cd webapp && npm install)", call. = FALSE)
+}
 system2(esbuild, c(file.path(webapp, "scripts", "parity-entry.mts"),
                    "--bundle", "--platform=node", "--format=esm",
                    paste0("--outfile=", bundle), "--log-level=error"))
