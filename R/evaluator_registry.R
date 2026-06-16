@@ -19,7 +19,7 @@ register_evaluator <- function(agnostic_id, fn) {
 #' Look up the evaluator for a metric identifier (matched on its agnostic id).
 #' @noRd
 get_evaluator <- function(metric_identifier) {
-  agnostic <- re_first(.METRIC_REGEX, metric_identifier)
+  agnostic <- canonical_metric_identifier(metric_identifier)
   if (is.na(agnostic)) return(NULL)
   .evaluator_registry[[agnostic]]
 }

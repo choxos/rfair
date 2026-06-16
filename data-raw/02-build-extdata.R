@@ -23,8 +23,21 @@ find_pkg_root <- function(start = getwd()) {
 }
 pkg_root <- find_pkg_root()
 
-# Metric versions rfuji currently supports (default first).
-supported <- c("metrics_v0.8.yaml", "metrics_v0.7_software.yaml")
+# Metric versions rfuji supports (default first). These mirror the public
+# f-uji.net selector plus older release-specific YAMLs kept in upstream tags.
+supported <- c(
+  "metrics_v0.8.yaml",
+  "metrics_v0.5.yaml",
+  "metrics_v0.5ssv2.yaml",
+  "metrics_v0.5ss.yaml",
+  "metrics_v0.5env.yaml",
+  "metrics_v0.7_software.yaml",
+  "metrics_v0.7_software_cessda.yaml",
+  "metrics_v0.6a2a.yaml",
+  "metrics_v0.4.yaml",
+  "metrics_v0.3.yaml",
+  "metrics_v0.2.yaml"
+)
 
 dest_dir <- file.path(pkg_root, "inst", "extdata", "metrics")
 dir.create(dest_dir, recursive = TRUE, showWarnings = FALSE)

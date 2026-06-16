@@ -7,8 +7,8 @@
 Object Assessment) metrics. Given a persistent identifier or URL it resolves the
 object, harvests metadata from its landing page and from registries (DataCite,
 Crossref, GitHub), and scores it against the FAIRsFAIR metrics
-([v0.8](https://doi.org/10.5281/zenodo.15045911)) for Findability, Accessibility,
-Interoperability, and Reusability.
+([v0.8](https://doi.org/10.5281/zenodo.15045911) by default) for Findability,
+Accessibility, Interoperability, and Reusability.
 
 Unlike the original `rfuji` (an HTTP client for an external F-UJI server), this
 version performs the **entire assessment in R** — no Python, no server.
@@ -48,6 +48,28 @@ as.data.frame(a)      # one row per metric
 as_fuji_json(a)       # F-UJI-compatible JSON
 as_rdf(a)             # DQV + schema.org Rating (JSON-LD)
 ```
+
+## Metric versions and F-UJI options
+
+`rfuji` bundles the current F-UJI website choices plus release-specific legacy
+metric files from upstream F-UJI:
+
+```r
+rfuji_metric_versions()
+#> 0.8 0.5 0.5ssv2 0.5ss 0.5env 0.7_software ...
+
+assess_fair(
+  "https://doi.org/10.5281/zenodo.8347772",
+  metric_version = "0.5ssv2",
+  use_datacite = TRUE,
+  metadata_service_endpoint = "https://example.org/oai",
+  metadata_service_type = "oai_pmh"
+)
+```
+
+Supported metadata service type labels include OAI-PMH, OGC CSW, SPARQL, DCAT,
+schema.org JSON-LD, DataCite, Crossref, Signposting, typed links, RO-Crate, CKAN,
+and a generic other metadata document option.
 
 ## Beyond F-UJI
 
@@ -97,7 +119,7 @@ F-UJI sources by the scripts in `data-raw/`.
 A native R port of [F-UJI](https://github.com/pangaea-data-publisher/fuji)
 (© PANGAEA, MIT), itself based on the FAIRsFAIR metrics. License reusability uses
 the [(Re)usable Data Project](https://reusabledata.org) rubric; FAIR principle
-definitions come from the [FAIR-nanopubs](https://w3id.org/fair/principles)
+definitions come from the [FAIR-nanopubs](https://peta-pico.github.io/FAIR-nanopubs/principles/index-en.html)
 vocabulary referenced by [go-fair.org](https://www.go-fair.org/fair-principles/).
 
 ## License

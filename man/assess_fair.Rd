@@ -8,6 +8,8 @@ assess_fair(
   id,
   metric_version = "0.8",
   use_datacite = TRUE,
+  metadata_service_endpoint = NULL,
+  metadata_service_type = metadata_service_types(),
   test_debug = FALSE,
   resolve = TRUE,
   timeout = 15,
@@ -20,6 +22,13 @@ assess_fair(
 \item{metric_version}{Metric version to use (see \code{\link[=rfuji_metric_versions]{rfuji_metric_versions()}}).}
 
 \item{use_datacite}{Whether to query DataCite for registry metadata.}
+
+\item{metadata_service_endpoint}{Optional metadata service endpoint or
+metadata document URL (for example OAI-PMH, OGC CSW, SPARQL, DCAT,
+schema.org JSON-LD, DataCite, Crossref, Signposting, typed links,
+RO-Crate, or CKAN).}
+
+\item{metadata_service_type}{Type of \code{metadata_service_endpoint}.}
 
 \item{test_debug}{If \code{TRUE}, collect debug log messages in the result.}
 

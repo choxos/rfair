@@ -70,12 +70,13 @@ eval_license <- function(ctx, res) {
   }
   res$output <- license_info
 
-  t1 <- paste0(mid, "-1")  # license metadata element available
-  if (crit_is_defined(res, t1) && length(license_info) > 0L) {
-    crit_pass(res, t1, evidence = vapply(license_info, function(x) x$license, character(1)))
+  # license metadata element available
+  if (crit_is_defined_suffix(res, "-1") && length(license_info) > 0L) {
+    crit_pass_suffix(res, "-1", evidence = vapply(license_info, function(x) x$license, character(1)))
   }
-  t2 <- paste0(mid, "-2")  # license is valid and SPDX/CC registered
-  if (crit_is_defined(res, t2) && any(vapply(license_info, function(x) isTRUE(x$valid), logical(1)))) {
-    crit_pass(res, t2, evidence = "machine-readable license")
+  # license is valid and SPDX/CC registered
+  if (crit_is_defined_suffix(res, "-2") &&
+      any(vapply(license_info, function(x) isTRUE(x$valid), logical(1)))) {
+    crit_pass_suffix(res, "-2", evidence = "machine-readable license")
   }
 }

@@ -18,7 +18,13 @@
 ^ROADMAP\.md$
 ^\.claude$
 ^\.DS_Store$
+^\.gstack$
+^\.gstack/
 ^webapp$
 ^Meta$
 ^doc$
 ^\.lintr$
+^audit$
+^rfuji\.Rcheck$
+^rfuji_[0-9].*\.tar\.gz$
+^\.\.Rcheck$

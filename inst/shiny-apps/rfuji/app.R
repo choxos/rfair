@@ -12,6 +12,36 @@ MATURITY_COLORS <- c(incomplete = "#fe7d37", initial = "#dfb317",
                      moderate = "#97ca00", advanced = "#4c1")
 
 maturity_label <- function(m) MATURITY_LEVELS[pmin(pmax(as.integer(m), 0L), 3L) + 1L]
+metric_label <- function(v) {
+  labels <- c(
+    "0.8" = "FsF Metrics v0.8 - Domain agnostic",
+    "0.5" = "FsF Metrics v0.5 - Domain agnostic",
+    "0.5ssv2" = "FsF Metrics v0.5 - Social Sciences full (beta)",
+    "0.5ss" = "FsF Metrics v0.5 - Social Sciences part (beta)",
+    "0.5env" = "FsF Metrics v0.5 - Earth & Environmental Sciences (alpha)",
+    "0.7_software" = "FRSM Metrics v0.7 - Software",
+    "0.7_software_cessda" = "FRSM Metrics v0.7 - Software CESSDA",
+    "0.6a2a" = "FsF Metrics v0.6 A2A draft",
+    "0.4" = "FsF Metrics v0.4 legacy",
+    "0.3" = "FsF Metrics v0.3 legacy",
+    "0.2" = "FsF Metrics v0.2 legacy"
+  )
+  unname(labels[[v]] %||% paste("Metric", v))
+}
+service_type_choices <- c(
+  "OAI-PMH" = "oai_pmh",
+  "OGC CSW" = "ogc_csw",
+  "SPARQL" = "sparql",
+  "DCAT catalog/document" = "dcat",
+  "schema.org JSON-LD" = "schema_org",
+  "DataCite API/content negotiation" = "datacite",
+  "Crossref API" = "crossref",
+  "Signposting" = "signposting",
+  "Typed links" = "typed_links",
+  "RO-Crate metadata" = "ro_crate",
+  "CKAN API" = "ckan",
+  "Other metadata document" = "other"
+)
 
 badge <- function(text, color) {
   sprintf('<span style="display:inline-block;padding:.25em .6em;border-radius:.5rem;color:#fff;background:%s;font-weight:600">%s</span>',
@@ -42,7 +72,13 @@ ui <- page_sidebar(
     width = 360,
     textInput("pid", "Research data object (DOI / PID / URL)",
               placeholder = "https://doi.org/10.5281/zenodo.8347772"),
-    selectInput("metric", "Metric version", choices = rfuji_metric_versions(), selected = "0.8"),
+    selectInput("metric", "Metric version",
+                choices = setNames(rfuji_metric_versions(), vapply(rfuji_metric_versions(), metric_label, character(1))),
+                selected = "0.8"),
+    textInput("service_url", "Metadata service endpoint",
+              placeholder = "(Optional) endpoint or metadata document URL"),
+    selectInput("service_type", "Metadata service type",
+                choices = service_type_choices, selected = "oai_pmh"),
     checkboxInput("datacite", "Use DataCite", TRUE),
     checkboxInput("debug", "Collect debug log", FALSE),
     actionButton("go", "Assess FAIRness", class = "btn-primary", icon = icon("play")),
@@ -59,7 +95,10 @@ server <- function(input, output, session) {
     withProgress(message = "Harvesting metadata and scoring...", value = 0.5, {
       tryCatch(
         assess_fair(trimws(input$pid), metric_version = input$metric,
-                    use_datacite = input$datacite, test_debug = input$debug),
+                    use_datacite = input$datacite,
+                    metadata_service_endpoint = trimws(input$service_url),
+                    metadata_service_type = input$service_type,
+                    test_debug = input$debug),
         error = function(e) structure(list(error = conditionMessage(e)), class = "rfuji_error"))
     })
   })
