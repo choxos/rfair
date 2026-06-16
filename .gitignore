@@ -1,0 +1,14 @@
+node_modules
+dist
+*.local
+.DS_Store
+*.tsbuildinfo
+
+# public/data is committed here so the standalone webapp branch builds without
+# the R package; regenerate it with `npm run sync-data` when the package is
+# checked out alongside (e.g. via a git worktree).
+
+# Local-only material that can coexist in the working tree but is never part of
+# the web app (these live on the R-package side of the repo).
+.gstack/
+/comments/

@@ -1,0 +1,52 @@
+name: deploy-app
+
+# This workflow lives on the `webapp` branch, which holds the standalone web app
+# (the `main` branch is the R package only). It builds the app and publishes it
+# to the gh-pages `/app` directory, preserving the pkgdown site at the root.
+
+on:
+  push:
+    branches: [webapp]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages-app
+  cancel-in-progress: true
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install
+        # npm install (not npm ci) so the Linux runner can reconcile the
+        # platform-specific optional native deps (rollup/esbuild) that a
+        # lockfile generated on another OS does not enumerate. Versions stay
+        # pinned by the committed lockfile; the audit step below still gates.
+        run: npm install --no-audit --no-fund
+
+      - name: Security audit
+        run: npm audit --audit-level=moderate
+
+      - name: Typecheck, test, build
+        run: |
+          npm run typecheck
+          npm test
+          npm run build
+
+      - name: Deploy to gh-pages /app
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: dist
+          destination_dir: app
+          keep_files: true   # preserve the pkgdown site at the gh-pages root

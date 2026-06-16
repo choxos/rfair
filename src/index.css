@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+/* Class-based dark mode: toggle `.dark` on <html>. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-fair-f: #118ab2;
+  --color-fair-a: #06d6a0;
+  --color-fair-i: #f4c430;
+  --color-fair-r: #ef476f;
+  --color-fair-dark: #073b4c;
+  --color-brand-500: #0ea5b7;
+  --color-brand-600: #0e8aa8;
+
+  --color-maturity-incomplete: #fb923c;
+  --color-maturity-initial: #eab308;
+  --color-maturity-moderate: #84cc16;
+  --color-maturity-advanced: #10b981;
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, sans-serif;
+
+  --animate-fade-in: fade-in 0.5s ease both;
+  --animate-rise: rise 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes shimmer {
+  100% { transform: translateX(100%); }
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+  html.dark {
+    color-scheme: dark;
+  }
+  body {
+    @apply bg-slate-50 text-slate-800 antialiased;
+    background-image: radial-gradient(
+        60rem 60rem at 85% -10%,
+        color-mix(in oklab, var(--color-fair-f) 14%, transparent),
+        transparent
+      ),
+      radial-gradient(
+        50rem 50rem at -10% 0%,
+        color-mix(in oklab, var(--color-fair-a) 12%, transparent),
+        transparent
+      );
+    background-attachment: fixed;
+  }
+  .dark body {
+    @apply bg-slate-950 text-slate-200;
+    background-image: radial-gradient(
+        60rem 60rem at 85% -10%,
+        color-mix(in oklab, var(--color-fair-f) 22%, transparent),
+        transparent
+      ),
+      radial-gradient(
+        50rem 50rem at -10% 0%,
+        color-mix(in oklab, var(--color-fair-a) 16%, transparent),
+        transparent
+      );
+  }
+}
+
+@layer components {
+  /* Frosted card used throughout the UI. */
+  .card {
+    @apply rounded-2xl border border-slate-200/70 bg-white/80 shadow-sm
+      backdrop-blur-sm dark:border-white/10 dark:bg-white/5;
+  }
+  .skeleton {
+    @apply relative overflow-hidden rounded-xl bg-slate-200/70 dark:bg-white/10;
+  }
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.45),
+      transparent
+    );
+    animation: shimmer 1.4s infinite;
+  }
+  .dark .skeleton::after {
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.08),
+      transparent
+    );
+  }
+}
