@@ -45,6 +45,28 @@ new_metric_evaluation <- function(metric_def) {
 #' @noRd
 crit_is_defined <- function(res, test_id) !is.null(res$tests[[test_id]])
 
+#' Metric-test ids matching a canonical suffix (e.g. "-1", "-2").
+#'
+#' Domain-specific metric files often append a suffix to the metric id
+#' (`FsF-F2-01M-ss`) but put it after the test number
+#' (`FsF-F2-01M-3-ss`). Matching on agnostic test identifiers keeps evaluators
+#' reusable across FsF metric releases.
+#' @noRd
+crit_test_ids <- function(res, suffix) {
+  agnostic <- re_first(.METRIC_REGEX, res$metric_identifier)
+  canonical <- canonical_metric_identifier(res$metric_identifier)
+  prefixes <- unique(stats::na.omit(c(res$metric_identifier, agnostic, canonical)))
+  targets <- paste0(prefixes, suffix)
+  ids <- names(res$tests)
+  ids[vapply(ids, function(id) {
+    test <- res$tests[[id]]
+    id %in% targets || (test$agnostic_test_identifier %||% "") %in% targets
+  }, logical(1))]
+}
+
+#' @noRd
+crit_is_defined_suffix <- function(res, suffix) length(crit_test_ids(res, suffix)) > 0L
+
 #' Required metadata-property names declared by a metric test's requirements.
 #' @noRd
 crit_required_names <- function(res, test_id) {
@@ -57,6 +79,13 @@ crit_required_names <- function(res, test_id) {
     }
   }
   character(0)
+}
+
+#' @noRd
+crit_required_names_suffix <- function(res, suffix) {
+  ids <- crit_test_ids(res, suffix)
+  if (!length(ids)) return(character(0))
+  crit_required_names(res, ids[[1]])
 }
 
 #' @noRd
@@ -83,6 +112,14 @@ crit_pass <- function(res, test_id, evidence = NULL) {
   res$score_earned <- res$score_earned + score
   res$maturity     <- max(res$maturity, mat)
   res$test_status  <- "pass"
+  invisible(res)
+}
+
+#' Mark all tests matching a canonical suffix as passed.
+#' @noRd
+crit_pass_suffix <- function(res, suffix, evidence = NULL) {
+  ids <- crit_test_ids(res, suffix)
+  for (id in ids) crit_pass(res, id, evidence = evidence)
   invisible(res)
 }
 

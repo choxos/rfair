@@ -3,10 +3,15 @@
 #' FsF-F3-01M: metadata includes the identifier of the data it describes.
 #' @noRd
 eval_data_identifier_included <- function(ctx, res) {
-  t <- paste0(res$metric_identifier, "-2")
   urls <- content_urls_of(ctx)
-  if (crit_is_defined(res, t) && length(urls) > 0L) {
-    crit_pass(res, t, evidence = urls)
+  content_info <- !is.null(ctx$metadata_merged$object_format) ||
+    !is.null(ctx$metadata_merged$object_size) ||
+    length(urls) > 0L
+  if (crit_is_defined_suffix(res, "-1") && content_info) {
+    crit_pass_suffix(res, "-1", evidence = "data content metadata")
+  }
+  if (crit_is_defined_suffix(res, "-2") && length(urls) > 0L) {
+    crit_pass_suffix(res, "-2", evidence = urls)
   }
   res$output <- list(object_content_identifier = content_urls_of(ctx))
 }
@@ -18,12 +23,24 @@ eval_data_identifier_included <- function(ctx, res) {
 #' does not qualify.
 #' @noRd
 eval_searchable <- function(ctx, res) {
-  t <- paste0(res$metric_identifier, "-1")
   embedded <- Filter(function(s) s$method %in% c("embedded", "meta_tags", "microdata", "rdfa"),
                      ctx$metadata_sources)
   mechs <- unique(vapply(embedded, function(s) tolower(s$source %||% ""), character(1)))
-  if (crit_is_defined(res, t) && length(embedded) > 0L) {
-    crit_pass(res, t, evidence = mechs)
+  if (crit_is_defined_suffix(res, "-1") && length(embedded) > 0L) {
+    crit_pass_suffix(res, "-1", evidence = mechs)
+  }
+
+  sources <- source_names(ctx)
+  if (crit_is_defined_suffix(res, "-2") && any(grepl("datacite", sources))) {
+    crit_pass_suffix(res, "-2", evidence = "DataCite")
+  }
+
+  # Some social-science prototype metrics use -3 for the generic
+  # "programmatically retrievable metadata" criterion.
+  if (crit_is_defined_suffix(res, "-3") && length(ctx$metadata_sources) > 0L) {
+    crit_pass_suffix(res, "-3",
+                     evidence = unique(vapply(ctx$metadata_sources, function(s)
+                       s$method %||% "", character(1))))
   }
   res$output <- list(search_mechanisms = mechs)
 }

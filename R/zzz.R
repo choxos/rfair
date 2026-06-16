@@ -19,6 +19,9 @@
   register_evaluator("FsF-F4-01M",   eval_searchable)
   # Accessible
   register_evaluator("FsF-A1-01M",   eval_data_access_level)
+  register_evaluator("FsF-A1-03D",   eval_data_standard_protocol_legacy)
+  register_evaluator("FsF-A1-02M",   eval_metadata_standard_protocol_legacy)
+  register_evaluator("FsF-A2-01M",   eval_metadata_persistence_legacy)
   register_evaluator("FsF-A1-02MD",  eval_retrievable)
   register_evaluator("FsF-A1.1-01MD", eval_standard_protocol)
   register_evaluator("FsF-A1.2-01MD", eval_protocol_auth)

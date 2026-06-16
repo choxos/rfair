@@ -8,6 +8,20 @@
 .METRIC_REGEX <- "^FsF-[FAIR][0-9]?(\\.[0-9])?-[0-9]+[MD]+|FRSM-[0-9]+-[FAIR][0-9]?(\\.[0-9])?"
 .METRIC_TEST_REGEX <- "FsF-[FAIR][0-9]?(\\.[0-9])?-[0-9]+[MD]+(-[0-9\\+]+[a-z]?)|^FRSM-[0-9]+-[FAIR][0-9]?(\\.[0-9])?(?:-[a-zA-Z]+)?(-[0-9]+)?"
 
+# Historical FsF metric files use older identifier spellings for tests that now
+# share the same implementation. Keep this map deliberately small: metrics with
+# materially different semantics get their own evaluator wrapper in zzz.R.
+.METRIC_EVALUATOR_ALIASES <- c(
+  "FsF-F1-01D" = "FsF-F1-01MD",
+  "FsF-F1-01M" = "FsF-F1-01MD",
+  "FsF-F1-01DD" = "FsF-F1-01MD",
+  "FsF-F1-02D" = "FsF-F1-02MD",
+  "FsF-F1-02M" = "FsF-F1-02MD",
+  "FsF-F1-02DD" = "FsF-F1-02MD",
+  "FsF-I1-02M" = "FsF-I2-01M",
+  "FsF-R1-01MD" = "FsF-R1-01M"
+)
+
 #' First regex match of `pattern` in `x` (perl), or NA.
 #' @noRd
 re_first <- function(pattern, x) {
@@ -15,6 +29,14 @@ re_first <- function(pattern, x) {
   m <- regexpr(pattern, x, perl = TRUE)
   if (m == -1L) return(NA_character_)
   regmatches(x, m)
+}
+
+#' Canonical evaluator key for a metric identifier.
+#' @noRd
+canonical_metric_identifier <- function(metric_identifier) {
+  agnostic <- re_first(.METRIC_REGEX, metric_identifier)
+  if (is.na(agnostic)) return(NA_character_)
+  if (agnostic %in% names(.METRIC_EVALUATOR_ALIASES)) .METRIC_EVALUATOR_ALIASES[[agnostic]] else agnostic
 }
 
 #' Normalize a metric version string to the bundled YAML file name.
@@ -45,7 +67,7 @@ load_metrics <- function(version = "0.8") {
   config <- spec$config %||% list()
   metrics <- spec$metrics %||% list()
 
-  ver <- re_first("([0-9]+\\.[0-9]+)", fname) %||% as.character(version)
+  ver <- sub("^metrics_v(.*)\\.yaml$", "\\1", fname)
   metric_spec <- config$metric_specification %||% "https://doi.org/10.5281/zenodo.6461229"
 
   out <- list(
@@ -88,5 +110,9 @@ build_custom_metrics <- function(metrics) {
 rfuji_metric_versions <- function() {
   dir <- system.file("extdata", "metrics", package = "rfuji")
   files <- list.files(dir, pattern = "^metrics_v.*\\.yaml$")
-  sub("^metrics_v(.*)\\.yaml$", "\\1", files)
+  versions <- sub("^metrics_v(.*)\\.yaml$", "\\1", files)
+  preferred <- c("0.8", "0.5", "0.5ssv2", "0.5ss", "0.5env",
+                 "0.7_software", "0.7_software_cessda",
+                 "0.6a2a", "0.4", "0.3", "0.2")
+  c(preferred[preferred %in% versions], sort(setdiff(versions, preferred)))
 }

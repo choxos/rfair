@@ -5,7 +5,6 @@
 
 #' @noRd
 eval_community_metadata <- function(ctx, res) {
-  mid <- res$metric_identifier
   nss <- ctx_namespace_uris(ctx)
   found <- Filter(Negate(is.null), lapply(nss, lookup_standard))
   # dedupe by standard name
@@ -15,14 +14,12 @@ eval_community_metadata <- function(ctx, res) {
   disc <- Filter(function(s) identical(s$type, "disciplinary"), uniq)
 
   # -3 multidisciplinary but community endorsed (maturity 1)
-  t3 <- paste0(mid, "-3")
-  if (crit_is_defined(res, t3) && length(generic)) {
-    crit_pass(res, t3, evidence = vapply(generic, function(s) s$name, character(1)))
+  if (crit_is_defined_suffix(res, "-3") && length(generic)) {
+    crit_pass_suffix(res, "-3", evidence = vapply(generic, function(s) s$name, character(1)))
   }
   # -1 community-specific (disciplinary) standard (maturity 3)
-  t1 <- paste0(mid, "-1")
-  if (crit_is_defined(res, t1) && length(disc)) {
-    crit_pass(res, t1, evidence = vapply(disc, function(s) s$name, character(1)))
+  if (crit_is_defined_suffix(res, "-1") && length(disc)) {
+    crit_pass_suffix(res, "-1", evidence = vapply(disc, function(s) s$name, character(1)))
   }
   res$output <- lapply(uniq, function(s) list(
     metadata_standard = s$name, type = s$type, url = s$uri, subject_areas = s$subject))

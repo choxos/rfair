@@ -19,15 +19,16 @@
 
 #' @noRd
 eval_semantic_vocabulary <- function(ctx, res) {
-  t2 <- paste0(res$metric_identifier, "-2")
-  if (!crit_is_defined(res, t2)) return(invisible())
   strip_ns <- function(x) sub("^www\\.", "", sub("[/#]+$", "", sub("^https?://", "", tolower(x))))
   norm <- strip_ns(ctx_namespace_uris(ctx))
   defnorm <- strip_ns(ref_data("default_namespaces"))
   nondefault <- norm[!vapply(norm, function(n) any(startsWith(n, defnorm)), logical(1))]
+  if (crit_is_defined_suffix(res, "-1") && length(nondefault)) {
+    crit_pass_suffix(res, "-1", evidence = nondefault)
+  }
   known <- nondefault[vapply(nondefault, function(n) any(startsWith(n, .KNOWN_VOCABS)), logical(1))]
-  if (length(known)) {
-    crit_pass(res, t2, evidence = known)
+  if (crit_is_defined_suffix(res, "-2") && length(known)) {
+    crit_pass_suffix(res, "-2", evidence = known)
     res$output <- lapply(known, function(n) list(namespace = n, is_namespace_active = TRUE))
   }
 }

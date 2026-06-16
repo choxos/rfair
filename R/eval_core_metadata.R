@@ -8,24 +8,30 @@
 
 #' @noRd
 eval_core_metadata <- function(ctx, res) {
-  mid <- res$metric_identifier
   found <- intersect(names(ctx$metadata_merged), REFERENCE_ELEMENTS)
   status <- "insufficient metadata"
 
+  # Legacy FsF <=0.6 also gave credit for metadata being offered through a
+  # common web mechanism (embedded metadata, content negotiation, signposting).
+  if (crit_is_defined_suffix(res, "-1") && length(ctx$metadata_sources) > 0L) {
+    crit_pass_suffix(res, "-1",
+                     evidence = unique(vapply(ctx$metadata_sources, function(s)
+                       paste(s$source %||% "", s$method %||% "", sep = ":"),
+                       character(1))))
+  }
+
   # FsF-F2-01M-2: core citation metadata
-  t2 <- paste0(mid, "-2")
-  if (crit_is_defined(res, t2) && all(.CITATION_CORE %in% found)) {
-    crit_pass(res, t2, evidence = paste(.CITATION_CORE, collapse = ", "))
+  if (crit_is_defined_suffix(res, "-2") && all(.CITATION_CORE %in% found)) {
+    crit_pass_suffix(res, "-2", evidence = paste(.CITATION_CORE, collapse = ", "))
     status <- "partial metadata"
   }
 
   # FsF-F2-01M-3: full core descriptive metadata
-  t3 <- paste0(mid, "-3")
-  if (crit_is_defined(res, t3)) {
-    required <- crit_required_names(res, t3)
+  if (crit_is_defined_suffix(res, "-3")) {
+    required <- crit_required_names_suffix(res, "-3")
     if (!length(required)) required <- REQUIRED_CORE_METADATA
     if (all(required %in% found)) {
-      crit_pass(res, t3, evidence = paste(required, collapse = ", "))
+      crit_pass_suffix(res, "-3", evidence = paste(required, collapse = ", "))
       status <- "all metadata"
     }
   }

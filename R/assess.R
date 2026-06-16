@@ -4,11 +4,20 @@
 
 #' Create the engine state environment (the R analogue of `FAIRCheck`).
 #' @noRd
-new_engine_ctx <- function(id, metrics_meta, use_datacite = TRUE, test_debug = FALSE) {
+metadata_service_types <- function() {
+  c("oai_pmh", "ogc_csw", "sparql", "dcat", "schema_org", "datacite",
+    "crossref", "signposting", "typed_links", "ro_crate", "ckan", "other")
+}
+
+new_engine_ctx <- function(id, metrics_meta, use_datacite = TRUE, test_debug = FALSE,
+                           metadata_service_endpoint = NULL,
+                           metadata_service_type = NULL) {
   ctx <- new.env(parent = emptyenv())
   ctx$id <- id
   ctx$use_datacite <- use_datacite
   ctx$test_debug <- test_debug
+  ctx$metadata_service_endpoint <- metadata_service_endpoint
+  ctx$metadata_service_type <- metadata_service_type
   ctx$metrics <- metrics_meta
   ctx$pid <- NULL
   ctx$pid_url <- NA_character_
@@ -68,6 +77,11 @@ run_evaluators <- function(ctx, metrics_meta) {
 #' @param id A persistent identifier or URL (DOI, Handle, ARK, URN, ...).
 #' @param metric_version Metric version to use (see [rfuji_metric_versions()]).
 #' @param use_datacite Whether to query DataCite for registry metadata.
+#' @param metadata_service_endpoint Optional metadata service endpoint or
+#'   metadata document URL (for example OAI-PMH, OGC CSW, SPARQL, DCAT,
+#'   schema.org JSON-LD, DataCite, Crossref, Signposting, typed links,
+#'   RO-Crate, or CKAN).
+#' @param metadata_service_type Type of `metadata_service_endpoint`.
 #' @param test_debug If `TRUE`, collect debug log messages in the result.
 #' @param resolve If `TRUE`, resolve the identifier to its landing page.
 #' @param timeout Per-request timeout in seconds.
@@ -82,12 +96,21 @@ run_evaluators <- function(ctx, metrics_meta) {
 #' summary(a)
 #' }
 assess_fair <- function(id, metric_version = "0.8", use_datacite = TRUE,
+                        metadata_service_endpoint = NULL,
+                        metadata_service_type = metadata_service_types(),
                         test_debug = FALSE, resolve = TRUE, timeout = 15,
                         use_headless = FALSE) {
   if (!is_nonempty_string(id)) stop("`id` must be a non-empty identifier or URL.", call. = FALSE)
+  metadata_service_endpoint <- trimws(as.character(metadata_service_endpoint %||% ""))
+  if (!nzchar(metadata_service_endpoint)) metadata_service_endpoint <- NULL
+  metadata_service_type <- match.arg(metadata_service_type)
   start_time <- format(Sys.time(), "%Y-%m-%dT%H:%M:%S%z")
   metrics_meta <- load_metrics(metric_version)
-  ctx <- new_engine_ctx(id, metrics_meta, use_datacite = use_datacite, test_debug = test_debug)
+  ctx <- new_engine_ctx(
+    id, metrics_meta, use_datacite = use_datacite, test_debug = test_debug,
+    metadata_service_endpoint = metadata_service_endpoint,
+    metadata_service_type = metadata_service_type
+  )
 
   parsed <- id_parse(id)
   ctx$pid <- parsed
@@ -134,7 +157,10 @@ assess_fair <- function(id, metric_version = "0.8", use_datacite = TRUE,
   end_time <- format(Sys.time(), "%Y-%m-%dT%H:%M:%S%z")
 
   request <- list(object_identifier = id, metric_version = metrics_meta$version,
-                  use_datacite = use_datacite, test_debug = test_debug)
+                  use_datacite = use_datacite,
+                  metadata_service_endpoint = metadata_service_endpoint %||% "",
+                  metadata_service_type = if (is.null(metadata_service_endpoint)) "" else metadata_service_type,
+                  test_debug = test_debug)
   new_fair_assessment(
     id = id, request = request, results = results, summary = summary,
     resolved_url = ctx$landing_url %||% NA_character_, metrics_meta = metrics_meta,
