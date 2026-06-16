@@ -18,6 +18,8 @@
 ^ROADMAP\.md$
 ^\.claude$
 ^\.DS_Store$
+^\.gstack$
+^\.gstack/
 ^webapp$
 ^Meta$
 ^doc$
