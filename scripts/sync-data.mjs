@@ -4,7 +4,11 @@
 // The web app lives on its own `webapp` branch, so the R package is not present
 // by default. public/data is committed here so the app builds standalone; run
 // this only to refresh it, with the package checked out alongside. Point at the
-// package with RFUJI_PKG, or use a git worktree:
+// package with RFUJI_PKG, or use a sibling/parent git worktree:
+//   git worktree add webapp webapp
+//   (cd webapp && npm run sync-data)
+//
+// or:
 //   git worktree add ../rfuji-pkg main
 //   RFUJI_PKG=../rfuji-pkg npm run sync-data
 import { cpSync, mkdirSync, readdirSync, existsSync } from "node:fs";
@@ -13,17 +17,28 @@ import { fileURLToPath } from "node:url";
 
 const here = dirname(fileURLToPath(import.meta.url));
 const root = join(here, "..");
-const pkg = process.env.RFUJI_PKG
-  ? isAbsolute(process.env.RFUJI_PKG)
-    ? process.env.RFUJI_PKG
-    : resolve(root, process.env.RFUJI_PKG)
-  : join(root, "..", "rfuji"); // sibling clone fallback
-const src = join(pkg, "inst", "extdata", "web");
+
+function packageRoot(candidate) {
+  const d = isAbsolute(candidate) ? candidate : resolve(root, candidate);
+  return existsSync(join(d, "DESCRIPTION")) && existsSync(join(d, "inst", "extdata", "web"))
+    ? d
+    : null;
+}
+
+const candidates = process.env.RFUJI_PKG
+  ? [process.env.RFUJI_PKG]
+  : [
+      join(root, ".."),          // ./webapp worktree inside the package checkout
+      join(root, "..", "rfuji"), // sibling clone fallback
+      join(root, "..", "rfuji-pkg"),
+    ];
+const pkg = candidates.map(packageRoot).find(Boolean);
+const src = pkg ? join(pkg, "inst", "extdata", "web") : "";
 const dest = join(root, "public", "data");
 
-if (!existsSync(src)) {
+if (!pkg || !existsSync(src)) {
   console.warn(
-    `sync-data: source ${src} not found; using the committed public/data.\n` +
+    `sync-data: package source not found; using the committed public/data.\n` +
       "Set RFUJI_PKG to the R package root to refresh (see scripts/sync-data.mjs)."
   );
   process.exit(0);

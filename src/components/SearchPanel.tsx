@@ -1,18 +1,23 @@
-import { METRIC_SETS, type MetricVersion } from "../lib/types";
+import {
+  METADATA_SERVICE_TYPES,
+  SOFTWARE_METRIC_VERSIONS,
+  type AssessmentOptions,
+  type MetadataServiceType,
+  METRIC_SETS,
+  type MetricVersion,
+} from "../lib/types";
 
-const EXAMPLES: Record<MetricVersion, { label: string; id: string }[]> = {
-  "0.8": [
+const DATA_EXAMPLES = [
     { label: "Zenodo", id: "https://doi.org/10.5281/zenodo.8347772" },
     { label: "PANGAEA", id: "https://doi.org/10.1594/PANGAEA.908011" },
     { label: "Dryad", id: "https://doi.org/10.5061/dryad.q573n5tj9" },
     { label: "GitHub repo", id: "https://github.com/pangaea-data-publisher/fuji" },
-  ],
-  "0.7_software": [
+];
+const SOFTWARE_EXAMPLES = [
     { label: "F-UJI", id: "https://github.com/pangaea-data-publisher/fuji" },
     { label: "rfuji", id: "https://github.com/choxos/rfuji" },
     { label: "datacite", id: "https://github.com/datacite/datacite" },
-  ],
-};
+];
 
 export function SearchPanel({
   pid,
@@ -22,6 +27,8 @@ export function SearchPanel({
   ready,
   version,
   setVersion,
+  options,
+  setOptions,
 }: {
   pid: string;
   setPid: (s: string) => void;
@@ -30,8 +37,11 @@ export function SearchPanel({
   ready: boolean;
   version: MetricVersion;
   setVersion: (v: MetricVersion) => void;
+  options: AssessmentOptions;
+  setOptions: (o: AssessmentOptions) => void;
 }) {
-  const software = version === "0.7_software";
+  const software = SOFTWARE_METRIC_VERSIONS.has(version);
+  const examples = software ? SOFTWARE_EXAMPLES : DATA_EXAMPLES;
   return (
     <section className="mx-auto max-w-3xl text-center">
       <h1 className="bg-gradient-to-br from-slate-900 to-slate-500 bg-clip-text text-3xl font-extrabold tracking-tight text-transparent sm:text-4xl dark:from-white dark:to-slate-400">
@@ -77,11 +87,43 @@ export function SearchPanel({
             {loading ? "Assessing…" : "Assess"}
           </button>
         </div>
+        {!software && (
+          <div className="mt-3 rounded-lg border border-slate-200/70 bg-slate-50/70 p-3 dark:border-white/10 dark:bg-white/5">
+            <div className="grid gap-3 sm:grid-cols-[1fr_auto]">
+              <label className="flex items-center gap-2 text-xs font-medium text-slate-600 dark:text-slate-300">
+                <input
+                  type="checkbox"
+                  checked={options.useDatacite}
+                  onChange={(e) => setOptions({ ...options, useDatacite: e.target.checked })}
+                  className="h-4 w-4 rounded border-slate-300 text-fair-f focus:ring-fair-f"
+                />
+                Use DataCite
+              </label>
+              <select
+                value={options.metadataServiceType}
+                onChange={(e) => setOptions({ ...options, metadataServiceType: e.target.value as MetadataServiceType })}
+                className="rounded-lg border border-slate-200 bg-white px-2 py-1 text-xs font-medium text-slate-600 outline-none focus:border-fair-f dark:border-white/10 dark:bg-slate-900 dark:text-slate-300"
+                aria-label="Metadata service type"
+              >
+                {METADATA_SERVICE_TYPES.map((m) => (
+                  <option key={m.value} value={m.value}>{m.label}</option>
+                ))}
+              </select>
+            </div>
+            <input
+              className="mt-2 w-full min-w-0 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs outline-none placeholder:text-slate-400 focus:border-fair-f dark:border-white/10 dark:bg-slate-900"
+              value={options.metadataServiceEndpoint}
+              onChange={(e) => setOptions({ ...options, metadataServiceEndpoint: e.target.value })}
+              placeholder="Optional metadata service endpoint"
+              aria-label="Metadata service endpoint"
+            />
+          </div>
+        )}
       </div>
 
       <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-xs">
         <span className="text-slate-400">Try:</span>
-        {EXAMPLES[version].map((ex) => (
+        {examples.map((ex) => (
           <button
             key={ex.id}
             onClick={() => {
