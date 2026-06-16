@@ -200,9 +200,10 @@ cross-engine parity harness (`tests/conformance/parity.R`) runs from a
 clean install: `esbuild` is an explicit `webapp` devDependency, the
 harness bundles `parity-entry.mts` and diffs registry-core metrics R vs
 TS - \[x\] GitHub Actions: `R-CMD-check.yaml` (mac/win/linux + devel),
-`pkgdown.yaml` (gh-pages root, `clean:false`), `deploy-app.yaml`; live
-site at `choxos.github.io/rfuji` + `/app` - \[x\] roxygen links resolve
-clean; README; vignettes (`rfuji`, `methodology`, `beyond-fuji`,
+`pkgdown.yaml` (gh-pages root, `clean:false`), and the `webapp` branch
+`.github/workflows/deploy.yaml` workflow (`deploy-app`); live site at
+`choxos.github.io/rfuji` + `/app` - \[x\] roxygen links resolve clean;
+README; vignettes (`rfuji`, `methodology`, `beyond-fuji`,
 `illustrating-fairness`); `fair_assessment` class + `plot` method docs;
 `R CMD build` succeeds
 

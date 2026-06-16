@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rfuji</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -156,7 +156,10 @@ maturity levels come from the bundled FAIRsFAIR YAML, not from
 hard-coded R logic.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="../reference/rfuji_metric_versions.html">rfuji_metric_versions</a></span><span class="op">(</span><span class="op">)</span>      <span class="co"># bundled metric versions</span></span>
-<span><span class="co">#&gt; [1] "0.7_software" "0.8"</span></span>
+<span><span class="co">#&gt;  [1] "0.8"                 "0.5"                 "0.5ssv2"            </span></span>
+<span><span class="co">#&gt;  [4] "0.5ss"               "0.5env"              "0.7_software"       </span></span>
+<span><span class="co">#&gt;  [7] "0.7_software_cessda" "0.6a2a"              "0.4"                </span></span>
+<span><span class="co">#&gt; [10] "0.3"                 "0.2"</span></span>
 <span><span class="co"># v0.8 has 17 metrics across F/A/I/R (one row each):</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="fu"><a href="../reference/assess_fair.html">assess_fair</a></span><span class="op">(</span><span class="st">"https://doi.org/10.5281/zenodo.8347772"</span>, resolve <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] 17</span></span></code></pre></div>
@@ -314,16 +317,19 @@ reference.</p>
 <div class="section level2">
 <h2 id="fidelity-to-f-uji">5. Fidelity to F-UJI<a class="anchor" aria-label="anchor" href="#fidelity-to-f-uji"></a>
 </h2>
-<p>Because rfuji reimplements an existing scoring engine, it is
-validated against it. <code>tests/conformance/run.R</code> runs
-identifiers through both rfuji and a locally run F-UJI server and
-compares per-metric earned scores. On F-UJI 4.0.0 (metrics v0.8) the
-agreement is <strong>94.1% on a Zenodo DOI (16/17 metrics
-exact)</strong> and <strong>85.3%</strong> across PANGAEA and Dryad; the
-consistent divergence is the data file-format metric (F-UJI uses Tika
-content detection where rfuji uses an HTTP HEAD). A separate harness
-(<code>tests/conformance/parity.R</code>) confirms the R engine and the
-browser TypeScript engine agree 100% on registry-derivable metrics.</p>
+<p>Because rfuji reimplements an existing scoring engine, it includes a
+non-CRAN conformance harness. <code>tests/conformance/run.R</code> runs
+identifiers through both rfuji and a locally run, version-matched F-UJI
+server and compares per-metric earned scores. A manual run on 2026-06-16
+against F-UJI 4.0.0 (metrics v0.8) measured <strong>94.1% on a Zenodo
+DOI (16/17 metrics exact)</strong> and <strong>85.3%</strong> across
+PANGAEA and Dryad; the consistent divergence was the data file-format
+metric (F-UJI uses Tika content detection where rfuji uses an HTTP
+HEAD). This reference-server comparison is not reproduced by CI yet. A
+separate harness (<code>tests/conformance/parity.R</code>) compares the
+R engine with the browser TypeScript engine on registry-derivable
+metrics after the <code>webapp</code> branch is checked out alongside
+the package.</p>
 </div>
 <div class="section level2">
 <h2 id="beyond-f-uji">6. Beyond F-UJI<a class="anchor" aria-label="anchor" href="#beyond-f-uji"></a>

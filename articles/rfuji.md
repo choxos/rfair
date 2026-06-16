@@ -86,4 +86,3 @@ A no-install browser version is at
 <https://choxos.github.io/rfuji/app/>; because browsers cannot fetch
 landing pages cross-origin, it scores from registry metadata
 (DataCite/Crossref) only, so some metrics are lower than the R engine.
-\`\`\`

@@ -37,11 +37,13 @@ cat(as_fuji_json(a))
 #>     "object_identifier": "https://doi.org/10.5281/zenodo.8347772",
 #>     "metric_version": "0.8",
 #>     "use_datacite": true,
+#>     "metadata_service_endpoint": "",
+#>     "metadata_service_type": "",
 #>     "test_debug": false
 #>   },
-#>   "start_timestamp": "2026-06-16T21:09:48+0000",
-#>   "end_timestamp": "2026-06-16T21:09:52+0000",
-#>   "software_version": "2.1.0",
+#>   "start_timestamp": "2026-06-16T23:55:48+0000",
+#>   "end_timestamp": "2026-06-16T23:55:52+0000",
+#>   "software_version": "2.2.0",
 #>   "metric_version": "0.8",
 #>   "metric_specification": "https://doi.org/10.5281/zenodo.15045911",
 #>   "total_metrics": 17,
@@ -691,7 +693,7 @@ cat(as_fuji_json(a))
 #>           },
 #>           "metric_test_maturity": 1,
 #>           "metric_test_status": "pass",
-#>           "evidence": ["https://schema.org/SoftwareSourceCode", "Software", "SoftwareSourceCode"]
+#>           "evidence": ["https://schema.org/SoftwareSourceCode", "Software", "SoftwareSourceCode", "https://zenodo.org/records/8347772/files/pangaea-data-publisher/fuji-v2.2.5.zip"]
 #>         },
 #>         "FsF-R1-01M-2": {
 #>           "metric_test_identifier": "FsF-R1-01M-2",
@@ -703,7 +705,7 @@ cat(as_fuji_json(a))
 #>           },
 #>           "metric_test_maturity": 3,
 #>           "metric_test_status": "pass",
-#>           "evidence": "file type/size or data links"
+#>           "evidence": "file type/size, data links, or service endpoint"
 #>         },
 #>         "FsF-R1-01M-3": {
 #>           "metric_test_identifier": "FsF-R1-01M-3",
@@ -714,8 +716,8 @@ cat(as_fuji_json(a))
 #>             "total": 0
 #>           },
 #>           "metric_test_maturity": 3,
-#>           "metric_test_status": "fail",
-#>           "evidence": []
+#>           "metric_test_status": "pass",
+#>           "evidence": "declared content descriptor"
 #>         }
 #>       },
 #>       "test_status": "pass",

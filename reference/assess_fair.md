@@ -10,6 +10,8 @@ assess_fair(
   id,
   metric_version = "0.8",
   use_datacite = TRUE,
+  metadata_service_endpoint = NULL,
+  metadata_service_type = metadata_service_types(),
   test_debug = FALSE,
   resolve = TRUE,
   timeout = 15,
@@ -31,6 +33,16 @@ assess_fair(
 - use_datacite:
 
   Whether to query DataCite for registry metadata.
+
+- metadata_service_endpoint:
+
+  Optional metadata service endpoint or metadata document URL (for
+  example OAI-PMH, OGC CSW, SPARQL, DCAT, schema.org JSON-LD, DataCite,
+  Crossref, Signposting, typed links, RO-Crate, or CKAN).
+
+- metadata_service_type:
+
+  Type of `metadata_service_endpoint`.
 
 - test_debug:
 

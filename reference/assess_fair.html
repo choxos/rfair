@@ -9,7 +9,7 @@ against the FAIRsFAIR metrics, entirely in R."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">rfuji</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -46,6 +46,8 @@ against the FAIRsFAIR metrics, entirely in R.</p>
 <span>  <span class="va">id</span>,</span>
 <span>  metric_version <span class="op">=</span> <span class="st">"0.8"</span>,</span>
 <span>  use_datacite <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  metadata_service_endpoint <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  metadata_service_type <span class="op">=</span> <span class="fu">metadata_service_types</span><span class="op">(</span><span class="op">)</span>,</span>
 <span>  test_debug <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  resolve <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  timeout <span class="op">=</span> <span class="fl">15</span>,</span>
@@ -67,6 +69,17 @@ against the FAIRsFAIR metrics, entirely in R.</p>
 
 <dt id="arg-use-datacite">use_datacite<a class="anchor" aria-label="anchor" href="#arg-use-datacite"></a></dt>
 <dd><p>Whether to query DataCite for registry metadata.</p></dd>
+
+
+<dt id="arg-metadata-service-endpoint">metadata_service_endpoint<a class="anchor" aria-label="anchor" href="#arg-metadata-service-endpoint"></a></dt>
+<dd><p>Optional metadata service endpoint or
+metadata document URL (for example OAI-PMH, OGC CSW, SPARQL, DCAT,
+schema.org JSON-LD, DataCite, Crossref, Signposting, typed links,
+RO-Crate, or CKAN).</p></dd>
+
+
+<dt id="arg-metadata-service-type">metadata_service_type<a class="anchor" aria-label="anchor" href="#arg-metadata-service-type"></a></dt>
+<dd><p>Type of <code>metadata_service_endpoint</code>.</p></dd>
 
 
 <dt id="arg-test-debug">test_debug<a class="anchor" aria-label="anchor" href="#arg-test-debug"></a></dt>

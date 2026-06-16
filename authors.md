@@ -17,13 +17,13 @@ Source:
 [`DESCRIPTION`](https://github.com/choxos/rfuji/blob/main/DESCRIPTION)
 
 Sofi-Mahmudi A, Neumann S (2026). *rfuji: Assess the FAIRness of
-Research Data Objects*. R package version 2.1.0,
+Research Data Objects*. R package version 2.2.0,
 <https://github.com/choxos/rfuji>.
 
     @Manual{,
       title = {rfuji: Assess the FAIRness of Research Data Objects},
       author = {Ahmad Sofi-Mahmudi and Steffen Neumann},
       year = {2026},
-      note = {R package version 2.1.0},
+      note = {R package version 2.2.0},
       url = {https://github.com/choxos/rfuji},
     }

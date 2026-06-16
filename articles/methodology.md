@@ -101,7 +101,10 @@ logic.
 ``` r
 
 rfuji_metric_versions()      # bundled metric versions
-#> [1] "0.7_software" "0.8"
+#>  [1] "0.8"                 "0.5"                 "0.5ssv2"            
+#>  [4] "0.5ss"               "0.5env"              "0.7_software"       
+#>  [7] "0.7_software_cessda" "0.6a2a"              "0.4"                
+#> [10] "0.3"                 "0.2"
 # v0.8 has 17 metrics across F/A/I/R (one row each):
 nrow(as.data.frame(assess_fair("https://doi.org/10.5281/zenodo.8347772", resolve = FALSE)))
 #> [1] 17
@@ -172,15 +175,18 @@ upstream software-FAIR reference.
 
 ## 5. Fidelity to F-UJI
 
-Because rfuji reimplements an existing scoring engine, it is validated
-against it. `tests/conformance/run.R` runs identifiers through both
-rfuji and a locally run F-UJI server and compares per-metric earned
-scores. On F-UJI 4.0.0 (metrics v0.8) the agreement is **94.1% on a
-Zenodo DOI (16/17 metrics exact)** and **85.3%** across PANGAEA and
-Dryad; the consistent divergence is the data file-format metric (F-UJI
-uses Tika content detection where rfuji uses an HTTP HEAD). A separate
-harness (`tests/conformance/parity.R`) confirms the R engine and the
-browser TypeScript engine agree 100% on registry-derivable metrics.
+Because rfuji reimplements an existing scoring engine, it includes a
+non-CRAN conformance harness. `tests/conformance/run.R` runs identifiers
+through both rfuji and a locally run, version-matched F-UJI server and
+compares per-metric earned scores. A manual run on 2026-06-16 against
+F-UJI 4.0.0 (metrics v0.8) measured **94.1% on a Zenodo DOI (16/17
+metrics exact)** and **85.3%** across PANGAEA and Dryad; the consistent
+divergence was the data file-format metric (F-UJI uses Tika content
+detection where rfuji uses an HTTP HEAD). This reference-server
+comparison is not reproduced by CI yet. A separate harness
+(`tests/conformance/parity.R`) compares the R engine with the browser
+TypeScript engine on registry-derivable metrics after the `webapp`
+branch is checked out alongside the package.
 
 ## 6. Beyond F-UJI
 
