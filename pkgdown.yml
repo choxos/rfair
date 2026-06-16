@@ -1,0 +1,11 @@
+pandoc: 3.8.3
+pkgdown: 2.2.0
+pkgdown_sha: ~
+articles:
+  beyond-fuji: beyond-fuji.html
+  methodology: methodology.html
+  rfuji: rfuji.html
+last_built: 2026-06-16T19:59Z
+urls:
+  reference: https://choxos.github.io/rfuji/reference
+  article: https://choxos.github.io/rfuji/articles
