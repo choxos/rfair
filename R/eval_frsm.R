@@ -5,8 +5,8 @@
 # requirements, registry DOI, version, contributors, ...).
 
 .sw <- function(ctx) ctx$software %||% list()
-.p <- function(res, n, ev = NULL) crit_pass(res, paste0(res$metric_identifier, "-", n), evidence = ev)
-.def <- function(res, n) crit_is_defined(res, paste0(res$metric_identifier, "-", n))
+.p <- function(res, n, ev = NULL) crit_pass_suffix(res, paste0("-", n), evidence = ev)
+.def <- function(res, n) crit_is_defined_suffix(res, paste0("-", n))
 .semver <- function(v) is_nonempty_string(v) && grepl("^v?\\d+\\.\\d+", v)
 
 #' @noRd

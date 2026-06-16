@@ -29,6 +29,19 @@ test_that("as_fuji_json emits valid, schema-shaped JSON", {
   expect_equal(length(obj$results), a$total_metrics)
 })
 
+test_that("assess_fair records metadata service request options", {
+  a <- assess_fair(
+    "https://doi.org/10.5281/zenodo.8347772",
+    resolve = FALSE,
+    metadata_service_endpoint = "https://example.org/oai",
+    metadata_service_type = "oai_pmh",
+    use_datacite = FALSE
+  )
+  expect_false(a$request$use_datacite)
+  expect_equal(a$request$metadata_service_endpoint, "https://example.org/oai")
+  expect_equal(a$request$metadata_service_type, "oai_pmh")
+})
+
 test_that("print.fair_assessment is stable", {
   a <- assess_fair("https://doi.org/10.5281/zenodo.8347772", resolve = FALSE)
   expect_output(print(a), "fair_assessment")

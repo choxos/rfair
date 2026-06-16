@@ -32,13 +32,25 @@ write_min <- function(x, name, pretty = FALSE) {
 }
 
 ## metrics (parsed) ----------------------------------------------------------
-metrics_file <- file.path(pkg_root, "inst", "extdata", "metrics", "metrics_v0.8.yaml")
-metrics <- yaml::read_yaml(metrics_file)
-write_min(metrics, "metrics_v0.8.json", pretty = TRUE)
-
-# FRSM research-software metric set (for the web app's metric-set selector)
-sw_file <- file.path(pkg_root, "inst", "extdata", "metrics", "metrics_v0.7_software.yaml")
-write_min(yaml::read_yaml(sw_file), "metrics_v0.7_software.json", pretty = TRUE)
+metrics_dir <- file.path(pkg_root, "inst", "extdata", "metrics")
+metrics_files <- list.files(metrics_dir, pattern = "^metrics_v.*\\.yaml$", full.names = TRUE)
+metrics_files <- metrics_files[order(match(basename(metrics_files), c(
+  "metrics_v0.8.yaml",
+  "metrics_v0.5.yaml",
+  "metrics_v0.5ssv2.yaml",
+  "metrics_v0.5ss.yaml",
+  "metrics_v0.5env.yaml",
+  "metrics_v0.7_software.yaml",
+  "metrics_v0.7_software_cessda.yaml",
+  "metrics_v0.6a2a.yaml",
+  "metrics_v0.4.yaml",
+  "metrics_v0.3.yaml",
+  "metrics_v0.2.yaml"
+)), basename(metrics_files))]
+for (metrics_file in metrics_files) {
+  out_name <- sub("\\.yaml$", ".json", basename(metrics_file))
+  write_min(yaml::read_yaml(metrics_file), out_name, pretty = TRUE)
+}
 
 ## SPDX licenses (trimmed) ---------------------------------------------------
 spdx_min <- lapply(rfuji_data$spdx, function(L) list(
