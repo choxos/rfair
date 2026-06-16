@@ -30,7 +30,11 @@ jobs:
 
       - name: Install
         working-directory: webapp
-        run: npm ci
+        # npm install (not npm ci) so the Linux runner can reconcile the
+        # platform-specific optional native deps (rollup/esbuild) that an
+        # npm lockfile generated on macOS does not enumerate. Versions stay
+        # pinned by the committed lockfile; the audit step below still gates.
+        run: npm install --no-audit --no-fund
 
       - name: Security audit
         working-directory: webapp
