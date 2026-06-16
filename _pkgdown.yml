@@ -1,0 +1,36 @@
+url: https://choxos.github.io/rfuji
+
+template:
+  bootstrap: 5
+  bslib:
+    primary: "#118AB2"
+
+navbar:
+  structure:
+    left: [reference]
+    right: [search, github, webapp]
+  components:
+    webapp:
+      text: Web app
+      href: https://choxos.github.io/rfuji/app/
+
+reference:
+  - title: Assessment
+    contents:
+      - assess_fair
+      - as_fuji_json
+      - id_parse
+      - rfuji_metric_versions
+  - title: Beyond F-UJI (reuse, sensitivity, hygiene, FAIR-TLC)
+    contents:
+      - license_reuse
+      - classify_access
+      - reusabledata_rating
+      - identifier_hygiene
+      - fair_principles
+      - principle_definition
+      - fair_tlc
+      - as_rdf
+  - title: App
+    contents:
+      - launch_rfuji

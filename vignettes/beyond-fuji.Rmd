@@ -1,0 +1,84 @@
+---
+title: "Beyond F-UJI: reuse, sensitivity, hygiene, and FAIR-TLC"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Beyond F-UJI: reuse, sensitivity, hygiene, and FAIR-TLC}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(collapse = TRUE, comment = "#>")
+library(rfuji)
+```
+
+Automated FAIR tools have well-documented blind spots. In peer review of a
+COVID-19 FAIR-assessment study, the reviewer (Melissa Haendel) noted that such
+tools reward the *presence* of a license, an identifier, or a metadata field
+without checking whether the data is actually reusable, legitimately restricted,
+or properly identified. `rfuji` adds checks for exactly these.
+
+## A license can be present yet not open for reuse
+
+Detecting that a license exists says nothing about whether you may reuse the
+data. `license_reuse()` classifies the actual permissions, and maps each license
+to the six-category taxonomy of the [(Re)usable Data
+Project](https://reusabledata.org) (Carbon et al. 2019).
+
+```{r}
+license_reuse("https://creativecommons.org/licenses/by/4.0/")[c("category", "rdp_category", "facilitates_reuse")]
+license_reuse("https://creativecommons.org/licenses/by-nc-nd/4.0/")[c("category", "rdp_category", "facilitates_reuse")]
+```
+
+Only *permissive* licenses facilitate reuse without negotiation; CC-BY-NC-ND is
+present and standard, yet restrictive.
+
+## Controlled-access and sensitive data is not a FAIR failure
+
+Data behind a data-use agreement (e.g. human/clinical data) is legitimately
+restricted; it should be judged on metadata richness, not open download.
+`classify_access()` flags this, drawing on the (Re)usable Data Project
+curations.
+
+```{r}
+classify_access(access_level = "closedAccess",
+                urls = "https://www.ncbi.nlm.nih.gov/gap/?term=phs000424")[c("access", "controlled_access", "sensitive")]
+```
+
+## Identifier hygiene
+
+Layered identifiers (an identifier minted on top of another) and non-persistent
+identifiers reduce interoperability.
+
+```{r}
+identifier_hygiene("RRID:MGI:5577054")$issues
+identifier_hygiene("https://doi.org/10.5281/zenodo.8347772")$hygiene_ok
+```
+
+## FAIR-TLC: Traceable, Licensed, Connected
+
+The reviewer's own framework extends FAIR with three principles
+([Haendel et al., FAIR+](https://doi.org/10.5281/zenodo.203295)): data should be
+**Traceable** (provenance, attribution), **Licensed** (clearly and reusably),
+and **Connected** (qualified links to related entities). `fair_tlc()` computes
+these from an assessment.
+
+```{r, eval = FALSE}
+a <- assess_fair("https://doi.org/10.5281/zenodo.8347772")
+fair_tlc(a)
+#>   dimension                             indicator   met
+#> 1 Traceable                         T1 Provenance  TRUE
+#> 2 Traceable                        T2 Attribution  TRUE
+#> 3  Licensed L1 Documented & minimally restrictive  TRUE
+#> 4  Licensed           L2 Flowthrough transparency  TRUE
+#> 5 Connected                      C1 Connectedness  TRUE
+```
+
+## The canonical FAIR principles
+
+For reference, the authoritative principle definitions (from the FAIR-nanopubs
+vocabulary used by go-fair.org):
+
+```{r}
+head(fair_principles(), 4)
+```

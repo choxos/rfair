@@ -33,3 +33,16 @@ vignettes/*.pdf
 # Temporary files created by R markdown
 *.utf8.md
 *.knit.md
+
+# OS / editor / build artifacts
+.DS_Store
+**/.DS_Store
+*.tsbuildinfo
+.Rproj.user
+
+# Bulky third-party reference material (source papers + repos used to build the
+# package; kept locally, not part of the published package -- see .Rbuildignore)
+/comments/
+
+# Local fuji reference server venv (for tests/conformance)
+.venv_rfuji/

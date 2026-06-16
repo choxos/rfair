@@ -1,0 +1,53 @@
+name: deploy-app
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "webapp/**"
+      - "inst/extdata/web/**"
+      - ".github/workflows/deploy-app.yaml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pages-app
+  cancel-in-progress: true
+
+jobs:
+  build-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: webapp/package-lock.json
+
+      - name: Install
+        working-directory: webapp
+        run: npm ci
+
+      - name: Security audit
+        working-directory: webapp
+        run: npm audit --audit-level=high
+
+      - name: Sync reference data + typecheck + test + build
+        working-directory: webapp
+        run: |
+          npm run sync-data
+          npm run typecheck
+          npm test
+          npm run build
+
+      - name: Deploy to gh-pages /app
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: webapp/dist
+          destination_dir: app
+          keep_files: true   # preserve the pkgdown site at the gh-pages root
