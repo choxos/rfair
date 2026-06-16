@@ -36,6 +36,10 @@ metrics_file <- file.path(pkg_root, "inst", "extdata", "metrics", "metrics_v0.8.
 metrics <- yaml::read_yaml(metrics_file)
 write_min(metrics, "metrics_v0.8.json", pretty = TRUE)
 
+# FRSM research-software metric set (for the web app's metric-set selector)
+sw_file <- file.path(pkg_root, "inst", "extdata", "metrics", "metrics_v0.7_software.yaml")
+write_min(yaml::read_yaml(sw_file), "metrics_v0.7_software.json", pretty = TRUE)
+
 ## SPDX licenses (trimmed) ---------------------------------------------------
 spdx_min <- lapply(rfuji_data$spdx, function(L) list(
   licenseId = L$licenseId, name = L$name,
