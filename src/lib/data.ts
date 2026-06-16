@@ -1,3 +1,4 @@
+import { METRIC_SETS } from "./types";
 import type { RefData } from "./types";
 
 let cache: RefData | null = null;
@@ -8,14 +9,19 @@ export async function loadData(): Promise<RefData> {
   if (cache) return cache;
   const base = import.meta.env.BASE_URL;
   const get = (f: string) => fetch(`${base}data/${f}`).then((r) => r.json());
-  const [metrics, softwareMetrics, licenses, formats, access, protocols] = await Promise.all([
-    get("metrics_v0.8.json"),
-    get("metrics_v0.7_software.json"),
+  const metricEntries = await Promise.all(METRIC_SETS.map(async (m) => [
+    m.value,
+    await get(`metrics_v${m.value}.json`),
+  ] as const));
+  const metricSets = Object.fromEntries(metricEntries);
+  const [licenses, formats, access, protocols] = await Promise.all([
     get("licenses.json"),
     get("file_formats.json"),
     get("access_rights.json"),
     get("standard_protocols.json"),
   ]);
-  cache = { metrics, softwareMetrics, licenses, formats, access, protocols };
+  const metrics = metricSets["0.8"];
+  const softwareMetrics = metricSets["0.7_software"];
+  cache = { metrics, softwareMetrics, metricSets, licenses, formats, access, protocols };
   return cache;
 }

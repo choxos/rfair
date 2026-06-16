@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { loadData } from "./lib/data";
 import { assess } from "./lib/engine";
 import { useTheme } from "./lib/hooks";
-import type { Assessment, MetricVersion, RefData } from "./lib/types";
+import { METRIC_SETS, METADATA_SERVICE_TYPES } from "./lib/types";
+import type { Assessment, AssessmentOptions, MetadataServiceType, MetricVersion, RefData } from "./lib/types";
 import { Header } from "./components/Header";
 import { SearchPanel } from "./components/SearchPanel";
 import { EmptyState } from "./components/EmptyState";
@@ -24,13 +25,21 @@ function ResultSkeleton() {
   );
 }
 
-const isVersion = (v: string | null): v is MetricVersion => v === "0.8" || v === "0.7_software";
+const isVersion = (v: string | null): v is MetricVersion =>
+  !!v && METRIC_SETS.some((m) => m.value === v);
+const isServiceType = (v: string | null): v is MetadataServiceType =>
+  !!v && METADATA_SERVICE_TYPES.some((m) => m.value === v);
 
 export default function App() {
   const [theme, toggleTheme] = useTheme();
   const [data, setData] = useState<RefData | null>(null);
   const [pid, setPid] = useState("");
   const [version, setVersion] = useState<MetricVersion>("0.8");
+  const [options, setOptions] = useState<AssessmentOptions>({
+    useDatacite: true,
+    metadataServiceEndpoint: "",
+    metadataServiceType: "oai_pmh",
+  });
   const [result, setResult] = useState<Assessment | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -44,10 +53,17 @@ export default function App() {
         const set = params.get("set");
         const ver: MetricVersion = isVersion(set) ? set : "0.8";
         if (isVersion(set)) setVersion(ver);
+        const serviceType = params.get("service_type");
+        const nextOptions: AssessmentOptions = {
+          useDatacite: params.get("datacite") !== "0",
+          metadataServiceEndpoint: params.get("service") ?? "",
+          metadataServiceType: isServiceType(serviceType) ? serviceType : "oai_pmh",
+        };
+        setOptions(nextOptions);
         const q = params.get("doi");
         if (q) {
           setPid(q);
-          void run(q, d, ver);
+          void run(q, d, ver, nextOptions);
         }
       })
       .catch((e) => setError(`Failed to load reference data: ${e}`));
@@ -60,21 +76,30 @@ export default function App() {
     setError(null);
   }
 
-  async function run(id?: string, ref?: RefData, ver?: MetricVersion) {
+  async function run(id?: string, ref?: RefData, ver?: MetricVersion, opts?: AssessmentOptions) {
     const d = ref ?? data;
     const v = ver ?? version;
+    const o = opts ?? options;
     const target = (id ?? pid).trim();
     if (!d || !target) return;
     setLoading(true);
     setError(null);
     setResult(null);
     try {
-      const r = await assess(target, d, v);
+      const r = await assess(target, d, v, o);
       setResult(r);
       setTab("metrics");
       const u = new URL(location.href);
       u.searchParams.set("doi", target);
       u.searchParams.set("set", v);
+      u.searchParams.set("datacite", o.useDatacite ? "1" : "0");
+      if (o.metadataServiceEndpoint.trim()) {
+        u.searchParams.set("service", o.metadataServiceEndpoint.trim());
+        u.searchParams.set("service_type", o.metadataServiceType);
+      } else {
+        u.searchParams.delete("service");
+        u.searchParams.delete("service_type");
+      }
       history.replaceState(null, "", u);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -96,6 +121,8 @@ export default function App() {
           ready={!!data}
           version={version}
           setVersion={changeVersion}
+          options={options}
+          setOptions={setOptions}
         />
 
         {error && (

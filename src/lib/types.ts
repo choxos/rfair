@@ -82,6 +82,7 @@ export interface Assessment {
 export interface RefData {
   metrics: { config?: Record<string, unknown>; metrics: any[] };
   softwareMetrics: { config?: Record<string, unknown>; metrics: any[] };
+  metricSets?: Record<string, { config?: Record<string, unknown>; metrics: any[] }>;
   licenses: { licenseId: string; name: string; detailsUrl: string; isOsiApproved: boolean; seeAlso: string[] }[];
   formats: { science: string[]; long_term: string[]; open: string[] };
   access: { id: string; uri: string; access_condition: string }[];
@@ -89,12 +90,69 @@ export interface RefData {
 }
 
 /** Available metric sets the browser engine can score. */
-export type MetricVersion = "0.8" | "0.7_software";
+export type MetricVersion =
+  | "0.8"
+  | "0.5"
+  | "0.5ssv2"
+  | "0.5ss"
+  | "0.5env"
+  | "0.7_software"
+  | "0.7_software_cessda"
+  | "0.6a2a"
+  | "0.4"
+  | "0.3"
+  | "0.2";
 
 export const METRIC_SETS: { value: MetricVersion; label: string; short: string }[] = [
-  { value: "0.8", label: "FAIR Data — FsF v0.8", short: "Data" },
-  { value: "0.7_software", label: "Research Software — FRSM v0.7", short: "Software" },
+  { value: "0.8", label: "FsF Metrics v0.8 - Domain agnostic", short: "Data v0.8" },
+  { value: "0.5", label: "FsF Metrics v0.5 - Domain agnostic", short: "Data v0.5" },
+  { value: "0.5ssv2", label: "FsF Metrics v0.5 - Social Sciences full (beta)", short: "Social Sciences" },
+  { value: "0.5ss", label: "FsF Metrics v0.5 - Social Sciences part (beta)", short: "Social Sciences part" },
+  { value: "0.5env", label: "FsF Metrics v0.5 - Earth & Environmental Sciences (alpha)", short: "Earth & Env" },
+  { value: "0.7_software", label: "FRSM Metrics v0.7 - Software", short: "Software" },
+  { value: "0.7_software_cessda", label: "FRSM Metrics v0.7 - Software CESSDA", short: "Software CESSDA" },
+  { value: "0.6a2a", label: "FsF Metrics v0.6 A2A draft", short: "A2A" },
+  { value: "0.4", label: "FsF Metrics v0.4 legacy", short: "v0.4" },
+  { value: "0.3", label: "FsF Metrics v0.3 legacy", short: "v0.3" },
+  { value: "0.2", label: "FsF Metrics v0.2 legacy", short: "v0.2" },
 ];
+
+export const SOFTWARE_METRIC_VERSIONS = new Set<MetricVersion>(["0.7_software", "0.7_software_cessda"]);
+
+export type MetadataServiceType =
+  | "oai_pmh"
+  | "ogc_csw"
+  | "sparql"
+  | "dcat"
+  | "schema_org"
+  | "datacite"
+  | "crossref"
+  | "signposting"
+  | "typed_links"
+  | "ro_crate"
+  | "ckan"
+  | "other";
+
+export const METADATA_SERVICE_TYPES: { value: MetadataServiceType; label: string }[] = [
+  { value: "oai_pmh", label: "OAI-PMH" },
+  { value: "ogc_csw", label: "OGC CSW" },
+  { value: "sparql", label: "SPARQL" },
+  { value: "dcat", label: "DCAT catalog/document" },
+  { value: "schema_org", label: "schema.org JSON-LD" },
+  { value: "datacite", label: "DataCite API/content negotiation" },
+  { value: "crossref", label: "Crossref API" },
+  { value: "signposting", label: "Signposting" },
+  { value: "typed_links", label: "Typed links" },
+  { value: "ro_crate", label: "RO-Crate metadata" },
+  { value: "ckan", label: "CKAN API" },
+  { value: "other", label: "Other metadata document" },
+];
+
+export interface AssessmentOptions {
+  useDatacite: boolean;
+  metadataServiceEndpoint: string;
+  metadataServiceType: MetadataServiceType;
+}
 
 /** Software signals harvested from a code repository for the FRSM metrics. */
 export interface SoftwareSignals {
