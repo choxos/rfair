@@ -155,14 +155,17 @@ heuristic and not yet validated against an upstream software-FAIR reference.
 
 ## 5. Fidelity to F-UJI
 
-Because rfuji reimplements an existing scoring engine, it is validated against
-it. `tests/conformance/run.R` runs identifiers through both rfuji and a locally
-run F-UJI server and compares per-metric earned scores. On F-UJI 4.0.0
-(metrics v0.8) the agreement is **94.1% on a Zenodo DOI (16/17 metrics exact)**
-and **85.3%** across PANGAEA and Dryad; the consistent divergence is the data
+Because rfuji reimplements an existing scoring engine, it includes a
+non-CRAN conformance harness. `tests/conformance/run.R` runs identifiers through
+both rfuji and a locally run, version-matched F-UJI server and compares
+per-metric earned scores. A manual run on 2026-06-16 against F-UJI 4.0.0
+(metrics v0.8) measured **94.1% on a Zenodo DOI (16/17 metrics exact)** and
+**85.3%** across PANGAEA and Dryad; the consistent divergence was the data
 file-format metric (F-UJI uses Tika content detection where rfuji uses an HTTP
-HEAD). A separate harness (`tests/conformance/parity.R`) confirms the R engine
-and the browser TypeScript engine agree 100% on registry-derivable metrics.
+HEAD). This reference-server comparison is not reproduced by CI yet. A separate
+harness (`tests/conformance/parity.R`) compares the R engine with the browser
+TypeScript engine on registry-derivable metrics after the `webapp` branch is
+checked out alongside the package.
 
 ## 6. Beyond F-UJI
 

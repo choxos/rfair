@@ -94,7 +94,7 @@ historical manual runs that need a reference service to reproduce.
 **Verified by CI or a runnable local command (current checkout):**
 - [x] testthat suite (identifier, merge, scorer, assess, reuse, phase3, xml-signposting, shiny, frsm, integration, plot)
 - [x] R↔TS cross-engine parity harness (`tests/conformance/parity.R`) runs from a clean install: `esbuild` is an explicit `webapp` devDependency, the harness bundles `parity-entry.mts` and diffs registry-core metrics R vs TS
-- [x] GitHub Actions: `R-CMD-check.yaml` (mac/win/linux + devel), `pkgdown.yaml` (gh-pages root, `clean:false`), `deploy-app.yaml`; live site at `choxos.github.io/rfuji` + `/app`
+- [x] GitHub Actions: `R-CMD-check.yaml` (mac/win/linux + devel), `pkgdown.yaml` (gh-pages root, `clean:false`), and the `webapp` branch `.github/workflows/deploy.yaml` workflow (`deploy-app`); live site at `choxos.github.io/rfuji` + `/app`
 - [x] roxygen links resolve clean; README; vignettes (`rfuji`, `methodology`, `beyond-fuji`, `illustrating-fairness`); `fair_assessment` class + `plot` method docs; `R CMD build` succeeds
 
 **Historical / manual evidence (not reproduced by CI; needs a reference server):**
