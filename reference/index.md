@@ -24,6 +24,14 @@
 - [`summary(`*`<fair_assessment>`*`)`](https://choxos.github.io/rfuji/reference/summary.fair_assessment.md)
   : Summarize a FAIR assessment as an F/A/I/R score table.
 
+- [`plot(`*`<fair_assessment>`*`)`](https://choxos.github.io/rfuji/reference/plot.fair_assessment.md)
+  : Plot a FAIR assessment as a scorecard
+
+## Example data
+
+- [`fair_example`](https://choxos.github.io/rfuji/reference/fair_example.md)
+  : An example FAIR assessment
+
 ## Beyond F-UJI (reuse, sensitivity, hygiene, FAIR-TLC)
 
 - [`license_reuse()`](https://choxos.github.io/rfuji/reference/license_reuse.md)

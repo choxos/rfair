@@ -4,6 +4,7 @@
 <url><loc>https://choxos.github.io/rfuji/LICENSE.html</loc></url>
 <url><loc>https://choxos.github.io/rfuji/ROADMAP.html</loc></url>
 <url><loc>https://choxos.github.io/rfuji/articles/beyond-fuji.html</loc></url>
+<url><loc>https://choxos.github.io/rfuji/articles/illustrating-fairness.html</loc></url>
 <url><loc>https://choxos.github.io/rfuji/articles/index.html</loc></url>
 <url><loc>https://choxos.github.io/rfuji/articles/methodology.html</loc></url>
 <url><loc>https://choxos.github.io/rfuji/articles/rfuji.html</loc></url>
@@ -15,6 +16,7 @@
 <url><loc>https://choxos.github.io/rfuji/reference/assess_fair.html</loc></url>
 <url><loc>https://choxos.github.io/rfuji/reference/classify_access.html</loc></url>
 <url><loc>https://choxos.github.io/rfuji/reference/fair_assessment.html</loc></url>
+<url><loc>https://choxos.github.io/rfuji/reference/fair_example.html</loc></url>
 <url><loc>https://choxos.github.io/rfuji/reference/fair_principles.html</loc></url>
 <url><loc>https://choxos.github.io/rfuji/reference/fair_tlc.html</loc></url>
 <url><loc>https://choxos.github.io/rfuji/reference/id_parse.html</loc></url>
@@ -22,6 +24,7 @@
 <url><loc>https://choxos.github.io/rfuji/reference/index.html</loc></url>
 <url><loc>https://choxos.github.io/rfuji/reference/launch_rfuji.html</loc></url>
 <url><loc>https://choxos.github.io/rfuji/reference/license_reuse.html</loc></url>
+<url><loc>https://choxos.github.io/rfuji/reference/plot.fair_assessment.html</loc></url>
 <url><loc>https://choxos.github.io/rfuji/reference/principle_definition.html</loc></url>
 <url><loc>https://choxos.github.io/rfuji/reference/reusabledata_rating.html</loc></url>
 <url><loc>https://choxos.github.io/rfuji/reference/rfuji-package.html</loc></url>

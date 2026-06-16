@@ -152,103 +152,79 @@ shinytest2 smoke test (non-CRAN) once shinytest2 is installed
 Richer report export (docx/xlsx/csv) and the concentric two-ring donut
 (see Phase 6 design)
 
-## Phase 6 — JS/TS web app + gh-pages `[~]`
+## Phase 6 — JS/TS web app + gh-pages `[x]`
 
-`webapp/` (subdir on main, excluded from R build): React + TS + Vite +
-Tailwind
+The web app lives on its own **`webapp` branch** (app at the repo root),
+so the `main` branch is the R package only. It deploys to gh-pages
+`/app` from that branch; `main` carries only the R package + pkgdown
+docs (gh-pages root).
 
-Separate TS scoring engine (criterium engine + evaluators + scorer)
-reading `inst/extdata/web/*.json` (synced by `npm run sync-data`)
+Standalone `webapp` branch: React 19 + TypeScript + Vite 8 + Tailwind 4
 
-Client-side harvest from DataCite + Crossref (CORS-enabled); CORS
-landing-page limitation documented in UI + README
+Separate TS scoring engine (criterium engine + evaluators + scorer);
+reference JSON committed to the branch under `public/data` (regenerated
+from the package’s `inst/extdata/web` via `npm run sync-data` when the
+package is checked out alongside)
 
-UI: FAIR donut, category cards + maturity badges, per-metric accordion
-report, reuse/sensitivity/hygiene panels, harvested-metadata view, JSON
-download
+Client-side harvest from DataCite + Crossref + GitHub (CORS-enabled);
+CORS landing-page limitation documented in UI + README
 
-Build passes (164 KB JS / 53 KB gzip); engine validated live (Zenodo
-61.5%, figshare 53.8% — registry-only, matches R for registry-derivable
-metrics)
+Modern, minimal UI (not an f-uji.net replica): sticky header with
+light/dark toggle, hero search with example chips, “what is FAIR” empty
+state, loading skeleton, URL state (`?doi=`), share/copy/download
 
-`deploy-app.yaml` → gh-pages `/app` (`keep_files: true` preserves
-pkgdown root)
+**Concentric sunburst summary** (inner F/A/I/R ring + outer per-metric
+ring, opacity ∝ score, FAIR % in center) as the score hero
 
-Concentric two-ring donut (inner F/A/I/R + outer individual metrics,
-opacity ∝ score)
+Per-category ring cards + maturity badges, per-metric accordion,
+reuse/access/hygiene + FAIR-TLC panels, harvested-metadata view
 
-FAIR-TLC + RDP license category surfaced in the Reuse & access tab
+Vitest unit tests + typecheck + `npm audit` gate in the branch’s
+`deploy.yaml`; build clean (0 vulnerabilities)
 
-Client-side GitHub API harvest (api.github.com is CORS-enabled) for
-software objects
+Playwright browser e2e in CI (manual browse smoke done)
 
-Vitest unit tests + Playwright e2e in CI (R↔︎TS parity script exists in
-`tests/conformance/parity.R`)
-
-Deviation from plan: built as a `webapp/` subdir (not a separate branch)
-to avoid mid-session branch switching; functionally identical for
-gh-pages
-
-### Visual design (model on <https://www.f-uji.net> result page; improve on it)
-
-**Concentric donut** (Chart.js doughnut, two rings): inner ring =
-F/A/I/R categories, outer ring = the individual metrics with opacity
-proportional to score%; total score % in the center. Category colors F
-`#118AB2`, A `#06D6A0`, I `#FFD166`, R `#EF476F`.
-
-**Per-category cards**: small score donut + “earned of total” + a
-FAIR-level (maturity) badge. Maturity colors: incomplete `#fe7d37`,
-initial `#dfb317`, moderate `#97ca00`, advanced `#4c1` (0/1/2/3).
-
-**Accordion report**, one collapsible per metric: FAIR level (X of 3) +
-badge, score (earned/total), Output JSON, a metric-tests table (test id,
-name, score, maturity, pass/fail icon), and Debug messages (when
-test_debug).
-
-**Harvested-metadata** collapsible showing the unmerged source records
-(method, format, schema, namespaces, mapped fields) — rfuji already
-produces these in `metadata_unmerged`.
-
-Header summary card: resolved PID/URL, metric version + spec link,
-software version, JSON export button.
-
-rfuji additions beyond F-UJI’s page: reuse (open vs restrictive),
-controlled-access/sensitivity, identifier-hygiene panels; embeddable
-result JSON-LD (schema:Rating) like F-UJI emits.
-
-Note: the same donut + card components should back the Shiny app (Phase
-5) so the two UIs share a visual language.
+R↔︎TS parity: run `tests/conformance/parity.R` after materializing the
+app with `git worktree add webapp webapp` (esbuild is an explicit
+devDependency on the branch)
 
 ## Cross-cutting `[~]`
 
-testthat suite (identifier, merge, scorer, assess, reuse, phase3,
-xml-signposting, shiny)
+Status is split into what CI / a local command verifies *now*, versus
+historical manual runs that need a reference service to reproduce.
 
-**R↔︎TS cross-engine parity harness** (`tests/conformance/parity.R`):
-100% agreement on registry-core metrics (e.g. 30/30 over the
-5-identifier fixture set) — no drift between the two engines
+**Verified by CI or a runnable local command (current checkout):** -
+\[x\] testthat suite (identifier, merge, scorer, assess, reuse, phase3,
+xml-signposting, shiny, frsm, integration, plot) - \[x\] R↔︎TS
+cross-engine parity harness (`tests/conformance/parity.R`) runs from a
+clean install: `esbuild` is an explicit `webapp` devDependency, the
+harness bundles `parity-entry.mts` and diffs registry-core metrics R vs
+TS - \[x\] GitHub Actions: `R-CMD-check.yaml` (mac/win/linux + devel),
+`pkgdown.yaml` (gh-pages root, `clean:false`), `deploy-app.yaml`; live
+site at `choxos.github.io/rfuji` + `/app` - \[x\] roxygen links resolve
+clean; README; vignettes (`rfuji`, `methodology`, `beyond-fuji`,
+`illustrating-fairness`); `fair_assessment` class + `plot` method docs;
+`R CMD build` succeeds
 
-**Conformance vs upstream F-UJI 4.0.0 (metrics v0.8) — validated: 94.1%
-on Zenodo (16/17 metrics exact), 85.3% over PANGAEA+Dryad.** Only
-FsF-R1.3-02D (data file format) diverges (Tika vs HEAD). Meets the ≥85%
-gate.
+**Historical / manual evidence (not reproduced by CI; needs a reference
+server):** - \[~\] **Conformance vs upstream F-UJI 4.0.0 (metrics
+v0.8)**, measured manually on 2026-06-16 against a locally run F-UJI:
+94.1% on a Zenodo DOI (16/17 metrics exact), 85.3% over PANGAEA+Dryad;
+only FsF-R1.3-02D (data file format) diverged (Tika vs HEAD). Reproduce
+with `tests/conformance/run.R` after starting a local F-UJI at
+`localhost:1071`. CI does **not** start a reference server, so treat
+this as historical until automated. - \[~\] R↔︎TS parity previously
+measured 100% on the registry-core fixture set; the harness is runnable
+(above) but is not yet a CI gate.
 
-`httptest2` cassettes for full-pipeline replay (unit tests already
-offline via `resolve = FALSE`)
-
-GitHub Actions: `R-CMD-check.yaml` (mac/win/linux + devel),
-`pkgdown.yaml` (gh-pages root, `clean:false`), `deploy-app.yaml`;
-`_pkgdown.yml` (untested in CI until first push)
-
-roxygen links resolve clean; README rewritten; getting-started vignette
-(`vignettes/rfuji.Rmd`); `fair_assessment` class doc; `R CMD build`
-succeeds
-
-More vignettes (interpreting scores, reuse/sensitivity deep-dive)
-
-CRAN readiness: full `R CMD check` clean across platforms (network
-examples already `\donttest`/`\dontrun`); installed size check;
-`cran-comments.md`
+**Still open:** - \[ \] `httptest2` cassettes for full-pipeline replay
+(unit tests already offline via `resolve = FALSE`) - \[ \] Automate
+F-UJI conformance (containerized reference server) or archive a
+version-pinned conformance artifact, then promote the claim back to
+verified - \[ \] CRAN readiness: full strict `R CMD check` clean in an
+environment with all `Suggests` + system libs (`librdf`, `libmagic`)
+installed (the fallback check with `_R_CHECK_FORCE_SUGGESTS_=false` is
+clean); installed-size check
 
 ## Reviewer-driven extensions (Haendel review + comments/ folder) `[x]`
 

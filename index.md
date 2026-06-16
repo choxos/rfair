@@ -1,4 +1,4 @@
-# rfuji ![](https://img.shields.io/badge/FAIR-assessment-118AB2)
+# rfuji ![FAIR assessment](https://img.shields.io/badge/FAIR-assessment-118AB2)
 
 > Assess the FAIRness of research data objects, natively in R.
 

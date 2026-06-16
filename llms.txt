@@ -1,4 +1,4 @@
-# rfuji ![](https://img.shields.io/badge/FAIR-assessment-118AB2)
+# rfuji ![FAIR assessment](https://img.shields.io/badge/FAIR-assessment-118AB2)
 
 > Assess the FAIRness of research data objects, natively in R.
 
@@ -136,6 +136,14 @@ MIT © rfuji authors. See `LICENSE`.
 - [`summary(`*`<fair_assessment>`*`)`](https://choxos.github.io/rfuji/reference/summary.fair_assessment.md)
   : Summarize a FAIR assessment as an F/A/I/R score table.
 
+- [`plot(`*`<fair_assessment>`*`)`](https://choxos.github.io/rfuji/reference/plot.fair_assessment.md)
+  : Plot a FAIR assessment as a scorecard
+
+## Example data
+
+- [`fair_example`](https://choxos.github.io/rfuji/reference/fair_example.md)
+  : An example FAIR assessment
+
 ## Beyond F-UJI (reuse, sensitivity, hygiene, FAIR-TLC)
 
 - [`license_reuse()`](https://choxos.github.io/rfuji/reference/license_reuse.md)
@@ -166,6 +174,8 @@ MIT © rfuji authors. See `LICENSE`.
 
 - [Beyond F-UJI: reuse, sensitivity, hygiene, and
   FAIR-TLC](https://choxos.github.io/rfuji/articles/beyond-fuji.md):
+- [Illustrating and interpreting a FAIR
+  assessment](https://choxos.github.io/rfuji/articles/illustrating-fairness.md):
 - [How rfuji works: methodology and
   architecture](https://choxos.github.io/rfuji/articles/methodology.md):
 - [Getting started with

@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="index.html">rfuji</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.0.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.1.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -94,42 +94,27 @@
 <li><label><input type="checkbox">Richer report export (docx/xlsx/csv) and the concentric two-ring donut (see Phase 6 design)</label></li>
 </ul></div>
 <div class="section level2">
-<h2 id="phase-6--jsts-web-app--gh-pages-">Phase 6 — JS/TS web app + gh-pages <code>[~]</code>
-<a class="anchor" aria-label="anchor" href="#phase-6--jsts-web-app--gh-pages-"></a></h2>
-<ul class="task-list"><li><label><input type="checkbox" checked><code>webapp/</code> (subdir on main, excluded from R build): React + TS + Vite + Tailwind</label></li>
-<li><label><input type="checkbox" checked>Separate TS scoring engine (criterium engine + evaluators + scorer) reading <code>inst/extdata/web/*.json</code> (synced by <code>npm run sync-data</code>)</label></li>
-<li><label><input type="checkbox" checked>Client-side harvest from DataCite + Crossref (CORS-enabled); CORS landing-page limitation documented in UI + README</label></li>
-<li><label><input type="checkbox" checked>UI: FAIR donut, category cards + maturity badges, per-metric accordion report, reuse/sensitivity/hygiene panels, harvested-metadata view, JSON download</label></li>
-<li><label><input type="checkbox" checked>Build passes (164 KB JS / 53 KB gzip); engine validated live (Zenodo 61.5%, figshare 53.8% — registry-only, matches R for registry-derivable metrics)</label></li>
-<li><label><input type="checkbox" checked><code>deploy-app.yaml</code> → gh-pages <code>/app</code> (<code>keep_files: true</code> preserves pkgdown root)</label></li>
-<li><label><input type="checkbox" checked>Concentric two-ring donut (inner F/A/I/R + outer individual metrics, opacity ∝ score)</label></li>
-<li><label><input type="checkbox" checked>FAIR-TLC + RDP license category surfaced in the Reuse &amp; access tab</label></li>
-<li><label><input type="checkbox">Client-side GitHub API harvest (api.github.com is CORS-enabled) for software objects</label></li>
-<li><label><input type="checkbox">Vitest unit tests + Playwright e2e in CI (R↔︎TS parity script exists in <code>tests/conformance/parity.R</code>)</label></li>
-<li><label><input type="checkbox">Deviation from plan: built as a <code>webapp/</code> subdir (not a separate branch) to avoid mid-session branch switching; functionally identical for gh-pages</label></li>
-</ul><div class="section level3">
-<h3 id="visual-design-model-on-httpswwwf-ujinet-result-page-improve-on-it">Visual design (model on <a href="https://www.f-uji.net" class="external-link uri">https://www.f-uji.net</a> result page; improve on it)<a class="anchor" aria-label="anchor" href="#visual-design-model-on-httpswwwf-ujinet-result-page-improve-on-it"></a></h3>
-<ul><li><label><input type="checkbox"><strong>Concentric donut</strong> (Chart.js doughnut, two rings): inner ring = F/A/I/R categories, outer ring = the individual metrics with opacity proportional to score%; total score % in the center. Category colors F <code>#118AB2</code>, A <code>#06D6A0</code>, I <code>#FFD166</code>, R <code>#EF476F</code>.</label></li>
-<li><label><input type="checkbox"><strong>Per-category cards</strong>: small score donut + “earned of total” + a FAIR-level (maturity) badge. Maturity colors: incomplete <code>#fe7d37</code>, initial <code>#dfb317</code>, moderate <code>#97ca00</code>, advanced <code>#4c1</code> (0/1/2/3).</label></li>
-<li><label><input type="checkbox"><strong>Accordion report</strong>, one collapsible per metric: FAIR level (X of 3) + badge, score (earned/total), Output JSON, a metric-tests table (test id, name, score, maturity, pass/fail icon), and Debug messages (when test_debug).</label></li>
-<li><label><input type="checkbox"><strong>Harvested-metadata</strong> collapsible showing the unmerged source records (method, format, schema, namespaces, mapped fields) — rfuji already produces these in <code>metadata_unmerged</code>.</label></li>
-<li><label><input type="checkbox">Header summary card: resolved PID/URL, metric version + spec link, software version, JSON export button.</label></li>
-<li><label><input type="checkbox">rfuji additions beyond F-UJI’s page: reuse (open vs restrictive), controlled-access/sensitivity, identifier-hygiene panels; embeddable result JSON-LD (schema:Rating) like F-UJI emits.</label></li>
-<li>Note: the same donut + card components should back the Shiny app (Phase 5) so the two UIs share a visual language.</li>
+<h2 id="phase-6--jsts-web-app--gh-pages-x">Phase 6 — JS/TS web app + gh-pages <code>[x]</code>
+<a class="anchor" aria-label="anchor" href="#phase-6--jsts-web-app--gh-pages-x"></a></h2>
+<p>The web app lives on its own <strong><code>webapp</code> branch</strong> (app at the repo root), so the <code>main</code> branch is the R package only. It deploys to gh-pages <code>/app</code> from that branch; <code>main</code> carries only the R package + pkgdown docs (gh-pages root).</p>
+<ul><li><label><input type="checkbox" checked>Standalone <code>webapp</code> branch: React 19 + TypeScript + Vite 8 + Tailwind 4</label></li>
+<li><label><input type="checkbox" checked>Separate TS scoring engine (criterium engine + evaluators + scorer); reference JSON committed to the branch under <code>public/data</code> (regenerated from the package’s <code>inst/extdata/web</code> via <code>npm run sync-data</code> when the package is checked out alongside)</label></li>
+<li><label><input type="checkbox" checked>Client-side harvest from DataCite + Crossref + GitHub (CORS-enabled); CORS landing-page limitation documented in UI + README</label></li>
+<li><label><input type="checkbox" checked>Modern, minimal UI (not an f-uji.net replica): sticky header with light/dark toggle, hero search with example chips, “what is FAIR” empty state, loading skeleton, URL state (<code>?doi=</code>), share/copy/download</label></li>
+<li><label><input type="checkbox" checked><strong>Concentric sunburst summary</strong> (inner F/A/I/R ring + outer per-metric ring, opacity ∝ score, FAIR % in center) as the score hero</label></li>
+<li><label><input type="checkbox" checked>Per-category ring cards + maturity badges, per-metric accordion, reuse/access/hygiene + FAIR-TLC panels, harvested-metadata view</label></li>
+<li><label><input type="checkbox" checked>Vitest unit tests + typecheck + <code>npm audit</code> gate in the branch’s <code>deploy.yaml</code>; build clean (0 vulnerabilities)</label></li>
+<li><label><input type="checkbox">Playwright browser e2e in CI (manual browse smoke done)</label></li>
+<li>R↔︎TS parity: run <code>tests/conformance/parity.R</code> after materializing the app with <code>git worktree add webapp webapp</code> (esbuild is an explicit devDependency on the branch)</li>
 </ul></div>
-</div>
 <div class="section level2">
 <h2 id="cross-cutting-">Cross-cutting <code>[~]</code>
 <a class="anchor" aria-label="anchor" href="#cross-cutting-"></a></h2>
-<ul class="task-list"><li><label><input type="checkbox" checked>testthat suite (identifier, merge, scorer, assess, reuse, phase3, xml-signposting, shiny)</label></li>
-<li><label><input type="checkbox" checked><strong>R↔︎TS cross-engine parity harness</strong> (<code>tests/conformance/parity.R</code>): 100% agreement on registry-core metrics (e.g. 30/30 over the 5-identifier fixture set) — no drift between the two engines</label></li>
-<li><label><input type="checkbox" checked><strong>Conformance vs upstream F-UJI 4.0.0 (metrics v0.8) — validated: 94.1% on Zenodo (16/17 metrics exact), 85.3% over PANGAEA+Dryad.</strong> Only FsF-R1.3-02D (data file format) diverges (Tika vs HEAD). Meets the ≥85% gate.</label></li>
-<li><label><input type="checkbox"><code>httptest2</code> cassettes for full-pipeline replay (unit tests already offline via <code>resolve = FALSE</code>)</label></li>
-<li><label><input type="checkbox" checked>GitHub Actions: <code>R-CMD-check.yaml</code> (mac/win/linux + devel), <code>pkgdown.yaml</code> (gh-pages root, <code>clean:false</code>), <code>deploy-app.yaml</code>; <code>_pkgdown.yml</code> (untested in CI until first push)</label></li>
-<li><label><input type="checkbox" checked>roxygen links resolve clean; README rewritten; getting-started vignette (<code>vignettes/rfuji.Rmd</code>); <code>fair_assessment</code> class doc; <code>R CMD build</code> succeeds</label></li>
-<li><label><input type="checkbox">More vignettes (interpreting scores, reuse/sensitivity deep-dive)</label></li>
-<li><label><input type="checkbox">CRAN readiness: full <code>R CMD check</code> clean across platforms (network examples already <code>\donttest</code>/<code>\dontrun</code>); installed size check; <code>cran-comments.md</code></label></li>
-</ul></div>
+<p>Status is split into what CI / a local command verifies <em>now</em>, versus historical manual runs that need a reference service to reproduce.</p>
+<p><strong>Verified by CI or a runnable local command (current checkout):</strong> - [x] testthat suite (identifier, merge, scorer, assess, reuse, phase3, xml-signposting, shiny, frsm, integration, plot) - [x] R↔︎TS cross-engine parity harness (<code>tests/conformance/parity.R</code>) runs from a clean install: <code>esbuild</code> is an explicit <code>webapp</code> devDependency, the harness bundles <code>parity-entry.mts</code> and diffs registry-core metrics R vs TS - [x] GitHub Actions: <code>R-CMD-check.yaml</code> (mac/win/linux + devel), <code>pkgdown.yaml</code> (gh-pages root, <code>clean:false</code>), <code>deploy-app.yaml</code>; live site at <code>choxos.github.io/rfuji</code> + <code>/app</code> - [x] roxygen links resolve clean; README; vignettes (<code>rfuji</code>, <code>methodology</code>, <code>beyond-fuji</code>, <code>illustrating-fairness</code>); <code>fair_assessment</code> class + <code>plot</code> method docs; <code>R CMD build</code> succeeds</p>
+<p><strong>Historical / manual evidence (not reproduced by CI; needs a reference server):</strong> - [~] <strong>Conformance vs upstream F-UJI 4.0.0 (metrics v0.8)</strong>, measured manually on 2026-06-16 against a locally run F-UJI: 94.1% on a Zenodo DOI (16/17 metrics exact), 85.3% over PANGAEA+Dryad; only FsF-R1.3-02D (data file format) diverged (Tika vs HEAD). Reproduce with <code>tests/conformance/run.R</code> after starting a local F-UJI at <code>localhost:1071</code>. CI does <strong>not</strong> start a reference server, so treat this as historical until automated. - [~] R↔︎TS parity previously measured 100% on the registry-core fixture set; the harness is runnable (above) but is not yet a CI gate.</p>
+<p><strong>Still open:</strong> - [ ] <code>httptest2</code> cassettes for full-pipeline replay (unit tests already offline via <code>resolve = FALSE</code>) - [ ] Automate F-UJI conformance (containerized reference server) or archive a version-pinned conformance artifact, then promote the claim back to verified - [ ] CRAN readiness: full strict <code>R CMD check</code> clean in an environment with all <code>Suggests</code> + system libs (<code>librdf</code>, <code>libmagic</code>) installed (the fallback check with <code>_R_CHECK_FORCE_SUGGESTS_=false</code> is clean); installed-size check</p>
+</div>
 <div class="section level2">
 <h2 id="reviewer-driven-extensions-haendel-review--comments-folder-x">Reviewer-driven extensions (Haendel review + comments/ folder) <code>[x]</code>
 <a class="anchor" aria-label="anchor" href="#reviewer-driven-extensions-haendel-review--comments-folder-x"></a></h2>

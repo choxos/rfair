@@ -1,4 +1,4 @@
 # License
 
     YEAR: 2026
-    COPYRIGHT HOLDER: rfuji authors
+    COPYRIGHT HOLDER: Ahmad Sofi-Mahmudi
