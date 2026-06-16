@@ -26,6 +26,10 @@ reference:
       - fair_assessment
       - as.data.frame.fair_assessment
       - summary.fair_assessment
+      - plot.fair_assessment
+  - title: Example data
+    contents:
+      - fair_example
   - title: Beyond F-UJI (reuse, sensitivity, hygiene, FAIR-TLC)
     contents:
       - license_reuse

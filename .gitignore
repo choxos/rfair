@@ -46,3 +46,4 @@ vignettes/*.pdf
 
 # Local fuji reference server venv (for tests/conformance)
 .venv_rfuji/
+.gstack/
