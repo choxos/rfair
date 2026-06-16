@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { loadData } from "./lib/data";
 import { assess } from "./lib/engine";
 import { useTheme } from "./lib/hooks";
-import type { Assessment, RefData } from "./lib/types";
+import type { Assessment, MetricVersion, RefData } from "./lib/types";
 import { Header } from "./components/Header";
 import { SearchPanel } from "./components/SearchPanel";
 import { EmptyState } from "./components/EmptyState";
@@ -24,10 +24,13 @@ function ResultSkeleton() {
   );
 }
 
+const isVersion = (v: string | null): v is MetricVersion => v === "0.8" || v === "0.7_software";
+
 export default function App() {
   const [theme, toggleTheme] = useTheme();
   const [data, setData] = useState<RefData | null>(null);
   const [pid, setPid] = useState("");
+  const [version, setVersion] = useState<MetricVersion>("0.8");
   const [result, setResult] = useState<Assessment | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,32 +40,44 @@ export default function App() {
     loadData()
       .then((d) => {
         setData(d);
-        const q = new URLSearchParams(location.search).get("doi");
+        const params = new URLSearchParams(location.search);
+        const set = params.get("set");
+        const ver: MetricVersion = isVersion(set) ? set : "0.8";
+        if (isVersion(set)) setVersion(ver);
+        const q = params.get("doi");
         if (q) {
           setPid(q);
-          void run(q, d);
+          void run(q, d, ver);
         }
       })
       .catch((e) => setError(`Failed to load reference data: ${e}`));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  async function run(id?: string, ref?: RefData) {
+  function changeVersion(v: MetricVersion) {
+    setVersion(v);
+    setResult(null);
+    setError(null);
+  }
+
+  async function run(id?: string, ref?: RefData, ver?: MetricVersion) {
     const d = ref ?? data;
+    const v = ver ?? version;
     const target = (id ?? pid).trim();
     if (!d || !target) return;
     setLoading(true);
     setError(null);
     setResult(null);
     try {
-      const r = await assess(target, d);
+      const r = await assess(target, d, v);
       setResult(r);
       setTab("metrics");
       const u = new URL(location.href);
       u.searchParams.set("doi", target);
+      u.searchParams.set("set", v);
       history.replaceState(null, "", u);
     } catch (e) {
-      setError(String(e));
+      setError(e instanceof Error ? e.message : String(e));
     } finally {
       setLoading(false);
     }
@@ -73,7 +88,15 @@ export default function App() {
       <Header theme={theme} onToggle={toggleTheme} />
 
       <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8 sm:px-6 sm:py-12">
-        <SearchPanel pid={pid} setPid={setPid} onRun={run} loading={loading} ready={!!data} />
+        <SearchPanel
+          pid={pid}
+          setPid={setPid}
+          onRun={run}
+          loading={loading}
+          ready={!!data}
+          version={version}
+          setVersion={changeVersion}
+        />
 
         {error && (
           <div role="alert" className="mx-auto mt-6 max-w-3xl rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-700 dark:border-rose-500/30 dark:bg-rose-500/10 dark:text-rose-300">

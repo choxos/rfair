@@ -1,4 +1,4 @@
-import type { Reference } from "./types";
+import type { Reference, SoftwareSignals } from "./types";
 
 // In the browser we can only reach CORS-enabled registry APIs (DataCite,
 // Crossref). Landing-page harvesting (embedded JSON-LD, RDF/XML) is blocked by
@@ -86,6 +86,81 @@ function mapCrossref(m: any, doi: string, out: Reference) {
   if (lic.length) out.license = lic;
   const links = (m.link ?? []).map((l: any) => ({ url: l.URL })).filter((l: any) => l.url);
   if (links.length) out.object_content_identifier = links;
+}
+
+export interface SoftwareHarvest {
+  signals: SoftwareSignals;
+  metadata: Reference;
+  sources: { source: string; method: string }[];
+  resolved: string | null;
+}
+
+const getJson = (u: string): Promise<any> =>
+  fetch(u).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+const getText = (u: string): Promise<string> =>
+  fetch(u).then((r) => (r.ok ? r.text() : "")).catch(() => "");
+
+// Harvest the software signals the FRSM metrics need from a GitHub repository
+// (ports collect_github.R::harvest_software_signals). GitHub's API is
+// CORS-enabled, so this runs client-side.
+export async function harvestSoftware(gh: { owner: string; repo: string }): Promise<SoftwareHarvest> {
+  const api = `https://api.github.com/repos/${gh.owner}/${gh.repo}`;
+  const j = await getJson(api);
+  if (!j) throw new Error("Could not read that GitHub repository (check the URL, or GitHub's rate limit).");
+
+  const branch = j.default_branch || "main";
+  const sig: SoftwareSignals = {
+    identifier: j.html_url, name: j.name, description: j.description ?? undefined,
+    language: j.language ?? undefined, topics: j.topics ?? [], contributors: 0,
+    has_license: !!(j.license && j.license.spdx_id && j.license.spdx_id !== "NOASSERTION"),
+    has_readme: false, has_citation: false, has_tests: false, has_ci: false,
+    has_requirements: false, has_docs: false, has_api: false,
+  };
+
+  const tree = await getJson(`${api}/git/trees/${branch}?recursive=1`);
+  const paths: string[] = (tree?.tree ?? []).map((t: any) => String(t.path ?? "").toLowerCase());
+  const any = (re: RegExp) => paths.some((p) => re.test(p));
+  sig.has_license = sig.has_license || any(/^licen[sc]e/);
+  sig.has_readme = any(/^readme/);
+  sig.has_citation = any(/^citation\.cff|^codemeta\.json/);
+  sig.has_tests = any(/(^|\/)tests?(\/|$)|(^|\/)test_|_test\.|\.test\./);
+  sig.has_ci = any(/^\.github\/workflows\/|^\.travis|^\.circleci|^azure-pipelines|^\.gitlab-ci/);
+  sig.has_requirements = any(/^(requirements.*\.txt|setup\.py|setup\.cfg|pyproject\.toml|package\.json|description|environment\.ya?ml|renv\.lock|cargo\.toml|go\.mod|pom\.xml|build\.gradle)$/);
+  sig.has_docs = any(/^docs?\/|readthedocs|mkdocs\.ya?ml/);
+  sig.has_api = any(/openapi|swagger|\.proto$|graphql/);
+
+  const contrib = await getJson(`${api}/contributors?per_page=100`);
+  sig.contributors = Array.isArray(contrib) ? contrib.length : 0;
+
+  const rel = await getJson(`${api}/releases/latest`);
+  sig.version = rel?.tag_name || undefined;
+
+  if (sig.has_citation) {
+    const base = `https://raw.githubusercontent.com/${gh.owner}/${gh.repo}/${branch}`;
+    const txt = (await getText(`${base}/codemeta.json`)) + "\n" + (await getText(`${base}/CITATION.cff`));
+    const dm = txt.match(/10\.\d{4,9}\/[^\s"'<>,)]+/);
+    if (dm) sig.registry_doi = dm[0];
+    if (!sig.version) {
+      const vm = txt.match(/"?version"?\s*[:=]\s*"?v?(\d+\.\d+[^\s",}]*)/i);
+      if (vm) sig.version = vm[1];
+    }
+  }
+
+  const metadata: Reference = {
+    object_identifier: j.html_url, title: j.name, summary: j.description ?? undefined,
+    object_type: "Software", creator: j.owner?.login ? [j.owner.login] : undefined,
+    publisher: j.owner?.login, access_level: ["public"],
+  };
+  if (j.topics?.length) metadata.keywords = j.topics;
+  const spdx = j.license?.spdx_id;
+  if (spdx && spdx !== "NOASSERTION") metadata.license = [spdx];
+  if (sig.version) metadata.version = sig.version;
+  if (sig.language) metadata.language = sig.language;
+  if (sig.registry_doi) {
+    metadata.related_resources = [{ related_resource: sig.registry_doi, relation_type: "IsSupplementTo" }];
+  }
+
+  return { signals: sig, metadata, sources: [{ source: "GitHub", method: "content_negotiation" }], resolved: j.html_url };
 }
 
 export interface Harvested {

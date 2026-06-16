@@ -8,13 +8,14 @@ export async function loadData(): Promise<RefData> {
   if (cache) return cache;
   const base = import.meta.env.BASE_URL;
   const get = (f: string) => fetch(`${base}data/${f}`).then((r) => r.json());
-  const [metrics, licenses, formats, access, protocols] = await Promise.all([
+  const [metrics, softwareMetrics, licenses, formats, access, protocols] = await Promise.all([
     get("metrics_v0.8.json"),
+    get("metrics_v0.7_software.json"),
     get("licenses.json"),
     get("file_formats.json"),
     get("access_rights.json"),
     get("standard_protocols.json"),
   ]);
-  cache = { metrics, licenses, formats, access, protocols };
+  cache = { metrics, softwareMetrics, licenses, formats, access, protocols };
   return cache;
 }

@@ -1,9 +1,18 @@
-const EXAMPLES: { label: string; id: string }[] = [
-  { label: "Zenodo", id: "https://doi.org/10.5281/zenodo.8347772" },
-  { label: "PANGAEA", id: "https://doi.org/10.1594/PANGAEA.908011" },
-  { label: "Dryad", id: "https://doi.org/10.5061/dryad.q573n5tj9" },
-  { label: "GitHub repo", id: "https://github.com/pangaea-data-publisher/fuji" },
-];
+import { METRIC_SETS, type MetricVersion } from "../lib/types";
+
+const EXAMPLES: Record<MetricVersion, { label: string; id: string }[]> = {
+  "0.8": [
+    { label: "Zenodo", id: "https://doi.org/10.5281/zenodo.8347772" },
+    { label: "PANGAEA", id: "https://doi.org/10.1594/PANGAEA.908011" },
+    { label: "Dryad", id: "https://doi.org/10.5061/dryad.q573n5tj9" },
+    { label: "GitHub repo", id: "https://github.com/pangaea-data-publisher/fuji" },
+  ],
+  "0.7_software": [
+    { label: "F-UJI", id: "https://github.com/pangaea-data-publisher/fuji" },
+    { label: "rfuji", id: "https://github.com/choxos/rfuji" },
+    { label: "datacite", id: "https://github.com/datacite/datacite" },
+  ],
+};
 
 export function SearchPanel({
   pid,
@@ -11,32 +20,53 @@ export function SearchPanel({
   onRun,
   loading,
   ready,
+  version,
+  setVersion,
 }: {
   pid: string;
   setPid: (s: string) => void;
   onRun: (id?: string) => void;
   loading: boolean;
   ready: boolean;
+  version: MetricVersion;
+  setVersion: (v: MetricVersion) => void;
 }) {
+  const software = version === "0.7_software";
   return (
     <section className="mx-auto max-w-3xl text-center">
       <h1 className="bg-gradient-to-br from-slate-900 to-slate-500 bg-clip-text text-3xl font-extrabold tracking-tight text-transparent sm:text-4xl dark:from-white dark:to-slate-400">
-        How FAIR is your research data?
+        How FAIR is your {software ? "research software" : "research data"}?
       </h1>
       <p className="mx-auto mt-3 max-w-xl text-sm text-slate-500 dark:text-slate-400">
-        Paste a DOI, persistent identifier, or URL. rfuji scores it against the
-        F-UJI FAIR metrics, entirely in your browser.
+        {software
+          ? "Paste a code repository URL. rfuji scores it against the FRSM (FAIR for Research Software) metrics, in your browser."
+          : "Paste a DOI, persistent identifier, or URL. rfuji scores it against the F-UJI FAIR metrics, in your browser."}
       </p>
 
       <div className="card mt-6 p-2 text-left shadow-md">
+        <div className="mb-2 flex items-center gap-2 px-1 pt-1">
+          <label htmlFor="metric-set" className="text-xs font-medium text-slate-400">
+            Metric set
+          </label>
+          <select
+            id="metric-set"
+            value={version}
+            onChange={(e) => setVersion(e.target.value as MetricVersion)}
+            className="rounded-lg border border-slate-200 bg-white/70 px-2 py-1 text-xs font-medium text-slate-600 outline-none focus:border-fair-f dark:border-white/10 dark:bg-white/5 dark:text-slate-300"
+          >
+            {METRIC_SETS.map((m) => (
+              <option key={m.value} value={m.value}>{m.label}</option>
+            ))}
+          </select>
+        </div>
         <div className="flex flex-col gap-2 sm:flex-row">
           <input
             className="min-w-0 flex-1 rounded-xl bg-transparent px-4 py-3 text-sm outline-none placeholder:text-slate-400"
             value={pid}
             onChange={(e) => setPid(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && onRun()}
-            placeholder="https://doi.org/10.5281/zenodo.8347772"
-            aria-label="Research data object identifier"
+            placeholder={software ? "https://github.com/owner/repo" : "https://doi.org/10.5281/zenodo.8347772"}
+            aria-label={software ? "Code repository URL" : "Research data object identifier"}
             autoFocus
           />
           <button
@@ -51,7 +81,7 @@ export function SearchPanel({
 
       <div className="mt-3 flex flex-wrap items-center justify-center gap-2 text-xs">
         <span className="text-slate-400">Try:</span>
-        {EXAMPLES.map((ex) => (
+        {EXAMPLES[version].map((ex) => (
           <button
             key={ex.id}
             onClick={() => {

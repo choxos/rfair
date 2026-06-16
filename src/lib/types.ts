@@ -81,8 +81,37 @@ export interface Assessment {
 
 export interface RefData {
   metrics: { config?: Record<string, unknown>; metrics: any[] };
+  softwareMetrics: { config?: Record<string, unknown>; metrics: any[] };
   licenses: { licenseId: string; name: string; detailsUrl: string; isOsiApproved: boolean; seeAlso: string[] }[];
   formats: { science: string[]; long_term: string[]; open: string[] };
   access: { id: string; uri: string; access_condition: string }[];
   protocols: Record<string, { name?: string; auth?: string }>;
+}
+
+/** Available metric sets the browser engine can score. */
+export type MetricVersion = "0.8" | "0.7_software";
+
+export const METRIC_SETS: { value: MetricVersion; label: string; short: string }[] = [
+  { value: "0.8", label: "FAIR Data — FsF v0.8", short: "Data" },
+  { value: "0.7_software", label: "Research Software — FRSM v0.7", short: "Software" },
+];
+
+/** Software signals harvested from a code repository for the FRSM metrics. */
+export interface SoftwareSignals {
+  identifier?: string;
+  version?: string;
+  registry_doi?: string;
+  name?: string;
+  description?: string;
+  language?: string;
+  topics: string[];
+  contributors: number;
+  has_license: boolean;
+  has_readme: boolean;
+  has_citation: boolean;
+  has_tests: boolean;
+  has_ci: boolean;
+  has_requirements: boolean;
+  has_docs: boolean;
+  has_api: boolean;
 }

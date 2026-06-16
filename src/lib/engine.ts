@@ -1,5 +1,5 @@
-import type { Assessment, CategoryScore, MetricResult, MetricTest, Reference, RefData } from "./types";
-import { harvest } from "./harvest";
+import type { Assessment, CategoryScore, MetricResult, MetricTest, MetricVersion, Reference, RefData, SoftwareSignals } from "./types";
+import { harvest, harvestSoftware, parseGithub } from "./harvest";
 import { reuseFromMetadata, classifyAccess, identifierHygiene, fairTlc } from "./reuse";
 
 // Engine state for one assessment.
@@ -139,6 +139,91 @@ function runEvaluator(mid: string, e: Eval, ctx: Ctx, data: RefData) {
   }
 }
 
+// FRSM (research software) evaluators, scoring from harvested repository
+// signals. Ports R/eval_frsm.R; `pass(e, "<mid>-<n>")` matches the metric-test
+// identifiers in metrics_v0.7_software.json (e.g. "FRSM-01-F1-1").
+const semver = (v?: string) => !!v && /^v?\d+\.\d+/.test(v);
+
+function runFrsm(mid: string, e: Eval, s: SoftwareSignals, metaLicense: boolean) {
+  switch (mid) {
+    case "FRSM-01-F1":
+      if (s.identifier) pass(e, `${mid}-1`);
+      if (s.registry_doi) { pass(e, `${mid}-2`); pass(e, `${mid}-3`); }
+      break;
+    case "FRSM-02-F1.1":
+      if (s.has_citation) pass(e, `${mid}-1`);
+      break;
+    case "FRSM-03-F1.2":
+      if (s.version) pass(e, `${mid}-1`);
+      if (semver(s.version)) pass(e, `${mid}-2`);
+      if (s.has_citation) pass(e, `${mid}-3`);
+      break;
+    case "FRSM-04-F2":
+      if (s.name && s.description) pass(e, `${mid}-1`);
+      if (s.has_readme) pass(e, `${mid}-2`);
+      if (s.has_citation) pass(e, `${mid}-3`);
+      break;
+    case "FRSM-05-R1":
+      if (s.has_readme) pass(e, `${mid}-1`);
+      if (s.has_ci) pass(e, `${mid}-2`);
+      if (s.has_requirements) pass(e, `${mid}-3`);
+      break;
+    case "FRSM-06-F2":
+      if (s.contributors > 0) pass(e, `${mid}-1`);
+      if (s.has_citation) pass(e, `${mid}-2`);
+      break;
+    case "FRSM-07-F3":
+      if (s.has_citation) pass(e, `${mid}-1`);
+      if (s.registry_doi) pass(e, `${mid}-2`);
+      break;
+    case "FRSM-08-F4":
+      if (s.registry_doi) { pass(e, `${mid}-1`); pass(e, `${mid}-2`); }
+      break;
+    case "FRSM-09-A1":
+      if (s.identifier && /^https/.test(s.identifier)) pass(e, `${mid}-1`);
+      break;
+    case "FRSM-10-I1":
+      if (s.has_requirements) pass(e, `${mid}-1`);
+      break;
+    case "FRSM-11-I1":
+      if (s.has_api) pass(e, `${mid}-1`);
+      break;
+    case "FRSM-12-I2":
+      if (s.has_citation) pass(e, `${mid}-1`);
+      break;
+    case "FRSM-13-R1":
+      if (s.has_requirements) { pass(e, `${mid}-1`); pass(e, `${mid}-2`); }
+      break;
+    case "FRSM-14-R1":
+      if (s.has_tests) pass(e, `${mid}-1`);
+      if (s.has_ci) pass(e, `${mid}-2`);
+      break;
+    case "FRSM-15-R1.1":
+      if (s.has_license) pass(e, `${mid}-1`);
+      break;
+    case "FRSM-16-R1.1":
+      if (metaLicense) pass(e, `${mid}-1`);
+      break;
+    case "FRSM-17-R1.2":
+      if (s.contributors > 0 || s.version) pass(e, `${mid}-1`);
+      break;
+  }
+}
+
+function buildResult(def: any, e: Eval): MetricResult {
+  const earned = Math.min(e.earned, e.total);
+  const pc = principleOf(def.metric_identifier);
+  const tests: MetricTest[] = e.tests.map((t) => ({ id: t.id, name: t.name, score: t.score, maturity: t.maturity, status: t.status }));
+  return {
+    id: Number(def.metric_number ?? 0),
+    metric_identifier: def.metric_identifier,
+    metric_name: def.metric_name ?? "",
+    principle: pc.principle, category: pc.category,
+    earned, total: e.total, percent: e.total ? Math.round((earned / e.total) * 1000) / 10 : 0,
+    maturity: e.maturity, status: e.status, tests, output: e.output, debug: [],
+  };
+}
+
 function summarize(results: MetricResult[]): CategoryScore[] {
   const cats = ["F", "A", "I", "R"];
   const out: CategoryScore[] = [];
@@ -159,24 +244,18 @@ function summarize(results: MetricResult[]): CategoryScore[] {
   return out;
 }
 
-export async function assess(input: string, data: RefData): Promise<Assessment> {
+export async function assess(input: string, data: RefData, version: MetricVersion = "0.8"): Promise<Assessment> {
+  return version === "0.7_software" ? assessSoftware(input, data) : assessData(input, data);
+}
+
+async function assessData(input: string, data: RefData): Promise<Assessment> {
   const h = await harvest(input);
   const ctx: Ctx = { id: input.trim(), doi: h.doi, metadata: h.metadata, sources: h.sources, resolved: h.resolved };
 
   const results: MetricResult[] = (data.metrics.metrics ?? []).map((def: any) => {
     const e = newEval(def);
     runEvaluator(def.metric_identifier, e, ctx, data);
-    const earned = Math.min(e.earned, e.total);
-    const pc = principleOf(def.metric_identifier);
-    const tests: MetricTest[] = e.tests.map((t) => ({ id: t.id, name: t.name, score: t.score, maturity: t.maturity, status: t.status }));
-    return {
-      id: Number(def.metric_number ?? 0),
-      metric_identifier: def.metric_identifier,
-      metric_name: def.metric_name ?? "",
-      principle: pc.principle, category: pc.category,
-      earned, total: e.total, percent: e.total ? Math.round((earned / e.total) * 1000) / 10 : 0,
-      maturity: e.maturity, status: e.status, tests, output: e.output, debug: [],
-    };
+    return buildResult(def, e);
   }).filter((r: MetricResult) => r.category)
     .sort((a: MetricResult, b: MetricResult) => a.id - b.id);
 
@@ -190,5 +269,32 @@ export async function assess(input: string, data: RefData): Promise<Assessment> 
     access: classifyAccess(ctx.metadata.access_level, urls, data),
     hygiene: identifierHygiene(ctx.id),
     tlc: fairTlc(ctx.metadata, reuse, hasRelated),
+  };
+}
+
+async function assessSoftware(input: string, data: RefData): Promise<Assessment> {
+  const gh = parseGithub(input.trim());
+  if (!gh) {
+    throw new Error("Software (FRSM) assessment needs a code repository URL, e.g. https://github.com/owner/repo");
+  }
+  const h = await harvestSoftware(gh);
+  const metaLicense = h.metadata.license != null;
+
+  const results: MetricResult[] = (data.softwareMetrics.metrics ?? []).map((def: any) => {
+    const e = newEval(def);
+    runFrsm(def.metric_identifier, e, h.signals, metaLicense);
+    return buildResult(def, e);
+  }).filter((r: MetricResult) => r.category)
+    .sort((a: MetricResult, b: MetricResult) => a.id - b.id);
+
+  const reuse = reuseFromMetadata(h.metadata.license, data);
+  const urls = [h.resolved].filter((u): u is string => !!u);
+  return {
+    id: input.trim(), doi: null, resolved_url: h.resolved, metric_version: "0.7_software",
+    metadata: h.metadata, sources: h.sources, results, summary: summarize(results),
+    reuse,
+    access: classifyAccess(h.metadata.access_level, urls, data),
+    hygiene: identifierHygiene(input.trim()),
+    tlc: fairTlc(h.metadata, reuse, asList(h.metadata.related_resources).length > 0),
   };
 }
