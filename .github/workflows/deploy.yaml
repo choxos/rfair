@@ -32,7 +32,12 @@ jobs:
           cache-dependency-path: package-lock.json
 
       - name: Install
-        run: npm ci
+        # npm install (not npm ci) so the Linux runner can reconcile the
+        # platform-specific optional native deps (rolldown/rollup/esbuild) that a
+        # lockfile generated on macOS does not enumerate; npm ci hard-fails on
+        # those (`Missing @emnapi/core ... from lock file`). Versions stay pinned
+        # by the committed lockfile; the audit step below still gates.
+        run: npm install --no-audit --no-fund
 
       - name: Security audit
         run: npm audit --audit-level=moderate
