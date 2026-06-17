@@ -1,5 +1,6 @@
 import { useState } from "react";
 import type { Assessment } from "../lib/types";
+import { asJsonLd } from "../lib/jsonld";
 import { Sunburst } from "./Sunburst";
 import { MaturityBadge } from "./MaturityBadge";
 
@@ -24,14 +25,16 @@ export function ScoreHero({ result }: { result: Assessment }) {
     window.setTimeout(() => setFlash(null), 1600);
   };
 
-  const download = () => {
-    const blob = new Blob([JSON.stringify(result, null, 2)], { type: "application/json" });
+  const save = (text: string, name: string, type: string) => {
+    const blob = new Blob([text], { type });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = "rfuji-result.json";
+    a.download = name;
     a.click();
     URL.revokeObjectURL(a.href);
   };
+  const download = () => save(JSON.stringify(result, null, 2), "rfuji-result.json", "application/json");
+  const downloadJsonLd = () => save(asJsonLd(result), "rfuji-result.jsonld", "application/ld+json");
   const copyJson = async () => {
     await navigator.clipboard.writeText(JSON.stringify(result, null, 2));
     note("JSON copied");
@@ -69,7 +72,8 @@ export function ScoreHero({ result }: { result: Assessment }) {
             <span>metrics v{result.metric_version}</span>
           </div>
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:justify-start">
-            <Action onClick={download}>↓ Download JSON</Action>
+            <Action onClick={download}>↓ JSON</Action>
+            <Action onClick={downloadJsonLd}>↓ JSON-LD</Action>
             <Action onClick={copyJson}>⧉ Copy JSON</Action>
             <Action onClick={share}>🔗 Share link</Action>
             {flash && <span className="text-xs font-medium text-fair-a">{flash}</span>}
