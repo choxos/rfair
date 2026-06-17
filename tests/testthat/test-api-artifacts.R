@@ -70,3 +70,34 @@ test_that("Plumber scaffold validates request enum parameters as 400s", {
   expect_equal(bad_service$parameter, "metadata_service_type")
   expect_true("oai_pmh" %in% bad_service$allowed)
 })
+
+test_that("Plumber scaffold validates boolean query parameters as 400s", {
+  testthat::skip_if_not_installed("plumber")
+  plumber_file <- api_artifact("plumber", "rfuji-api.R")
+  route <- plumber::plumb(plumber_file)$routes[["assess"]]
+  assess <- route$getFunc()
+
+  for (parameter in c("use_datacite", "resolve", "use_headless")) {
+    res <- new.env(parent = emptyenv())
+    args <- list(
+      id = "https://doi.org/10.5281/zenodo.8347772",
+      resolve = "false",
+      res = res
+    )
+    args[[parameter]] <- "not-bool"
+
+    bad_boolean <- do.call(assess, args)
+    expect_equal(res$status, 400)
+    expect_equal(bad_boolean$parameter, parameter)
+    expect_true("true" %in% bad_boolean$allowed)
+    expect_true("false" %in% bad_boolean$allowed)
+  }
+
+  parse_bool <- get("parse_bool", envir = environment(assess))
+  expect_false(parse_bool("0", TRUE))
+  expect_false(parse_bool("false", TRUE))
+  expect_false(parse_bool("no", TRUE))
+  expect_true(parse_bool("1", FALSE))
+  expect_true(parse_bool("true", FALSE))
+  expect_true(parse_bool("yes", FALSE))
+})
