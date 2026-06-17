@@ -65,7 +65,9 @@ crit_test_ids <- function(res, suffix) {
 }
 
 #' @noRd
-crit_is_defined_suffix <- function(res, suffix) length(crit_test_ids(res, suffix)) > 0L
+crit_is_defined_suffix <- function(res, suffix) {
+  length(res$tests) == 0L || length(crit_test_ids(res, suffix)) > 0L
+}
 
 #' Required metadata-property names declared by a metric test's requirements.
 #' @noRd
@@ -119,6 +121,12 @@ crit_pass <- function(res, test_id, evidence = NULL) {
 #' @noRd
 crit_pass_suffix <- function(res, suffix, evidence = NULL) {
   ids <- crit_test_ids(res, suffix)
+  if (!length(ids) && length(res$tests) == 0L && res$total_score > 0 && !identical(res$test_status, "pass")) {
+    res$score_earned <- res$total_score
+    res$maturity <- max(res$maturity, 1L)
+    res$test_status <- "pass"
+    return(invisible(res))
+  }
   for (id in ids) crit_pass(res, id, evidence = evidence)
   invisible(res)
 }
