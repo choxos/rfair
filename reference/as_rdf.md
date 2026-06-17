@@ -55,7 +55,7 @@ cat(as_rdf(a))
 #>     "prov:used": "https://doi.org/10.5281/zenodo.8347772"
 #>   },
 #>   "rfuji:metricVersion": "0.8",
-#>   "rfuji:softwareVersion": "2.3.3",
+#>   "rfuji:softwareVersion": "2.3.4",
 #>   "dqv:hasQualityMeasurement": [
 #>     {
 #>       "@type": "dqv:QualityMeasurement",
