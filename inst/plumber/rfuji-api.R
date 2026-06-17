@@ -2,8 +2,12 @@
 #* @apiDescription HTTP API scaffold for running rfuji FAIR assessments.
 
 parse_bool <- function(x, default = FALSE) {
-  if (missing(x) || is.null(x) || !nzchar(as.character(x))) return(default)
-  tolower(as.character(x)) %in% c("1", "true", "t", "yes", "y")
+  value <- parse_string(x, "")
+  if (!nzchar(value)) return(default)
+  value <- tolower(value)
+  if (value %in% c("1", "true", "t", "yes", "y")) return(TRUE)
+  if (value %in% c("0", "false", "f", "no", "n")) return(FALSE)
+  NA
 }
 
 parse_string <- function(x, default = "") {
@@ -97,15 +101,44 @@ function(id,
 
   endpoint <- parse_string(metadata_service_endpoint, "")
   if (!nzchar(endpoint)) endpoint <- NULL
+
+  use_datacite <- parse_bool(use_datacite, TRUE)
+  if (is.na(use_datacite)) {
+    return(bad_request(
+      res,
+      "Query parameter `use_datacite` must be boolean.",
+      "use_datacite",
+      c("true", "false", "1", "0", "yes", "no", "y", "n", "t", "f")
+    ))
+  }
+  resolve <- parse_bool(resolve, TRUE)
+  if (is.na(resolve)) {
+    return(bad_request(
+      res,
+      "Query parameter `resolve` must be boolean.",
+      "resolve",
+      c("true", "false", "1", "0", "yes", "no", "y", "n", "t", "f")
+    ))
+  }
+  use_headless <- parse_bool(use_headless, FALSE)
+  if (is.na(use_headless)) {
+    return(bad_request(
+      res,
+      "Query parameter `use_headless` must be boolean.",
+      "use_headless",
+      c("true", "false", "1", "0", "yes", "no", "y", "n", "t", "f")
+    ))
+  }
+
   assessment <- rfuji::assess_fair(
     id = id,
     metric_version = metric_version,
-    use_datacite = parse_bool(use_datacite, TRUE),
+    use_datacite = use_datacite,
     metadata_service_endpoint = endpoint,
     metadata_service_type = metadata_service_type,
-    resolve = parse_bool(resolve, TRUE),
+    resolve = resolve,
     timeout = parse_timeout(timeout, 15),
-    use_headless = parse_bool(use_headless, FALSE)
+    use_headless = use_headless
   )
   jsonlite::fromJSON(rfuji::as_fuji_json(assessment), simplifyVector = FALSE)
 }
