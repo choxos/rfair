@@ -81,7 +81,7 @@ describe("metadata service options", () => {
       ok: true,
       headers: { get: () => "application/ld+json" },
       json: async () => ({}),
-      text: async () => "",
+      text: async () => JSON.stringify({ "@type": "Dataset", name: "DCAT dataset" }),
     } as unknown as Response)) as typeof fetch;
 
     try {
@@ -160,6 +160,38 @@ describe("metadata service options", () => {
         });
         expect(h.metadata.metadata_service).toEqual([{ url: `https://example.org/${value}`, type: value }]);
         expect(h.sources.some((s) => s.method === "metadata_service_fetch")).toBe(true);
+      }
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  it("does not score malformed metadata service responses", async () => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = (async (url: string | URL | Request) => {
+      const href = String(url);
+      const text = href.includes("verb=GetRecord")
+        ? "<OAI-PMH><error code=\"idDoesNotExist\">missing</error></OAI-PMH>"
+        : "<html>not a metadata service</html>";
+      return {
+        ok: true,
+        status: 200,
+        headers: { get: () => "text/html" },
+        json: async () => ({}),
+        text: async () => text,
+      } as unknown as Response;
+    }) as typeof fetch;
+
+    try {
+      for (const { value } of METADATA_SERVICE_TYPES) {
+        const h = await harvest("https://doi.org/10.1234/example", {
+          useDatacite: false,
+          metadataServiceEndpoint: `https://example.org/${value}`,
+          metadataServiceType: value,
+        });
+        expect(h.metadata.metadata_service).toBeUndefined();
+        expect(h.sources.some((s) => s.method === "metadata_service_fetch")).toBe(false);
+        expect(h.metadata.metadata_service_request).toEqual([{ url: `https://example.org/${value}`, type: value }]);
       }
     } finally {
       globalThis.fetch = originalFetch;
