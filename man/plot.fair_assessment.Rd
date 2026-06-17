@@ -6,7 +6,7 @@
 \usage{
 \method{plot}{fair_assessment}(
   x,
-  type = c("category", "metric"),
+  type = c("category", "metric", "sunburst"),
   colors = .fair_cat_colors,
   show_maturity = (match.arg(type) == "category"),
   main = NULL,
@@ -19,7 +19,9 @@
 \item{type}{What to draw. \code{"category"} (default) draws one bar per FAIR
 category (Findable, Accessible, Interoperable, Reusable) plus the overall
 score; \code{"metric"} draws one bar per individual metric, grouped and colored
-by category.}
+by category; \code{"sunburst"} draws a concentric sunburst (an inner ring of the
+F/A/I/R categories and an outer ring of the individual metrics, each filled
+in proportion to its score) with the overall FAIR percentage in the center.}
 
 \item{colors}{Named character vector of category fill colors, with names
 \code{"F"}, \code{"A"}, \code{"I"}, \code{"R"}.}
@@ -46,6 +48,7 @@ metric), each annotated with its score and CMMI maturity level. See
 data(fair_example)
 plot(fair_example)
 plot(fair_example, type = "metric")
+plot(fair_example, type = "sunburst")
 }
 \seealso{
 \code{\link[=assess_fair]{assess_fair()}}, \code{\link[=summary.fair_assessment]{summary.fair_assessment()}}, \link{fair_example}

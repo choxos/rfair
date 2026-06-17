@@ -55,6 +55,16 @@ the metric identifier and its `earned/total`.
 plot(x, type = "metric")
 ```
 
+For a compact overview that shows both levels at once, `type = "sunburst"` draws
+a concentric ring chart: the inner ring is the four FAIR categories and the
+outer ring is the individual metrics, each filled in proportion to its score,
+with the overall FAIR percentage in the center. This is the same summary the
+web app shows.
+
+```{r fig.width = 6, fig.height = 5.4, fig.alt = "Concentric FAIR sunburst: inner ring of F/A/I/R categories, outer ring of individual metrics, overall percentage in the center."}
+plot(x, type = "sunburst")
+```
+
 ## 2. Score tables
 
 `summary()` returns the per-category table behind the scorecard (handy for
