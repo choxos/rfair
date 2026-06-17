@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">rfuji</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.2.2</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.3.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -131,12 +131,29 @@
 <p>A browser version (registry-only, no install) is published at <strong><a href="https://choxos.github.io/rfuji/app/" class="uri">https://choxos.github.io/rfuji/app/</a></strong>.</p>
 </div>
 <div class="section level2">
+<h2 id="http-api-scaffold">HTTP API scaffold<a class="anchor" aria-label="anchor" href="#http-api-scaffold"></a>
+</h2>
+<p><code>rfuji</code> also ships a Plumber scaffold and OpenAPI contract for teams that want to expose the same assessment engine over HTTP:</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">api</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"plumber"</span>, <span class="st">"rfuji-api.R"</span>, package <span class="op">=</span> <span class="st">"rfuji"</span><span class="op">)</span></span>
+<span><span class="va">pr</span> <span class="op">&lt;-</span> <span class="fu">plumber</span><span class="fu">::</span><span class="fu"><a href="https://www.rplumber.io/reference/pr.html" class="external-link">pr</a></span><span class="op">(</span><span class="va">api</span><span class="op">)</span></span>
+<span><span class="va">pr</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span>port <span class="op">=</span> <span class="fl">8000</span><span class="op">)</span></span></code></pre></div>
+<p>The machine-readable API contract is installed at:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"openapi"</span>, <span class="st">"rfuji-openapi.yaml"</span>, package <span class="op">=</span> <span class="st">"rfuji"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="how-it-works">How it works<a class="anchor" aria-label="anchor" href="#how-it-works"></a>
 </h2>
 <pre><code>id_parse() → resolve → harvest (DataCite JSON · landing-page JSON-LD/Dublin Core/
 OpenGraph · signposting typed links · XML · RDF · GitHub) → merge → 17 metric
 evaluators → F/A/I/R score → fair_assessment</code></pre>
 <p>Reference data (SPDX licenses, file formats, access rights, protocols, metadata standards, FAIR principles, reusabledata.org curations) is baked in from the F-UJI sources by the scripts in <code>data-raw/</code>.</p>
+</div>
+<div class="section level2">
+<h2 id="citation-and-metadata">Citation and metadata<a class="anchor" aria-label="anchor" href="#citation-and-metadata"></a>
+</h2>
+<p>The repository includes <code>CITATION.cff</code> and <code>codemeta.json</code> so software harvesters can find rfuji’s authorship, license, version, dependencies, repository URL, and upstream F-UJI provenance. A repository-specific archived DOI has not yet been minted; once one exists, add it to both metadata files before the next release.</p>
 </div>
 <div class="section level2">
 <h2 id="acknowledgements">Acknowledgements<a class="anchor" aria-label="anchor" href="#acknowledgements"></a>

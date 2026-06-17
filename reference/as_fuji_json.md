@@ -41,9 +41,9 @@ cat(as_fuji_json(a))
 #>     "metadata_service_type": "",
 #>     "test_debug": false
 #>   },
-#>   "start_timestamp": "2026-06-17T02:17:40+0000",
-#>   "end_timestamp": "2026-06-17T02:17:46+0000",
-#>   "software_version": "2.2.2",
+#>   "start_timestamp": "2026-06-17T03:52:33+0000",
+#>   "end_timestamp": "2026-06-17T03:52:39+0000",
+#>   "software_version": "2.3.0",
 #>   "metric_version": "0.8",
 #>   "metric_specification": "https://doi.org/10.5281/zenodo.15045911",
 #>   "total_metrics": 17,
