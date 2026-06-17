@@ -1,6 +1,6 @@
 Package: rfuji
 Title: Assess the FAIRness of Research Data Objects
-Version: 2.3.2
+Version: 2.3.3
 Authors@R: c(
     person("Ahmad", "Sofi-Mahmudi", email = "a.sofimahmudi@gmail.com",
            role = c("aut", "cre"), comment = c(ORCID = "0000-0001-6829-0823")),
@@ -8,6 +8,10 @@ Authors@R: c(
            comment = "Author of the original rfuji F-UJI API client"),
     person("PANGAEA", role = "cph",
            comment = "Copyright holder of the F-UJI service whose metrics rfuji reimplements"))
+Author: Ahmad Sofi-Mahmudi [aut, cre] (<https://orcid.org/0000-0001-6829-0823>),
+    Steffen Neumann [aut],
+    PANGAEA [cph]
+Maintainer: Ahmad Sofi-Mahmudi <a.sofimahmudi@gmail.com>
 Description: A native R implementation of the F-UJI (FAIRsFAIR Research Data
     Object Assessment) metrics for evaluating how well a research data object
     satisfies the FAIR principles (Findable, Accessible, Interoperable,
