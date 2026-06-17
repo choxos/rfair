@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: rfuji FAIR assessment API
-  version: 2.3.1
+  version: 2.3.2
   description: Machine-readable HTTP contract for services that expose rfuji FAIR assessments.
   license:
     name: MIT
@@ -34,7 +34,7 @@ paths:
                     example: rfuji
                   version:
                     type: string
-                    example: 2.3.1
+                    example: 2.3.2
   /metric-versions:
     get:
       summary: List metric versions bundled by rfuji

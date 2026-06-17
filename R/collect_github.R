@@ -101,10 +101,7 @@ harvest_software_signals <- function(api, repo, branch, j, ver, cm, token = "", 
     m <- regmatches(v, regexpr(doi_pat, v %||% "", perl = TRUE))
     if (length(m)) { registry_doi <- m[1]; break }
   }
-  has_interface_definition <- any_match("openapi|swagger|\\.proto$|graphql")
-  has_open_api <- has_interface_definition && !isTRUE(j$private)
-  has_format_schema <- has_interface_definition
-  has_format_docs <- has_format_schema || any_match("as_fuji_json|as_rdf|jsonld|rdf|json-schema|schema\\.json")
+  path_signals <- software_path_signals(paths, private = isTRUE(j$private))
 
   list(
     identifier = j$html_url,
@@ -123,12 +120,32 @@ harvest_software_signals <- function(api, repo, branch, j, ver, cm, token = "", 
     has_ci = any_match("^\\.github/workflows/|^\\.travis|^\\.circleci|^azure-pipelines|^\\.gitlab-ci"),
     has_requirements = any_match("^(requirements.*\\.txt|setup\\.py|setup\\.cfg|pyproject\\.toml|package\\.json|description|environment\\.ya?ml|renv\\.lock|cargo\\.toml|go\\.mod|pom\\.xml|build\\.gradle)$"),
     has_docs = any_match("^docs?/|readthedocs|mkdocs\\.ya?ml"),
+    has_api = path_signals$has_api,
+    has_open_api = path_signals$has_open_api,
+    has_machine_readable_api = path_signals$has_machine_readable_api,
+    has_data_format_docs = path_signals$has_data_format_docs,
+    has_open_data_formats = path_signals$has_open_data_formats,
+    has_schema_reference = path_signals$has_schema_reference
+  )
+}
+
+#' Detect software API, data-format, and schema signals from repository paths.
+#' @noRd
+software_path_signals <- function(paths, private = FALSE) {
+  paths <- tolower(as_chr(paths))
+  any_match <- function(re) any(grepl(re, paths, perl = TRUE))
+  has_interface_definition <- any_match("openapi|swagger|\\.proto$|graphql")
+  has_open_data_format <- any_match("(^|/)(openapi|swagger).*\\.(ya?ml|json)$|jsonld|json-ld|rdf|rdfs|\\.ttl$|\\.turtle$|\\.csv$|\\.tsv$|\\.parquet$|\\.feather$|\\.hdf5?$|\\.nc$|\\.netcdf$|\\.xml$")
+  has_schema_reference <- any_match("(^|/)(openapi|swagger).*\\.(ya?ml|json)$|json-schema|schema\\.json|\\.schema\\.json$|\\.xsd$|rdfs|\\.proto$|graphql")
+  has_format_docs <- has_open_data_format || has_schema_reference ||
+    any_match("as_fuji_json|as_rdf|jsonld|rdf|json-schema|schema\\.json")
+  list(
     has_api = has_interface_definition,
-    has_open_api = has_open_api,
+    has_open_api = has_interface_definition && !isTRUE(private),
     has_machine_readable_api = has_interface_definition,
     has_data_format_docs = has_format_docs,
-    has_open_data_formats = has_format_schema,
-    has_schema_reference = has_format_schema
+    has_open_data_formats = has_open_data_format,
+    has_schema_reference = has_schema_reference
   )
 }
 
