@@ -92,6 +92,98 @@ function recordMetadataService(out: Reference, endpoint: string, type: Assessmen
   out.metadata_service = [{ url: endpoint, type }];
 }
 
+function addServiceSource(sources: { source: string; method: string }[], source: string) {
+  if (!sources.some((s) => s.source === source && s.method === "metadata_service_fetch")) {
+    sources.push({ source, method: "metadata_service_fetch" });
+  }
+}
+
+function setIfMissing(out: Reference, key: string, value: unknown) {
+  if (value == null) return;
+  if (Array.isArray(value) && value.length === 0) return;
+  if (out[key] == null) out[key] = value;
+}
+
+function asArray(v: any): any[] {
+  return Array.isArray(v) ? v : v == null ? [] : [v];
+}
+
+function literal(v: any): string | undefined {
+  if (typeof v === "string" && v.trim()) return v.trim();
+  if (v && typeof v === "object") return literal(v.name ?? v["@value"] ?? v.value);
+  return undefined;
+}
+
+function literals(v: any): string[] {
+  return asArray(v).map(literal).filter((x): x is string => !!x);
+}
+
+function tryJson(text: string): any | null {
+  try { return JSON.parse(text); } catch { return null; }
+}
+
+function stripXml(s: string): string {
+  return s.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function xmlValues(xml: string, localName: string): string[] {
+  const re = new RegExp(`<(?:[\\w.-]+:)?${localName}\\b[^>]*>([\\s\\S]*?)<\\/(?:[\\w.-]+:)?${localName}>`, "gi");
+  return [...xml.matchAll(re)].map((m) => stripXml(m[1])).filter(Boolean);
+}
+
+function endpointWithParams(endpoint: string, params: Record<string, string>): string {
+  const u = new URL(endpoint);
+  for (const [k, v] of Object.entries(params)) u.searchParams.set(k, v);
+  return u.toString();
+}
+
+function findJsonLdNode(j: any): any {
+  const nodes = Array.isArray(j) ? j : asArray(j?.["@graph"] ?? j);
+  return nodes.find((n) => {
+    const types = literals(n?.["@type"]).map((t) => t.toLowerCase());
+    return types.some((t) => /dataset|creativework|software|datacatalog|distribution/.test(t));
+  }) ?? nodes[0] ?? j;
+}
+
+function applyJsonLd(j: any, out: Reference) {
+  const node = findJsonLdNode(j);
+  setIfMissing(out, "object_type", literal(node?.["@type"]) ?? "Dataset");
+  setIfMissing(out, "title", literal(node?.name ?? node?.headline));
+  setIfMissing(out, "summary", literal(node?.description));
+  const kw = Array.isArray(node?.keywords) ? literals(node.keywords) :
+    typeof node?.keywords === "string" ? node.keywords.split(",").map((s: string) => s.trim()).filter(Boolean) : [];
+  setIfMissing(out, "keywords", kw);
+  setIfMissing(out, "license", literals(node?.license));
+  setIfMissing(out, "publication_date", literal(node?.datePublished ?? node?.dateCreated));
+  setIfMissing(out, "creator", literals(node?.creator ?? node?.author));
+  setIfMissing(out, "publisher", literal(node?.publisher));
+  const content = literals(node?.contentUrl ?? node?.distribution?.contentUrl)
+    .map((url) => ({ url }));
+  setIfMissing(out, "object_content_identifier", content);
+}
+
+function applyDublinCoreXml(xml: string, out: Reference) {
+  setIfMissing(out, "title", xmlValues(xml, "title")[0]);
+  setIfMissing(out, "creator", xmlValues(xml, "creator"));
+  setIfMissing(out, "publisher", xmlValues(xml, "publisher")[0]);
+  setIfMissing(out, "publication_date", xmlValues(xml, "date")[0]);
+  setIfMissing(out, "keywords", xmlValues(xml, "subject"));
+  setIfMissing(out, "summary", xmlValues(xml, "description")[0]);
+  const ids = xmlValues(xml, "identifier").filter((u) => /^https?:|^doi:|^10\./i.test(u));
+  setIfMissing(out, "object_content_identifier", ids.map((url) => ({ url })));
+  setIfMissing(out, "license", xmlValues(xml, "rights"));
+}
+
+function applyLinkHeader(link: string | null, out: Reference) {
+  if (!link) return;
+  const links = [...link.matchAll(/<([^>]+)>;\s*rel="?([^",;]+)"?/gi)]
+    .map((m) => ({ url: m[1], rel: m[2].toLowerCase() }));
+  const items = links.filter((l) => /item|describedby|cite-as/.test(l.rel));
+  setIfMissing(out, "object_content_identifier", items.filter((l) => l.rel === "item").map((l) => ({ url: l.url })));
+  setIfMissing(out, "related_resources", links.filter((l) => l.rel !== "item")
+    .map((l) => ({ related_resource: l.url, relation_type: l.rel })));
+}
+
 export interface SoftwareHarvest {
   signals: SoftwareSignals;
   metadata: Reference;
@@ -214,9 +306,12 @@ export async function harvest(input: string, options: AssessmentOptions): Promis
     try {
       const r = await fetch(serviceEndpoint);
       if (r.ok) {
+        const txt = await r.text();
+        const j = tryJson(txt);
+        if (j) applyJsonLd(j, metadata);
         recordMetadataService(metadata, serviceEndpoint, options.metadataServiceType);
         metadata.metadata_service_payload_type = r.headers.get("content-type") ?? "unknown";
-        sources.push({ source: "DCAT", method: "metadata_service_fetch" });
+        addServiceSource(sources, "DCAT");
       }
     } catch { /* network/CORS */ }
   }
@@ -226,13 +321,17 @@ export async function harvest(input: string, options: AssessmentOptions): Promis
       const r = await fetch(serviceEndpoint);
       if (r.ok) {
         const txt = await r.text();
-        const m = txt.match(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/i);
-        if (m) {
+        const raw = /json|ld\+json/i.test(r.headers.get("content-type") ?? "") ? tryJson(txt) : null;
+        const scripts = raw ? [raw] : [...txt.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)]
+          .map((m) => tryJson(m[1]))
+          .filter(Boolean);
+        if (scripts.length) {
           try {
-            const j = JSON.parse(m[1]);
+            const j = scripts.length === 1 ? scripts[0] : scripts;
+            applyJsonLd(j, metadata);
             recordMetadataService(metadata, serviceEndpoint, options.metadataServiceType);
             metadata.schema_org_type = Array.isArray(j) ? j.map((x: any) => x?.["@type"]).filter(Boolean) : j?.["@type"];
-            sources.push({ source: "schema.org", method: "metadata_service_fetch" });
+            addServiceSource(sources, "schema.org");
           } catch { /* invalid JSON-LD */ }
         }
       }
@@ -252,7 +351,119 @@ export async function harvest(input: string, options: AssessmentOptions): Promis
         if (rec?.title && !metadata.title) metadata.title = rec.title;
         if (rec?.notes && !metadata.summary) metadata.summary = rec.notes;
         if (rec?.license_id && !metadata.license) metadata.license = [rec.license_id];
-        sources.push({ source: "CKAN", method: "metadata_service_fetch" });
+        addServiceSource(sources, "CKAN");
+      }
+    } catch { /* network/CORS */ }
+  }
+
+  if (serviceEndpoint && options.metadataServiceType === "datacite") {
+    try {
+      const r = await fetch(serviceEndpoint);
+      if (r.ok) {
+        const a = (await r.json())?.data?.attributes ?? {};
+        mapDatacite(a, doi ?? input.trim(), metadata);
+        recordMetadataService(metadata, serviceEndpoint, options.metadataServiceType);
+        addServiceSource(sources, "DataCite");
+      }
+    } catch { /* network/CORS */ }
+  }
+
+  if (serviceEndpoint && options.metadataServiceType === "crossref") {
+    try {
+      const r = await fetch(serviceEndpoint);
+      if (r.ok) {
+        mapCrossref((await r.json())?.message ?? {}, doi ?? input.trim(), metadata);
+        recordMetadataService(metadata, serviceEndpoint, options.metadataServiceType);
+        addServiceSource(sources, "Crossref");
+      }
+    } catch { /* network/CORS */ }
+  }
+
+  if (serviceEndpoint && options.metadataServiceType === "oai_pmh") {
+    try {
+      const r = await fetch(endpointWithParams(serviceEndpoint, {
+        verb: "GetRecord",
+        metadataPrefix: "oai_dc",
+        identifier: input.trim(),
+      }));
+      if (r.ok) {
+        const txt = await r.text();
+        applyDublinCoreXml(txt, metadata);
+        recordMetadataService(metadata, serviceEndpoint, options.metadataServiceType);
+        addServiceSource(sources, "OAI-PMH");
+      }
+    } catch {
+      try {
+        const r = await fetch(endpointWithParams(serviceEndpoint, { verb: "Identify" }));
+        if (r.ok) {
+          recordMetadataService(metadata, serviceEndpoint, options.metadataServiceType);
+          addServiceSource(sources, "OAI-PMH");
+        }
+      } catch { /* network/CORS */ }
+    }
+  }
+
+  if (serviceEndpoint && options.metadataServiceType === "ogc_csw") {
+    try {
+      const r = await fetch(endpointWithParams(serviceEndpoint, { service: "CSW", request: "GetCapabilities" }));
+      if (r.ok) {
+        const txt = await r.text();
+        setIfMissing(metadata, "title", xmlValues(txt, "Title")[0]);
+        recordMetadataService(metadata, serviceEndpoint, options.metadataServiceType);
+        addServiceSource(sources, "OGC CSW");
+      }
+    } catch { /* network/CORS */ }
+  }
+
+  if (serviceEndpoint && options.metadataServiceType === "sparql") {
+    try {
+      const r = await fetch(endpointWithParams(serviceEndpoint, {
+        query: "ASK { ?s ?p ?o }",
+        format: "application/sparql-results+json",
+      }));
+      if (r.ok) {
+        metadata.metadata_service_payload_type = r.headers.get("content-type") ?? "unknown";
+        recordMetadataService(metadata, serviceEndpoint, options.metadataServiceType);
+        addServiceSource(sources, "SPARQL");
+      }
+    } catch { /* network/CORS */ }
+  }
+
+  if (serviceEndpoint && (options.metadataServiceType === "signposting" || options.metadataServiceType === "typed_links")) {
+    try {
+      let r = await fetch(serviceEndpoint, { method: "HEAD" });
+      if (!r.ok || !r.headers.get("link")) r = await fetch(serviceEndpoint);
+      if (r.ok) {
+        applyLinkHeader(r.headers.get("link"), metadata);
+        recordMetadataService(metadata, serviceEndpoint, options.metadataServiceType);
+        addServiceSource(sources, options.metadataServiceType === "signposting" ? "Signposting" : "Typed links");
+      }
+    } catch { /* network/CORS */ }
+  }
+
+  if (serviceEndpoint && options.metadataServiceType === "ro_crate") {
+    try {
+      const r = await fetch(serviceEndpoint);
+      if (r.ok) {
+        const j = await r.json();
+        applyJsonLd(j, metadata);
+        recordMetadataService(metadata, serviceEndpoint, options.metadataServiceType);
+        addServiceSource(sources, "RO-Crate");
+      }
+    } catch { /* network/CORS */ }
+  }
+
+  if (serviceEndpoint && options.metadataServiceType === "other") {
+    try {
+      const r = await fetch(serviceEndpoint);
+      if (r.ok) {
+        const txt = await r.text();
+        const j = tryJson(txt);
+        if (j) applyJsonLd(j, metadata);
+        else applyDublinCoreXml(txt, metadata);
+        recordMetadataService(metadata, serviceEndpoint, options.metadataServiceType);
+        metadata.metadata_service_payload_type = r.headers.get("content-type") ?? "unknown";
+        addServiceSource(sources, "Metadata service");
       }
     } catch { /* network/CORS */ }
   }
