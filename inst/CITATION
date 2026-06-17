@@ -1,0 +1,14 @@
+bibentry(
+  bibtype = "Manual",
+  title = "rfuji: Native R FAIR Assessment Metrics",
+  author = c(
+    person("Ahmad", "Sofi-Mahmudi",
+           email = "a.sofimahmudi@gmail.com",
+           comment = c(ORCID = "0000-0001-6829-0823")),
+    person("Steffen", "Neumann")
+  ),
+  year = "2026",
+  version = "2.3.0",
+  url = "https://github.com/choxos/rfuji",
+  note = "R package version 2.3.0"
+)

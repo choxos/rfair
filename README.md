@@ -102,6 +102,23 @@ launch_rfuji()   # bslib Shiny app: scores, per-metric report, reuse/access pane
 A browser version (registry-only, no install) is published at
 **<https://choxos.github.io/rfuji/app/>**.
 
+## HTTP API scaffold
+
+`rfuji` also ships a Plumber scaffold and OpenAPI contract for teams that want
+to expose the same assessment engine over HTTP:
+
+```r
+api <- system.file("plumber", "rfuji-api.R", package = "rfuji")
+pr <- plumber::pr(api)
+pr$run(port = 8000)
+```
+
+The machine-readable API contract is installed at:
+
+```r
+system.file("openapi", "rfuji-openapi.yaml", package = "rfuji")
+```
+
 ## How it works
 
 ```
@@ -113,6 +130,13 @@ evaluators → F/A/I/R score → fair_assessment
 Reference data (SPDX licenses, file formats, access rights, protocols, metadata
 standards, FAIR principles, reusabledata.org curations) is baked in from the
 F-UJI sources by the scripts in `data-raw/`.
+
+## Citation and metadata
+
+The repository includes `CITATION.cff` and `codemeta.json` so software harvesters
+can find rfuji's authorship, license, version, dependencies, repository URL, and
+upstream F-UJI provenance. A repository-specific archived DOI has not yet been
+minted; once one exists, add it to both metadata files before the next release.
 
 ## Acknowledgements
 

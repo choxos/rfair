@@ -1,0 +1,160 @@
+openapi: 3.1.0
+info:
+  title: rfuji FAIR assessment API
+  version: 2.3.0
+  description: Machine-readable HTTP contract for services that expose rfuji FAIR assessments.
+  license:
+    name: MIT
+    url: https://spdx.org/licenses/MIT.html
+  contact:
+    name: Ahmad Sofi-Mahmudi
+    email: a.sofimahmudi@gmail.com
+servers:
+  - url: http://localhost:8000
+    description: Local Plumber service
+paths:
+  /health:
+    get:
+      summary: Health check
+      operationId: getHealth
+      responses:
+        "200":
+          description: Service status
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status, package, version]
+                properties:
+                  status:
+                    type: string
+                    example: ok
+                  package:
+                    type: string
+                    example: rfuji
+                  version:
+                    type: string
+                    example: 2.3.0
+  /metric-versions:
+    get:
+      summary: List metric versions bundled by rfuji
+      operationId: getMetricVersions
+      responses:
+        "200":
+          description: Metric version identifiers
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [metric_versions]
+                properties:
+                  metric_versions:
+                    type: array
+                    items:
+                      type: string
+                    example: ["0.8", "0.5", "0.7_software"]
+  /assess:
+    get:
+      summary: Assess the FAIRness of an identifier or URL
+      operationId: assessFair
+      parameters:
+        - name: id
+          in: query
+          required: true
+          description: Persistent identifier, DOI, Handle, ARK, URN, or URL to assess.
+          schema:
+            type: string
+          example: https://doi.org/10.5281/zenodo.8347772
+        - name: metric_version
+          in: query
+          required: false
+          description: Metric version accepted by rfuji_metric_versions().
+          schema:
+            type: string
+            default: "0.8"
+          example: "0.7_software"
+        - name: use_datacite
+          in: query
+          required: false
+          description: Whether to query DataCite metadata.
+          schema:
+            type: boolean
+            default: true
+        - name: metadata_service_endpoint
+          in: query
+          required: false
+          description: Optional metadata service endpoint or metadata document URL.
+          schema:
+            type: string
+          example: https://example.org/oai
+        - name: metadata_service_type
+          in: query
+          required: false
+          description: Metadata service type for the endpoint.
+          schema:
+            type: string
+            default: oai_pmh
+            enum:
+              - oai_pmh
+              - ogc_csw
+              - sparql
+              - dcat
+              - schema_org
+              - datacite
+              - crossref
+              - signposting
+              - typed_links
+              - ro_crate
+              - ckan
+              - other
+        - name: resolve
+          in: query
+          required: false
+          description: Whether to resolve the identifier before harvesting metadata.
+          schema:
+            type: boolean
+            default: true
+        - name: timeout
+          in: query
+          required: false
+          description: Per-request timeout in seconds, clamped to 1..120 by the service scaffold.
+          schema:
+            type: number
+            minimum: 1
+            maximum: 120
+            default: 15
+        - name: use_headless
+          in: query
+          required: false
+          description: Whether to use a headless browser when available.
+          schema:
+            type: boolean
+            default: false
+      responses:
+        "200":
+          description: F-UJI-compatible assessment result
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - request
+                  - software_version
+                  - metric_version
+                  - summary
+                  - results
+                properties:
+                  request:
+                    type: object
+                  software_version:
+                    type: string
+                  metric_version:
+                    type: string
+                  summary:
+                    type: object
+                  results:
+                    type: array
+                    items:
+                      type: object
+        "400":
+          description: Missing or invalid request parameter
