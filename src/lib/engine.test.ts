@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
 import { assess } from "./engine";
 import { licenseReuse, fairTlc, identifierHygiene } from "./reuse";
-import { harvest, parseDoi, parseGithub } from "./harvest";
+import { harvest, harvestSoftware, parseDoi, parseGithub } from "./harvest";
 import { METADATA_SERVICE_TYPES } from "./types";
 import type { AssessmentOptions, RefData } from "./types";
 
@@ -22,6 +22,11 @@ describe("licenseReuse + RDP taxonomy", () => {
   });
   it("classifies CC-BY-SA as copyleft", () => {
     expect(licenseReuse("https://creativecommons.org/licenses/by-sa/4.0/", data).rdp_category).toBe("copyleft");
+  });
+  it("classifies canonical SPDX license URLs", () => {
+    const r = licenseReuse("https://spdx.org/licenses/MIT.html", data);
+    expect(r.is_open).toBe(true);
+    expect(r.rdp_category).toBe("permissive");
   });
 });
 
@@ -248,6 +253,66 @@ describe("metadata service options", () => {
 });
 
 describe("software assessment", () => {
+  it("does not treat upstream CodeMeta DOIs as the software DOI", async () => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = (async (url: string | URL | Request) => {
+      const href = String(url);
+      if (href.includes("/git/trees/")) {
+        return { ok: true, json: async () => ({ tree: [{ path: "codemeta.json" }, { path: "CITATION.cff" }] }), text: async () => "" } as Response;
+      }
+      if (href.includes("/contributors")) {
+        return { ok: true, json: async () => [{ login: "a" }], text: async () => "" } as Response;
+      }
+      if (href.includes("/releases/latest")) {
+        return { ok: true, json: async () => ({ tag_name: "v1.2.3" }), text: async () => "" } as Response;
+      }
+      if (href.endsWith("/codemeta.json")) {
+        return {
+          ok: true,
+          json: async () => ({}),
+          text: async () => JSON.stringify({
+            identifier: "https://github.com/owner/repo",
+            isBasedOn: ["https://doi.org/10.5281/zenodo.3775793"],
+            license: "https://spdx.org/licenses/MIT.html",
+            version: "1.2.3",
+          }),
+        } as Response;
+      }
+      if (href.endsWith("/CITATION.cff")) {
+        return {
+          ok: true,
+          json: async () => ({}),
+          text: async () => "cff-version: 1.2.0\nversion: 1.2.3\n",
+        } as Response;
+      }
+      return {
+        ok: true,
+        json: async () => ({
+          html_url: "https://github.com/owner/repo",
+          name: "repo",
+          description: "demo package",
+          topics: [],
+          license: { spdx_id: "NOASSERTION" },
+          owner: { login: "owner" },
+          created_at: "2026-01-01T00:00:00Z",
+          updated_at: "2026-01-02T00:00:00Z",
+          language: "TypeScript",
+          default_branch: "main",
+        }),
+        text: async () => "",
+      } as Response;
+    }) as typeof fetch;
+
+    try {
+      const h = await harvestSoftware({ owner: "owner", repo: "repo" });
+      expect(h.signals.registry_doi).toBeUndefined();
+      expect(h.metadata.related_resources).toBeUndefined();
+      expect(h.metadata.license).toEqual(["https://spdx.org/licenses/MIT.html"]);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
   it("scores FRSM metrics from harvested GitHub signals", async () => {
     const originalFetch = globalThis.fetch;
     globalThis.fetch = (async (url: string | URL | Request) => {
