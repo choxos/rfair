@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rfuji</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.3.5</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.4.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -53,7 +53,7 @@
       <h1>Illustrating and interpreting a FAIR assessment</h1>
             
       
-      <small class="dont-index">Source: <a href="https://github.com/choxos/rfuji/blob/v2.3.5/vignettes/illustrating-fairness.Rmd" class="external-link"><code>vignettes/illustrating-fairness.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/choxos/rfuji/blob/v2.4.0/vignettes/illustrating-fairness.Rmd" class="external-link"><code>vignettes/illustrating-fairness.Rmd</code></a></small>
       <div class="d-none name"><code>illustrating-fairness.Rmd</code></div>
     </div>
 
@@ -108,13 +108,22 @@ and labeled with the metric identifier and its
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, type <span class="op">=</span> <span class="st">"metric"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="illustrating-fairness_files/figure-html/unnamed-chunk-5-1.png" class="r-plt" alt="Per-metric FAIR breakdown: one horizontal bar per metric, grouped by category." width="672" style="display: block; margin: auto;"></p>
+<p>For a compact overview that shows both levels at once,
+<code>type = "sunburst"</code> draws a concentric ring chart: the inner
+ring is the four FAIR categories and the outer ring is the individual
+metrics, each filled in proportion to its score, with the overall FAIR
+percentage in the center. This is the same summary the web app
+shows.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">x</span>, type <span class="op">=</span> <span class="st">"sunburst"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="illustrating-fairness_files/figure-html/unnamed-chunk-6-1.png" class="r-plt" alt="Concentric FAIR sunburst: inner ring of F/A/I/R categories, outer ring of individual metrics, overall percentage in the center." width="576" style="display: block; margin: auto;"></p>
 </div>
 <div class="section level2">
 <h2 id="score-tables">2. Score tables<a class="anchor" aria-label="anchor" href="#score-tables"></a>
 </h2>
 <p><code><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary()</a></code> returns the per-category table behind the
 scorecard (handy for reports and further computation):</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/summary.html" class="external-link">summary</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   category earned total percent maturity</span></span>
 <span><span class="co">#&gt; 1        F      7     7  100.00      3.0</span></span>
@@ -124,7 +133,7 @@ scorecard (handy for reports and further computation):</p>
 <span><span class="co">#&gt; 5     FAIR     23    26   88.46      2.5</span></span></code></pre></div>
 <p><code><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame()</a></code> gives one row per metric, with its
 principle, category, score, maturity, and pass/fail status:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">df</span>, <span class="fl">8</span><span class="op">)</span></span>
 <span><span class="co">#&gt;   metric_identifier principle category</span></span>
@@ -156,7 +165,7 @@ principle, category, score, maturity, and pass/fail status:</p>
 <span><span class="co">#&gt; 8      2     2     100        3   pass</span></span></code></pre></div>
 <p>Because it is a plain data frame you can slice it however you like,
 for example the metrics that did not earn full marks:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">df</span><span class="op">[</span><span class="va">df</span><span class="op">$</span><span class="va">earned</span> <span class="op">&lt;</span> <span class="va">df</span><span class="op">$</span><span class="va">total</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"metric_identifier"</span>, <span class="st">"metric_name"</span>, <span class="st">"earned"</span>, <span class="st">"total"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt;    metric_identifier</span></span>
 <span><span class="co">#&gt; 11        FsF-I2-01M</span></span>
@@ -203,7 +212,7 @@ reusable. <code>rfuji</code> surfaces that separately (see
 assessment object and worth showing alongside the scorecard.</p>
 <p>License <strong>reusability</strong> (not merely presence): a license
 can be detected yet not actually permit reuse.</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">x</span><span class="op">$</span><span class="va">reuse</span><span class="op">$</span><span class="va">licenses</span><span class="op">[[</span><span class="fl">1</span><span class="op">]</span><span class="op">]</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"license"</span>, <span class="st">"category"</span>, <span class="st">"rdp_category"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt; $license</span></span>
 <span><span class="co">#&gt; [1] "https://opensource.org/licenses/MIT"</span></span>
@@ -215,7 +224,7 @@ can be detected yet not actually permit reuse.</p>
 <span><span class="co">#&gt; [1] "permissive"</span></span></code></pre></div>
 <p>Access level and sensitivity flags (a restricted object is not a FAIR
 failure, but you should know):</p>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">x</span><span class="op">$</span><span class="va">access</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"access"</span>, <span class="st">"controlled_access"</span>, <span class="st">"sensitive"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt; $access</span></span>
 <span><span class="co">#&gt; [1] "public"</span></span>
@@ -227,7 +236,7 @@ failure, but you should know):</p>
 <span><span class="co">#&gt; [1] FALSE</span></span></code></pre></div>
 <p>Identifier hygiene (does the persistent identifier resolve cleanly,
 no obvious problems):</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">x</span><span class="op">$</span><span class="va">identifier_hygiene</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"scheme"</span>, <span class="st">"is_persistent"</span>, <span class="st">"hygiene_ok"</span><span class="op">)</span><span class="op">]</span></span>
 <span><span class="co">#&gt; $scheme</span></span>
 <span><span class="co">#&gt; [1] "doi"</span></span>
@@ -244,7 +253,7 @@ no obvious problems):</p>
 <p>The assessment serializes for downstream tools.
 <code><a href="../reference/as_fuji_json.html">as_fuji_json()</a></code> emits a payload matching the upstream F-UJI
 <code>FAIRResults</code> schema:</p>
-<div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">js</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_fuji_json.html">as_fuji_json</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/substr.html" class="external-link">substr</a></span><span class="op">(</span><span class="va">js</span>, <span class="fl">1</span>, <span class="fl">220</span><span class="op">)</span></span>
 <span><span class="co">#&gt; {</span></span>
@@ -258,7 +267,7 @@ no obvious problems):</p>
 <p><code><a href="../reference/as_rdf.html">as_rdf()</a></code> emits a machine-readable rating (W3C DQV plus a
 schema.org <code>Rating</code> as JSON-LD), suitable for embedding in a
 landing page:</p>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rdf</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/as_rdf.html">as_rdf</a></span><span class="op">(</span><span class="va">x</span><span class="op">)</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/substr.html" class="external-link">substr</a></span><span class="op">(</span><span class="va">rdf</span>, <span class="fl">1</span>, <span class="fl">220</span><span class="op">)</span></span>
 <span><span class="co">#&gt; [1] "{\n  \"@context\": {\n    \"dcat\": \"http://www.w3.org/ns/dcat#\",\n    \"dc\": \"http://purl.org/dc/terms/\",\n    \"schema\": \"http://schema.org/\",\n    \"dqv\": \"http://www.w3.org/ns/dqv#\",\n    \"prov\": \"http://www.w3.org/ns/prov#\",\n   "</span></span></code></pre></div>

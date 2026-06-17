@@ -15,7 +15,7 @@ for worked examples.
 # S3 method for class 'fair_assessment'
 plot(
   x,
-  type = c("category", "metric"),
+  type = c("category", "metric", "sunburst"),
   colors = .fair_cat_colors,
   show_maturity = (match.arg(type) == "category"),
   main = NULL,
@@ -35,7 +35,10 @@ plot(
   What to draw. `"category"` (default) draws one bar per FAIR category
   (Findable, Accessible, Interoperable, Reusable) plus the overall
   score; `"metric"` draws one bar per individual metric, grouped and
-  colored by category.
+  colored by category; `"sunburst"` draws a concentric sunburst (an
+  inner ring of the F/A/I/R categories and an outer ring of the
+  individual metrics, each filled in proportion to its score) with the
+  overall FAIR percentage in the center.
 
 - colors:
 
@@ -73,4 +76,6 @@ data(fair_example)
 plot(fair_example)
 
 plot(fair_example, type = "metric")
+
+plot(fair_example, type = "sunburst")
 ```

@@ -70,6 +70,21 @@ plot(x, type = "metric")
 ![Per-metric FAIR breakdown: one horizontal bar per metric, grouped by
 category.](illustrating-fairness_files/figure-html/unnamed-chunk-5-1.png)
 
+For a compact overview that shows both levels at once,
+`type = "sunburst"` draws a concentric ring chart: the inner ring is the
+four FAIR categories and the outer ring is the individual metrics, each
+filled in proportion to its score, with the overall FAIR percentage in
+the center. This is the same summary the web app shows.
+
+``` r
+
+plot(x, type = "sunburst")
+```
+
+![Concentric FAIR sunburst: inner ring of F/A/I/R categories, outer ring
+of individual metrics, overall percentage in the
+center.](illustrating-fairness_files/figure-html/unnamed-chunk-6-1.png)
+
 ## 2. Score tables
 
 [`summary()`](https://rdrr.io/r/base/summary.html) returns the
