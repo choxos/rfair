@@ -66,12 +66,16 @@ eval_frsm_standard_protocol_repo <- function(ctx, res) {    # FRSM-09-A1
 #' @noRd
 eval_frsm_open_formats <- function(ctx, res) {              # FRSM-10-I1
   sw <- .sw(ctx)
-  if (isTRUE(sw$has_requirements) && .def(res, 1)) .p(res, 1)  # declared deps use open formats
+  if ((isTRUE(sw$has_data_format_docs) || isTRUE(sw$has_requirements)) && .def(res, 1)) .p(res, 1)
+  if (isTRUE(sw$has_open_data_formats) && .def(res, 2)) .p(res, 2)
+  if (isTRUE(sw$has_schema_reference) && .def(res, 3)) .p(res, 3)
 }
 #' @noRd
 eval_frsm_open_api <- function(ctx, res) {                  # FRSM-11-I1
   sw <- .sw(ctx)
   if (isTRUE(sw$has_api) && .def(res, 1)) .p(res, 1)
+  if (isTRUE(sw$has_open_api) && .def(res, 2)) .p(res, 2)
+  if (isTRUE(sw$has_machine_readable_api) && .def(res, 3)) .p(res, 3)
 }
 #' @noRd
 eval_frsm_references <- function(ctx, res) {                # FRSM-12-I2
@@ -93,11 +97,13 @@ eval_frsm_test_cases <- function(ctx, res) {                # FRSM-14-R1
 eval_frsm_source_license <- function(ctx, res) {            # FRSM-15-R1.1
   sw <- .sw(ctx)
   if (isTRUE(sw$has_license) && .def(res, 1)) .p(res, 1)
+  if (isTRUE(sw$has_spdx_license) && .def(res, 3)) .p(res, 3)
 }
 #' @noRd
 eval_frsm_metadata_license <- function(ctx, res) {          # FRSM-16-R1.1
   # reuse the data-license evaluator's logic via the merged license field
   if (!is.null(ctx$metadata_merged$license) && .def(res, 1)) .p(res, 1)
+  if (isTRUE(.sw(ctx)$has_metadata_spdx_license) && .def(res, 2)) .p(res, 2)
 }
 #' @noRd
 eval_frsm_provenance <- function(ctx, res) {                # FRSM-17-R1.2

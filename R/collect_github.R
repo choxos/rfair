@@ -86,12 +86,25 @@ harvest_software_signals <- function(api, repo, branch, j, ver, cm, token = "", 
   contributors <- tryCatch(
     length(github_json(paste0(api, "/contributors?per_page=100"), token, timeout) %||% list()),
     error = function(e) 0L)
+  github_license_refs <- software_license_refs(list(
+    jget(j, "license", "spdx_id"),
+    jget(j, "license", "url")
+  ))
+  metadata_license_refs <- software_license_refs(cm$license)
+  license_ids <- software_spdx_ids(c(github_license_refs, metadata_license_refs))
+  metadata_license_ids <- software_spdx_ids(metadata_license_refs)
+  spdx_licenses <- tolower(vapply(ref_data("spdx"), function(x) x$licenseId %||% "", character(1)))
+  has_spdx_license <- any(tolower(license_ids) %in% spdx_licenses)
   doi_pat <- "10\\.\\d{4,9}/[^\\s\"'<>]+"
   registry_doi <- NULL
   for (v in c(cm$object_identifier, unlist(cm$related_resources))) {
     m <- regmatches(v, regexpr(doi_pat, v %||% "", perl = TRUE))
     if (length(m)) { registry_doi <- m[1]; break }
   }
+  has_interface_definition <- any_match("openapi|swagger|\\.proto$|graphql")
+  has_open_api <- has_interface_definition && !isTRUE(j$private)
+  has_format_schema <- has_interface_definition
+  has_format_docs <- has_format_schema || any_match("as_fuji_json|as_rdf|jsonld|rdf|json-schema|schema\\.json")
 
   list(
     identifier = j$html_url,
@@ -102,14 +115,47 @@ harvest_software_signals <- function(api, repo, branch, j, ver, cm, token = "", 
     contributors = contributors,
     archived = isTRUE(j$archived),
     has_license = !is.null(j$license) || any_match("^licen[sc]e"),
+    has_spdx_license = has_spdx_license,
+    has_metadata_spdx_license = any(tolower(metadata_license_ids) %in% spdx_licenses),
     has_readme = any_match("^readme"),
     has_citation = any_match("^citation\\.cff|^codemeta\\.json"),
     has_tests = any_match("(^|/)tests?(/|$)|(^|/)test_|_test\\.|\\.test\\."),
     has_ci = any_match("^\\.github/workflows/|^\\.travis|^\\.circleci|^azure-pipelines|^\\.gitlab-ci"),
     has_requirements = any_match("^(requirements.*\\.txt|setup\\.py|setup\\.cfg|pyproject\\.toml|package\\.json|description|environment\\.ya?ml|renv\\.lock|cargo\\.toml|go\\.mod|pom\\.xml|build\\.gradle)$"),
     has_docs = any_match("^docs?/|readthedocs|mkdocs\\.ya?ml"),
-    has_api = any_match("openapi|swagger|\\.proto$|graphql")
+    has_api = has_interface_definition,
+    has_open_api = has_open_api,
+    has_machine_readable_api = has_interface_definition,
+    has_data_format_docs = has_format_docs,
+    has_open_data_formats = has_format_schema,
+    has_schema_reference = has_format_schema
   )
+}
+
+#' Extract license reference strings from scalar or structured software metadata.
+#' @noRd
+software_license_refs <- function(x) {
+  if (is.null(x)) return(character(0))
+  if (is.list(x) && !is.data.frame(x)) {
+    fields <- c(x[["@id"]], x$url, x$name, x$identifier, x$licenseId)
+    if (length(fields)) return(as_chr(fields))
+    return(as_chr(unlist(lapply(x, software_license_refs), use.names = FALSE)))
+  }
+  as_chr(x)
+}
+
+#' Normalize SPDX license references to SPDX identifiers.
+#' @noRd
+software_spdx_ids <- function(x) {
+  refs <- unique(software_license_refs(x))
+  refs <- refs[refs != "NOASSERTION"]
+  unname(vapply(refs, function(ref) {
+    if (grepl("^https?://([^/]+\\.)?spdx\\.org/licenses/", ref, ignore.case = TRUE)) {
+      sub("\\.(html|json)$", "", sub(".*/", "", ref), ignore.case = TRUE)
+    } else {
+      ref
+    }
+  }, character(1)))
 }
 
 #' GET + parse a GitHub API JSON resource.
