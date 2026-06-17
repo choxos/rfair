@@ -118,6 +118,49 @@ function literals(v: any): string[] {
   return asArray(v).map(literal).filter((x): x is string => !!x);
 }
 
+function normalizeDoi(value: unknown): string | undefined {
+  if (typeof value !== "string") return undefined;
+  const m = value.match(/(?:doi:\s*|https?:\/\/(?:dx\.)?doi\.org\/)?(10\.\d{4,9}\/[^\s"'<>,)]+)/i);
+  return m?.[1];
+}
+
+function codemetaSoftwareDoi(text: string): string | undefined {
+  if (!text.trim()) return undefined;
+  try {
+    const cm = JSON.parse(text);
+    const candidates = [
+      cm.doi,
+      cm.identifier,
+      cm["@id"],
+      cm.sameAs,
+    ].flatMap(asArray);
+    for (const value of candidates) {
+      const doi = normalizeDoi(literal(value) ?? value);
+      if (doi) return doi;
+    }
+  } catch {
+    return undefined;
+  }
+  return undefined;
+}
+
+function codemetaLicenses(text: string): string[] {
+  if (!text.trim()) return [];
+  try {
+    const cm = JSON.parse(text);
+    return asArray(cm.license)
+      .map((value) => literal(value) ?? literal(value?.["@id"]) ?? literal(value?.url))
+      .filter((value): value is string => !!value);
+  } catch {
+    return [];
+  }
+}
+
+function citationSoftwareDoi(text: string): string | undefined {
+  const m = text.match(/^\s*doi\s*:\s*["']?([^"'\n#]+)["']?/im);
+  return normalizeDoi(m?.[1]);
+}
+
 function tryJson(text: string): any | null {
   try { return JSON.parse(text); } catch { return null; }
 }
@@ -265,12 +308,15 @@ export async function harvestSoftware(gh: { owner: string; repo: string }): Prom
 
   const rel = await getJson(`${api}/releases/latest`);
   sig.version = rel?.tag_name || undefined;
+  let metadataLicenses: string[] = [];
 
   if (sig.has_citation) {
     const base = `https://raw.githubusercontent.com/${gh.owner}/${gh.repo}/${branch}`;
-    const txt = (await getText(`${base}/codemeta.json`)) + "\n" + (await getText(`${base}/CITATION.cff`));
-    const dm = txt.match(/10\.\d{4,9}\/[^\s"'<>,)]+/);
-    if (dm) sig.registry_doi = dm[0];
+    const codemeta = await getText(`${base}/codemeta.json`);
+    const citation = await getText(`${base}/CITATION.cff`);
+    const txt = `${codemeta}\n${citation}`;
+    sig.registry_doi = codemetaSoftwareDoi(codemeta) ?? citationSoftwareDoi(citation);
+    metadataLicenses = codemetaLicenses(codemeta);
     if (!sig.version) {
       const vm = txt.match(/"?version"?\s*[:=]\s*"?v?(\d+\.\d+[^\s",}]*)/i);
       if (vm) sig.version = vm[1];
@@ -285,6 +331,7 @@ export async function harvestSoftware(gh: { owner: string; repo: string }): Prom
   if (j.topics?.length) metadata.keywords = j.topics;
   const spdx = j.license?.spdx_id;
   if (spdx && spdx !== "NOASSERTION") metadata.license = [spdx];
+  if (!metadata.license && metadataLicenses.length) metadata.license = metadataLicenses;
   if (sig.version) metadata.version = sig.version;
   if (sig.language) metadata.language = sig.language;
   if (sig.registry_doi) {

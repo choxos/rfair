@@ -7,6 +7,8 @@ function resolveLicenseId(license: string, data: RefData): string | null {
     if (/creativecommons\.org\/publicdomain\//i.test(license)) return "CC0-1.0";
     const m = license.match(CC_RE);
     if (m) return `CC-${m[1]}-${m[2]}`.toUpperCase();
+    const spdx = license.match(/^https?:\/\/(?:www\.)?spdx\.org\/licenses\/([A-Za-z0-9.+-]+)(?:\.(?:html|json))?$/i);
+    if (spdx) return spdx[1];
     const hit = data.licenses.find((l) => (l.seeAlso ?? []).includes(license));
     return hit?.licenseId ?? null;
   }
