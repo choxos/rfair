@@ -42,3 +42,20 @@ test_that("FRSM software license signals handle structured metadata", {
   expect_equal(software_license_refs(list(list(url = "https://spdx.org/licenses/BSD-3-Clause.html"))),
                "https://spdx.org/licenses/BSD-3-Clause.html")
 })
+
+test_that("FRSM software path signals distinguish API, format, and schema evidence", {
+  openapi <- software_path_signals("inst/openapi/rfuji-openapi.yaml")
+  expect_true(openapi$has_api)
+  expect_true(openapi$has_open_data_formats)
+  expect_true(openapi$has_schema_reference)
+
+  graphql <- software_path_signals("schema/query.graphql")
+  expect_true(graphql$has_api)
+  expect_false(graphql$has_open_data_formats)
+  expect_true(graphql$has_schema_reference)
+
+  formats <- software_path_signals(c("examples/result.jsonld", "schemas/result.xsd"))
+  expect_false(formats$has_api)
+  expect_true(formats$has_open_data_formats)
+  expect_true(formats$has_schema_reference)
+})
