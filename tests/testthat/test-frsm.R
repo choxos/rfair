@@ -8,8 +8,12 @@ test_that("FRSM software metrics load and evaluators score from signals", {
     identifier = "https://github.com/o/r", version = "v1.2.0",
     registry_doi = "10.5281/zenodo.123", name = "r", description = "a tool",
     contributors = 5, has_license = TRUE, has_readme = TRUE, has_citation = TRUE,
-    has_tests = TRUE, has_ci = TRUE, has_requirements = TRUE, has_api = FALSE)
-  ctx$metadata_merged <- list(license = "MIT")
+    has_tests = TRUE, has_ci = TRUE, has_requirements = TRUE, has_api = TRUE,
+    has_open_api = TRUE, has_machine_readable_api = TRUE,
+    has_data_format_docs = TRUE, has_open_data_formats = TRUE,
+    has_schema_reference = TRUE, has_spdx_license = TRUE,
+    has_metadata_spdx_license = TRUE)
+  ctx$metadata_merged <- list(license = "https://spdx.org/licenses/MIT.html")
   ctx$test_debug <- FALSE
   mk <- function(id) new_metric_evaluation(m$custom[[id]])
 
@@ -21,4 +25,20 @@ test_that("FRSM software metrics load and evaluators score from signals", {
 
   t <- mk("FRSM-14-R1"); eval_frsm_test_cases(ctx, t)
   expect_gt(finalize_result(t)$score$earned, 0)            # tests + CI present
+
+  api <- mk("FRSM-11-I1"); eval_frsm_open_api(ctx, api)
+  expect_identical(finalize_result(api)$test_status, "pass") # OpenAPI contract present
+
+  lic <- mk("FRSM-16-R1.1"); eval_frsm_metadata_license(ctx, lic)
+  expect_identical(finalize_result(lic)$test_status, "pass") # SPDX license metadata
+})
+
+test_that("FRSM software license signals handle structured metadata", {
+  expect_equal(software_spdx_ids("https://spdx.org/licenses/MIT.html"), "MIT")
+  expect_equal(
+    software_spdx_ids(list(list(`@id` = "https://spdx.org/licenses/Apache-2.0.json"))),
+    "Apache-2.0"
+  )
+  expect_equal(software_license_refs(list(list(url = "https://spdx.org/licenses/BSD-3-Clause.html"))),
+               "https://spdx.org/licenses/BSD-3-Clause.html")
 })

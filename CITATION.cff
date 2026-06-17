@@ -2,7 +2,7 @@ cff-version: 1.2.0
 message: "If you use rfuji, please cite the software repository and the version you used."
 type: software
 title: "rfuji: native R FAIR assessment metrics"
-version: 2.3.0
+version: 2.3.1
 abstract: "rfuji is a native R implementation of F-UJI and FAIRsFAIR research data object assessment metrics, including legacy metric versions, software FAIR metrics, and reusable JSON/RDF outputs."
 authors:
   - family-names: Sofi-Mahmudi
