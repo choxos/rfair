@@ -67,7 +67,14 @@ function normalizedTestId(id: string): string {
 function passSuffix(e: Eval, mid: string, suffix: string) {
   const targets = new Set([`${mid}${suffix}`, `${agnosticMetricId(mid)}${suffix}`, `${canonicalMetricId(mid)}${suffix}`]);
   const t = e.tests.find((x) => targets.has(normalizedTestId(x.id)) || targets.has(x.id));
-  if (!t) return;
+  if (!t) {
+    if (e.tests.length === 0 && e.status !== "pass" && e.total > 0) {
+      e.earned = e.total;
+      e.maturity = Math.max(e.maturity, 1);
+      e.status = "pass";
+    }
+    return;
+  }
   if (t.status === "pass") return;
   t.status = "pass";
   e.earned += t.score;

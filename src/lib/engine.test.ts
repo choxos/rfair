@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { assess } from "./engine";
 import { licenseReuse, fairTlc, identifierHygiene } from "./reuse";
 import { harvest, parseDoi, parseGithub } from "./harvest";
+import { METADATA_SERVICE_TYPES } from "./types";
 import type { AssessmentOptions, RefData } from "./types";
 
 // CC / software licenses resolve via regex, so an empty license table suffices.
@@ -91,6 +92,123 @@ describe("metadata service options", () => {
       });
       expect(h.sources).toEqual([{ source: "DCAT", method: "metadata_service_fetch" }]);
       expect(h.metadata.metadata_service).toEqual([{ url: "https://example.org/catalog.jsonld", type: "dcat" }]);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  it("validates every exposed metadata service option after a successful fetch", async () => {
+    const originalFetch = globalThis.fetch;
+    const response = ({
+      contentType = "application/json",
+      json = {},
+      link = null as string | null,
+      text = JSON.stringify(json),
+    } = {}) => ({
+      ok: true,
+      status: 200,
+      headers: { get: (name: string) => name.toLowerCase() === "content-type" ? contentType : name.toLowerCase() === "link" ? link : null },
+      json: async () => json,
+      text: async () => text,
+    } as unknown as Response);
+
+    globalThis.fetch = (async (url: string | URL | Request) => {
+      const href = String(url);
+      if (href.includes("dcat")) return response({ json: { "@type": "Dataset", name: "DCAT dataset" } });
+      if (href.includes("schema_org")) return response({
+        contentType: "application/ld+json",
+        json: { "@type": "Dataset", name: "schema dataset" },
+      });
+      if (href.includes("datacite")) return response({
+        json: { data: { attributes: { doi: "10.1234/example", titles: [{ title: "DataCite dataset" }] } } },
+      });
+      if (href.includes("crossref")) return response({
+        json: { message: { DOI: "10.1234/example", title: ["Crossref dataset"] } },
+      });
+      if (href.includes("oai_pmh")) return response({
+        contentType: "application/xml",
+        text: "<record><metadata><oai_dc:dc><dc:title>OAI dataset</dc:title></oai_dc:dc></metadata></record>",
+      });
+      if (href.includes("ogc_csw")) return response({
+        contentType: "application/xml",
+        text: "<Capabilities><ServiceIdentification><Title>CSW catalog</Title></ServiceIdentification></Capabilities>",
+      });
+      if (href.includes("sparql")) return response({
+        contentType: "application/sparql-results+json",
+        json: { boolean: true },
+      });
+      if (href.includes("signposting")) return response({ link: '<https://example.org/file.csv>; rel="item"' });
+      if (href.includes("typed_links")) return response({ link: '<https://example.org/metadata.json>; rel="describedby"' });
+      if (href.includes("ro_crate")) return response({
+        json: { "@graph": [{ "@id": "./", "@type": "Dataset", name: "RO-Crate dataset" }] },
+      });
+      if (href.includes("ckan")) return response({
+        json: { result: { title: "CKAN dataset", name: "ckan-dataset" } },
+      });
+      return response({
+        contentType: "application/xml",
+        text: "<metadata><title>Generic metadata</title></metadata>",
+      });
+    }) as typeof fetch;
+
+    try {
+      for (const { value } of METADATA_SERVICE_TYPES) {
+        const h = await harvest("https://doi.org/10.1234/example", {
+          useDatacite: false,
+          metadataServiceEndpoint: `https://example.org/${value}`,
+          metadataServiceType: value,
+        });
+        expect(h.metadata.metadata_service).toEqual([{ url: `https://example.org/${value}`, type: value }]);
+        expect(h.sources.some((s) => s.method === "metadata_service_fetch")).toBe(true);
+      }
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  it("scores metric-level legacy metric sets without per-test definitions", async () => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = (async () => ({
+      ok: true,
+      headers: { get: () => "application/json" },
+      json: async () => ({
+        data: {
+          attributes: {
+            doi: "10.1234/example",
+            types: { resourceTypeGeneral: "Dataset" },
+            creators: [{ name: "Ada Lovelace" }],
+            titles: [{ title: "Legacy dataset" }],
+            publisher: "Example Repository",
+            publicationYear: 2026,
+            descriptions: [{ descriptionType: "Abstract", description: "A dataset." }],
+            subjects: [{ subject: "legacy" }],
+          },
+        },
+      }),
+      text: async () => "",
+    } as unknown as Response)) as typeof fetch;
+
+    try {
+      const ref = {
+        ...data,
+        metrics: { metrics: [] },
+        metricSets: {
+          "0.3": {
+            metrics: [
+              { metric_identifier: "FsF-F1-01D", metric_number: 1, metric_name: "Unique identifier", total_score: 1 },
+              { metric_identifier: "FsF-F2-01M", metric_number: 2, metric_name: "Core metadata", total_score: 2 },
+            ],
+          },
+        },
+        formats: { science: [], long_term: [], open: [] },
+        access: [],
+        protocols: {},
+      } as unknown as RefData;
+
+      const result = await assess("https://doi.org/10.1234/example", ref, "0.3");
+      expect(result.results.find((r) => r.metric_identifier === "FsF-F1-01D")?.earned).toBe(1);
+      expect(result.results.find((r) => r.metric_identifier === "FsF-F2-01M")?.earned).toBe(2);
+      expect(result.summary.find((s) => s.category === "FAIR")?.earned).toBe(3);
     } finally {
       globalThis.fetch = originalFetch;
     }
