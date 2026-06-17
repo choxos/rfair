@@ -1,8 +1,8 @@
 import { describe, it, expect } from "vitest";
 import { assess } from "./engine";
 import { licenseReuse, fairTlc, identifierHygiene } from "./reuse";
-import { parseDoi, parseGithub } from "./harvest";
-import type { RefData } from "./types";
+import { harvest, parseDoi, parseGithub } from "./harvest";
+import type { AssessmentOptions, RefData } from "./types";
 
 // CC / software licenses resolve via regex, so an empty license table suffices.
 const data = { licenses: [] } as unknown as RefData;
@@ -45,6 +45,56 @@ describe("fairTlc", () => {
 describe("parsers", () => {
   it("parseDoi", () => expect(parseDoi("https://doi.org/10.5281/zenodo.1")).toBe("10.5281/zenodo.1"));
   it("parseGithub", () => expect(parseGithub("https://github.com/owner/repo")?.repo).toBe("repo"));
+});
+
+describe("metadata service options", () => {
+  const baseOptions: AssessmentOptions = {
+    useDatacite: false,
+    metadataServiceEndpoint: "https://example.org/oai",
+    metadataServiceType: "oai_pmh",
+  };
+
+  it("records unharvested service requests without scoring sources", async () => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = (async () => ({
+      ok: false,
+      status: 404,
+      headers: { get: () => null },
+      json: async () => ({}),
+      text: async () => "",
+    } as unknown as Response)) as typeof fetch;
+
+    try {
+      const h = await harvest("https://example.org/dataset", baseOptions);
+      expect(h.sources).toEqual([]);
+      expect(h.metadata.metadata_service).toBeUndefined();
+      expect(h.metadata.metadata_service_request).toEqual([{ url: "https://example.org/oai", type: "oai_pmh" }]);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
+
+  it("records metadata service only after a successful supported fetch", async () => {
+    const originalFetch = globalThis.fetch;
+    globalThis.fetch = (async () => ({
+      ok: true,
+      headers: { get: () => "application/ld+json" },
+      json: async () => ({}),
+      text: async () => "",
+    } as unknown as Response)) as typeof fetch;
+
+    try {
+      const h = await harvest("https://example.org/dataset", {
+        ...baseOptions,
+        metadataServiceEndpoint: "https://example.org/catalog.jsonld",
+        metadataServiceType: "dcat",
+      });
+      expect(h.sources).toEqual([{ source: "DCAT", method: "metadata_service_fetch" }]);
+      expect(h.metadata.metadata_service).toEqual([{ url: "https://example.org/catalog.jsonld", type: "dcat" }]);
+    } finally {
+      globalThis.fetch = originalFetch;
+    }
+  });
 });
 
 describe("software assessment", () => {
