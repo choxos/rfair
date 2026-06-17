@@ -14,16 +14,16 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/choxos/rfuji/blob/v2.3.1/inst/CITATION)
+[`inst/CITATION`](https://github.com/choxos/rfuji/blob/v2.3.2/inst/CITATION)
 
 Sofi-Mahmudi A, Neumann S (2026). *rfuji: Native R FAIR Assessment
-Metrics*. R package version 2.3.1, <https://github.com/choxos/rfuji>.
+Metrics*. R package version 2.3.2, <https://github.com/choxos/rfuji>.
 
     @Manual{,
       title = {rfuji: Native R FAIR Assessment Metrics},
       author = {Ahmad Sofi-Mahmudi and Steffen Neumann},
       year = {2026},
-      version = {2.3.1},
+      version = {2.3.2},
       url = {https://github.com/choxos/rfuji},
-      note = {R package version 2.3.1},
+      note = {R package version 2.3.2},
     }
