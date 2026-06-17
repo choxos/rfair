@@ -306,6 +306,8 @@ describe("software assessment", () => {
     try {
       const h = await harvestSoftware({ owner: "owner", repo: "repo" });
       expect(h.signals.registry_doi).toBeUndefined();
+      expect(h.signals.has_spdx_license).toBe(true);
+      expect(h.signals.has_metadata_spdx_license).toBe(true);
       expect(h.metadata.related_resources).toBeUndefined();
       expect(h.metadata.license).toEqual(["https://spdx.org/licenses/MIT.html"]);
     } finally {
@@ -325,6 +327,7 @@ describe("software assessment", () => {
             { path: "tests/engine.test.ts" },
             { path: ".github/workflows/ci.yml" },
             { path: "CITATION.cff" },
+            { path: "inst/openapi/rfuji-openapi.yaml" },
           ] }
         : href.includes("/contributors")
           ? [{ login: "a" }, { login: "b" }]
@@ -342,7 +345,12 @@ describe("software assessment", () => {
                 language: "TypeScript",
                 default_branch: "main",
               };
-      const text = "doi: 10.5281/zenodo.12345\nversion: 1.2.3\n";
+      const text = href.endsWith("/codemeta.json")
+        ? JSON.stringify({
+            license: [{ "@id": "https://spdx.org/licenses/MIT.html" }],
+            version: "1.2.3",
+          })
+        : "doi: 10.5281/zenodo.12345\nversion: 1.2.3\n";
       return { ok: true, json: async () => json, text: async () => text } as Response;
     }) as typeof fetch;
 
@@ -378,9 +386,43 @@ describe("software assessment", () => {
               metric_identifier: "FRSM-15-R1.1",
               metric_number: 15,
               metric_name: "Source license",
-              total_score: 1,
+              total_score: 3,
               metric_tests: [
                 { metric_test_identifier: "FRSM-15-R1.1-1", metric_test_name: "license", metric_test_score: 1, metric_test_maturity: 2 },
+                { metric_test_identifier: "FRSM-15-R1.1-2", metric_test_name: "bundled component licenses", metric_test_score: 1, metric_test_maturity: 2 },
+                { metric_test_identifier: "FRSM-15-R1.1-3", metric_test_name: "spdx", metric_test_score: 1, metric_test_maturity: 3 },
+              ],
+            },
+            {
+              metric_identifier: "FRSM-10-I1",
+              metric_number: 10,
+              metric_name: "Data formats",
+              total_score: 3,
+              metric_tests: [
+                { metric_test_identifier: "FRSM-10-I1-1", metric_test_name: "documented", metric_test_score: 1, metric_test_maturity: 1 },
+                { metric_test_identifier: "FRSM-10-I1-2", metric_test_name: "open", metric_test_score: 1, metric_test_maturity: 2 },
+                { metric_test_identifier: "FRSM-10-I1-3", metric_test_name: "schema", metric_test_score: 1, metric_test_maturity: 3 },
+              ],
+            },
+            {
+              metric_identifier: "FRSM-11-I1",
+              metric_number: 11,
+              metric_name: "API",
+              total_score: 3,
+              metric_tests: [
+                { metric_test_identifier: "FRSM-11-I1-1", metric_test_name: "api", metric_test_score: 1, metric_test_maturity: 1 },
+                { metric_test_identifier: "FRSM-11-I1-2", metric_test_name: "open", metric_test_score: 1, metric_test_maturity: 2 },
+                { metric_test_identifier: "FRSM-11-I1-3", metric_test_name: "machine readable", metric_test_score: 1, metric_test_maturity: 3 },
+              ],
+            },
+            {
+              metric_identifier: "FRSM-16-R1.1",
+              metric_number: 16,
+              metric_name: "Metadata license",
+              total_score: 2,
+              metric_tests: [
+                { metric_test_identifier: "FRSM-16-R1.1-1", metric_test_name: "license metadata", metric_test_score: 1, metric_test_maturity: 2 },
+                { metric_test_identifier: "FRSM-16-R1.1-2", metric_test_name: "spdx metadata", metric_test_score: 1, metric_test_maturity: 3 },
               ],
             },
           ],
@@ -392,10 +434,15 @@ describe("software assessment", () => {
 
       const result = await assess("https://github.com/owner/repo", ref, "0.7_software");
       expect(result.metric_version).toBe("0.7_software");
-      expect(result.results.map((r) => r.metric_identifier)).toEqual(["FRSM-01-F1", "FRSM-04-F2", "FRSM-15-R1.1"]);
+      expect(result.results.map((r) => r.metric_identifier)).toEqual([
+        "FRSM-01-F1", "FRSM-04-F2", "FRSM-10-I1", "FRSM-11-I1", "FRSM-15-R1.1", "FRSM-16-R1.1",
+      ]);
       expect(result.results.find((r) => r.metric_identifier === "FRSM-01-F1")?.earned).toBe(3);
-      expect(result.results.find((r) => r.metric_identifier === "FRSM-15-R1.1")?.earned).toBe(1);
-      expect(result.summary.find((s) => s.category === "FAIR")?.earned).toBe(7);
+      expect(result.results.find((r) => r.metric_identifier === "FRSM-10-I1")?.earned).toBe(3);
+      expect(result.results.find((r) => r.metric_identifier === "FRSM-11-I1")?.earned).toBe(3);
+      expect(result.results.find((r) => r.metric_identifier === "FRSM-15-R1.1")?.earned).toBe(2);
+      expect(result.results.find((r) => r.metric_identifier === "FRSM-16-R1.1")?.earned).toBe(2);
+      expect(result.summary.find((s) => s.category === "FAIR")?.earned).toBe(16);
     } finally {
       globalThis.fetch = originalFetch;
     }

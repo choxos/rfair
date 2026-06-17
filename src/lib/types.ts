@@ -172,4 +172,11 @@ export interface SoftwareSignals {
   has_requirements: boolean;
   has_docs: boolean;
   has_api: boolean;
+  has_spdx_license: boolean;
+  has_metadata_spdx_license: boolean;
+  has_open_api: boolean;
+  has_machine_readable_api: boolean;
+  has_data_format_docs: boolean;
+  has_open_data_formats: boolean;
+  has_schema_reference: boolean;
 }

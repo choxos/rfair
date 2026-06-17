@@ -241,10 +241,14 @@ function runFrsm(mid: string, e: Eval, s: SoftwareSignals, metaLicense: boolean)
       if (s.identifier && /^https/.test(s.identifier)) passSuffix(e, mid, "-1");
       break;
     case "FRSM-10-I1":
-      if (s.has_requirements) passSuffix(e, mid, "-1");
+      if (s.has_data_format_docs || s.has_requirements) passSuffix(e, mid, "-1");
+      if (s.has_open_data_formats) passSuffix(e, mid, "-2");
+      if (s.has_schema_reference) passSuffix(e, mid, "-3");
       break;
     case "FRSM-11-I1":
       if (s.has_api) passSuffix(e, mid, "-1");
+      if (s.has_open_api) passSuffix(e, mid, "-2");
+      if (s.has_machine_readable_api) passSuffix(e, mid, "-3");
       break;
     case "FRSM-12-I2":
       if (s.has_citation) passSuffix(e, mid, "-1");
@@ -258,9 +262,11 @@ function runFrsm(mid: string, e: Eval, s: SoftwareSignals, metaLicense: boolean)
       break;
     case "FRSM-15-R1.1":
       if (s.has_license) passSuffix(e, mid, "-1");
+      if (s.has_spdx_license) passSuffix(e, mid, "-3");
       break;
     case "FRSM-16-R1.1":
       if (metaLicense) passSuffix(e, mid, "-1");
+      if (s.has_metadata_spdx_license) passSuffix(e, mid, "-2");
       break;
     case "FRSM-17-R1.2":
       if (s.contributors > 0 || s.version) passSuffix(e, mid, "-1");
