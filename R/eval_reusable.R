@@ -16,7 +16,7 @@ eval_data_content_metadata <- function(ctx, res) {
   has_link <- length(urls) > 0L
   has_file_descriptor <- !is.null(mm$object_format) || !is.null(mm$object_size)
   has_variable <- !is.null(mm$measured_variable)
-  has_service <- is_nonempty_string(ctx$metadata_service_endpoint)
+  has_service <- !is.null(mm$metadata_service)
 
   # -1 resource type specified
   if (crit_is_defined_suffix(res, "-1") && (has_type || has_link)) {
@@ -42,7 +42,7 @@ eval_data_content_metadata <- function(ctx, res) {
     crit_pass_suffix(res, "-2b", evidence = as_chr(mm$measured_variable))
   }
   if (crit_is_defined_suffix(res, "-2c") && has_service) {
-    crit_pass_suffix(res, "-2c", evidence = ctx$metadata_service_endpoint)
+    crit_pass_suffix(res, "-2c", evidence = as_chr(mm$metadata_service))
   }
 
   # -3 measured variables / observation types

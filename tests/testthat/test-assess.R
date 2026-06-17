@@ -42,6 +42,18 @@ test_that("assess_fair records metadata service request options", {
   expect_equal(a$request$metadata_service_type, "oai_pmh")
 })
 
+test_that("metadata service request alone is not scoring evidence", {
+  a <- assess_fair(
+    "https://doi.org/10.5281/zenodo.8347772",
+    metric_version = "0.5",
+    resolve = FALSE,
+    metadata_service_endpoint = "https://example.org/oai",
+    metadata_service_type = "oai_pmh"
+  )
+  df <- as.data.frame(a)
+  expect_equal(df$earned[df$metric_identifier == "FsF-R1-01MD"], 0)
+})
+
 test_that("print.fair_assessment is stable", {
   a <- assess_fair("https://doi.org/10.5281/zenodo.8347772", resolve = FALSE)
   expect_output(print(a), "fair_assessment")
