@@ -88,24 +88,8 @@ function mapCrossref(m: any, doi: string, out: Reference) {
   if (links.length) out.object_content_identifier = links;
 }
 
-function metadataServiceSource(options: AssessmentOptions): { source: string; method: string } | null {
-  const endpoint = options.metadataServiceEndpoint.trim();
-  if (!endpoint) return null;
-  const label: Record<string, string> = {
-    oai_pmh: "OAI-PMH",
-    ogc_csw: "OGC CSW",
-    sparql: "SPARQL",
-    dcat: "DCAT",
-    schema_org: "schema.org",
-    datacite: "DataCite",
-    crossref: "Crossref",
-    signposting: "Signposting",
-    typed_links: "Typed links",
-    ro_crate: "RO-Crate",
-    ckan: "CKAN",
-    other: "Metadata service",
-  };
-  return { source: label[options.metadataServiceType] ?? "Metadata service", method: "user_supplied_endpoint" };
+function recordMetadataService(out: Reference, endpoint: string, type: AssessmentOptions["metadataServiceType"]) {
+  out.metadata_service = [{ url: endpoint, type }];
 }
 
 export interface SoftwareHarvest {
@@ -195,11 +179,8 @@ export async function harvest(input: string, options: AssessmentOptions): Promis
   const metadata: Reference = {};
   const sources: { source: string; method: string }[] = [];
   let resolved: string | null = null;
-  const serviceSource = metadataServiceSource(options);
-  if (serviceSource) {
-    metadata.metadata_service = [{ url: options.metadataServiceEndpoint.trim(), type: options.metadataServiceType }];
-    sources.push(serviceSource);
-  }
+  const serviceEndpoint = options.metadataServiceEndpoint.trim();
+  if (serviceEndpoint) metadata.metadata_service_request = [{ url: serviceEndpoint, type: options.metadataServiceType }];
 
   const gh = parseGithub(input);
   if (gh) {
@@ -229,25 +210,27 @@ export async function harvest(input: string, options: AssessmentOptions): Promis
     } catch { /* network/CORS */ }
   }
 
-  if (options.metadataServiceEndpoint.trim() && options.metadataServiceType === "dcat") {
+  if (serviceEndpoint && options.metadataServiceType === "dcat") {
     try {
-      const r = await fetch(options.metadataServiceEndpoint.trim());
+      const r = await fetch(serviceEndpoint);
       if (r.ok) {
+        recordMetadataService(metadata, serviceEndpoint, options.metadataServiceType);
         metadata.metadata_service_payload_type = r.headers.get("content-type") ?? "unknown";
         sources.push({ source: "DCAT", method: "metadata_service_fetch" });
       }
     } catch { /* network/CORS */ }
   }
 
-  if (options.metadataServiceEndpoint.trim() && options.metadataServiceType === "schema_org") {
+  if (serviceEndpoint && options.metadataServiceType === "schema_org") {
     try {
-      const r = await fetch(options.metadataServiceEndpoint.trim());
+      const r = await fetch(serviceEndpoint);
       if (r.ok) {
         const txt = await r.text();
         const m = txt.match(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/i);
         if (m) {
           try {
             const j = JSON.parse(m[1]);
+            recordMetadataService(metadata, serviceEndpoint, options.metadataServiceType);
             metadata.schema_org_type = Array.isArray(j) ? j.map((x: any) => x?.["@type"]).filter(Boolean) : j?.["@type"];
             sources.push({ source: "schema.org", method: "metadata_service_fetch" });
           } catch { /* invalid JSON-LD */ }
@@ -256,15 +239,16 @@ export async function harvest(input: string, options: AssessmentOptions): Promis
     } catch { /* network/CORS */ }
   }
 
-  if (options.metadataServiceEndpoint.trim() && options.metadataServiceType === "ckan") {
+  if (serviceEndpoint && options.metadataServiceType === "ckan") {
     try {
-      const u = new URL(options.metadataServiceEndpoint.trim());
+      const u = new URL(serviceEndpoint);
       const id = doi ?? input.trim();
       u.searchParams.set("id", id);
       const r = await fetch(u.toString());
       if (r.ok) {
         const j = await r.json();
         const rec = j?.result ?? j;
+        recordMetadataService(metadata, serviceEndpoint, options.metadataServiceType);
         if (rec?.title && !metadata.title) metadata.title = rec.title;
         if (rec?.notes && !metadata.summary) metadata.summary = rec.notes;
         if (rec?.license_id && !metadata.license) metadata.license = [rec.license_id];
