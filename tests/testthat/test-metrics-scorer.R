@@ -33,6 +33,17 @@ test_that("legacy FsF metric identifiers are scored through compatibility aliase
   expect_true("FsF-F2-01M-ss" %in% as.data.frame(ss)$metric_identifier)
 })
 
+test_that("metric-level legacy FsF versions without metric tests can score", {
+  for (v in c("0.2", "0.3")) {
+    a <- assess_fair("https://doi.org/10.5281/zenodo.8347772",
+                     metric_version = v, resolve = FALSE)
+    df <- as.data.frame(a)
+    expect_gt(a$summary$score_earned$FAIR, 0)
+    expect_gt(sum(df$status == "pass"), 0)
+    expect_equal(df$earned[df$metric_identifier == "FsF-F1-01D"], 1)
+  }
+})
+
 test_that("get_assessment_summary aggregates by category and principle", {
   results <- list(
     list(metric_identifier = "FsF-F1-01MD", score = list(earned = 1, total = 1),
