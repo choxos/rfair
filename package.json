@@ -1,7 +1,7 @@
 {
   "name": "rfuji-webapp",
   "private": true,
-  "version": "2.2.4",
+  "version": "2.2.5",
   "type": "module",
   "description": "Browser FAIR assessment client for rfuji (registry-based, client-side scoring).",
   "scripts": {

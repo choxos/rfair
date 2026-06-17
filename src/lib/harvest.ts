@@ -118,6 +118,27 @@ function literals(v: any): string[] {
   return asArray(v).map(literal).filter((x): x is string => !!x);
 }
 
+function licenseRefs(v: any): string[] {
+  return asArray(v).flatMap((value) => {
+    if (typeof value === "string" && value.trim()) return [value.trim()];
+    if (value && typeof value === "object") {
+      return [value["@id"], value.url, value.name, value.identifier, value.licenseId]
+        .map(literal)
+        .filter((x): x is string => !!x);
+    }
+    return [];
+  });
+}
+
+function spdxIds(v: any): string[] {
+  return [...new Set(licenseRefs(v).map((ref) => {
+    if (ref === "NOASSERTION") return null;
+    const m = ref.match(/^https?:\/\/(?:www\.)?spdx\.org\/licenses\/([A-Za-z0-9.+-]+)(?:\.(?:html|json))?$/i);
+    if (m) return m[1];
+    return /^[A-Za-z0-9.+-]+$/.test(ref) ? ref : null;
+  }).filter((x): x is string => !!x))];
+}
+
 function normalizeDoi(value: unknown): string | undefined {
   if (typeof value !== "string") return undefined;
   const m = value.match(/(?:doi:\s*|https?:\/\/(?:dx\.)?doi\.org\/)?(10\.\d{4,9}\/[^\s"'<>,)]+)/i);
@@ -148,9 +169,7 @@ function codemetaLicenses(text: string): string[] {
   if (!text.trim()) return [];
   try {
     const cm = JSON.parse(text);
-    return asArray(cm.license)
-      .map((value) => literal(value) ?? literal(value?.["@id"]) ?? literal(value?.url))
-      .filter((value): value is string => !!value);
+    return licenseRefs(cm.license);
   } catch {
     return [];
   }
@@ -283,12 +302,17 @@ export async function harvestSoftware(gh: { owner: string; repo: string }): Prom
   if (!j) throw new Error("Could not read that GitHub repository (check the URL, or GitHub's rate limit).");
 
   const branch = j.default_branch || "main";
+  const githubLicenseRefs = licenseRefs([j.license?.spdx_id, j.license?.url]);
   const sig: SoftwareSignals = {
     identifier: j.html_url, name: j.name, description: j.description ?? undefined,
     language: j.language ?? undefined, topics: j.topics ?? [], contributors: 0,
-    has_license: !!(j.license && j.license.spdx_id && j.license.spdx_id !== "NOASSERTION"),
+    has_license: spdxIds(githubLicenseRefs).length > 0,
     has_readme: false, has_citation: false, has_tests: false, has_ci: false,
     has_requirements: false, has_docs: false, has_api: false,
+    has_spdx_license: false, has_metadata_spdx_license: false,
+    has_open_api: false, has_machine_readable_api: false,
+    has_data_format_docs: false, has_open_data_formats: false,
+    has_schema_reference: false,
   };
 
   const tree = await getJson(`${api}/git/trees/${branch}?recursive=1`);
@@ -301,7 +325,15 @@ export async function harvestSoftware(gh: { owner: string; repo: string }): Prom
   sig.has_ci = any(/^\.github\/workflows\/|^\.travis|^\.circleci|^azure-pipelines|^\.gitlab-ci/);
   sig.has_requirements = any(/^(requirements.*\.txt|setup\.py|setup\.cfg|pyproject\.toml|package\.json|description|environment\.ya?ml|renv\.lock|cargo\.toml|go\.mod|pom\.xml|build\.gradle)$/);
   sig.has_docs = any(/^docs?\/|readthedocs|mkdocs\.ya?ml/);
-  sig.has_api = any(/openapi|swagger|\.proto$|graphql/);
+  const hasInterfaceDefinition = any(/openapi|swagger|\.proto$|graphql/);
+  const hasOpenDataFormat = any(/(^|\/)(openapi|swagger).*\.(ya?ml|json)$|jsonld|json-ld|rdf|rdfs|\.ttl$|\.turtle$|\.csv$|\.tsv$|\.parquet$|\.feather$|\.hdf5?$|\.nc$|\.netcdf$|\.xml$/);
+  const hasSchemaReference = any(/(^|\/)(openapi|swagger).*\.(ya?ml|json)$|json-schema|schema\.json|\.schema\.json$|\.xsd$|rdfs|\.proto$|graphql/);
+  sig.has_api = hasInterfaceDefinition;
+  sig.has_open_api = hasInterfaceDefinition && !j.private;
+  sig.has_machine_readable_api = hasInterfaceDefinition;
+  sig.has_data_format_docs = hasOpenDataFormat || hasSchemaReference || any(/as_fuji_json|as_rdf|jsonld|rdf|json-schema|schema\.json/);
+  sig.has_open_data_formats = hasOpenDataFormat;
+  sig.has_schema_reference = hasSchemaReference;
 
   const contrib = await getJson(`${api}/contributors?per_page=100`);
   sig.contributors = Array.isArray(contrib) ? contrib.length : 0;
@@ -322,6 +354,8 @@ export async function harvestSoftware(gh: { owner: string; repo: string }): Prom
       if (vm) sig.version = vm[1];
     }
   }
+  sig.has_spdx_license = spdxIds([...githubLicenseRefs, ...metadataLicenses]).length > 0;
+  sig.has_metadata_spdx_license = spdxIds(metadataLicenses).length > 0;
 
   const metadata: Reference = {
     object_identifier: j.html_url, title: j.name, summary: j.description ?? undefined,
