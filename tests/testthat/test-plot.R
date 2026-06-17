@@ -19,6 +19,12 @@ test_that("plot.fair_assessment draws both types without error", {
   grDevices::png(tmp, width = 700, height = 650)
   expect_silent(plot(fair_example, type = "metric"))
   grDevices::dev.off()
+
+  grDevices::png(tmp, width = 600, height = 560)
+  res2 <- plot(fair_example, type = "sunburst")
+  grDevices::dev.off()
+  expect_s3_class(res2, "fair_assessment")
+  expect_gt(file.size(tmp), 0)
 })
 
 test_that("plot validates its type argument", {

@@ -36,7 +36,9 @@
 #' @param type What to draw. `"category"` (default) draws one bar per FAIR
 #'   category (Findable, Accessible, Interoperable, Reusable) plus the overall
 #'   score; `"metric"` draws one bar per individual metric, grouped and colored
-#'   by category.
+#'   by category; `"sunburst"` draws a concentric sunburst (an inner ring of the
+#'   F/A/I/R categories and an outer ring of the individual metrics, each filled
+#'   in proportion to its score) with the overall FAIR percentage in the center.
 #' @param colors Named character vector of category fill colors, with names
 #'   `"F"`, `"A"`, `"I"`, `"R"`.
 #' @param show_maturity Logical; annotate each bar with its maturity level.
@@ -51,9 +53,10 @@
 #' data(fair_example)
 #' plot(fair_example)
 #' plot(fair_example, type = "metric")
+#' plot(fair_example, type = "sunburst")
 #' @seealso [assess_fair()], [summary.fair_assessment()], [fair_example]
 #' @export
-plot.fair_assessment <- function(x, type = c("category", "metric"),
+plot.fair_assessment <- function(x, type = c("category", "metric", "sunburst"),
                                  colors = .fair_cat_colors,
                                  show_maturity = (match.arg(type) == "category"),
                                  main = NULL, ...) {
@@ -62,12 +65,98 @@ plot.fair_assessment <- function(x, type = c("category", "metric"),
     main <- x$resolved_url %||% x$id %||% "FAIR assessment"
     if (nchar(main) > 64) main <- paste0(substr(main, 1, 61), "...")
   }
-  if (type == "category") {
-    .plot_fair_category(x, colors, show_maturity, main)
-  } else {
-    .plot_fair_metric(x, colors, main)
-  }
+  switch(type,
+    category = .plot_fair_category(x, colors, show_maturity, main),
+    metric = .plot_fair_metric(x, colors, main),
+    sunburst = .plot_fair_sunburst(x, colors, main)
+  )
   invisible(x)
+}
+
+#' @noRd
+.fair_short_id <- function(id) {
+  parts <- strsplit(id, "-", fixed = TRUE)[[1]]
+  if (grepl("^FRSM", id)) parts[3] %||% id else parts[2] %||% id
+}
+
+#' @noRd
+.sector_poly <- function(rin, rout, a0, a1) {
+  ao <- seq(a0, a1, length.out = 48)
+  ai <- rev(ao)
+  list(x = c(rout * sin(ao * pi / 180), rin * sin(ai * pi / 180)),
+       y = c(rout * cos(ao * pi / 180), rin * cos(ai * pi / 180)))
+}
+
+#' @noRd
+.plot_fair_sunburst <- function(x, colors, main) {
+  s <- summary(x)
+  df <- as.data.frame(x)
+  df <- df[!is.na(df$category) & df$category %in% c("F", "A", "I", "R"), , drop = FALSE]
+  if (!nrow(df)) {
+    graphics::plot.new(); graphics::text(0.5, 0.5, "No metrics to plot.")
+    return(invisible(NULL))
+  }
+  df$category <- factor(df$category, levels = c("F", "A", "I", "R"))
+  df <- df[order(df$category, df$metric_identifier), , drop = FALSE]
+  fair <- s[s$category == "FAIR", , drop = FALSE]
+
+  n <- nrow(df)
+  step <- 360 / n
+  gap <- 1.0  # degrees between slices
+  r_in <- c(0.42, 0.64)   # inner: categories
+  r_out <- c(0.68, 0.96)  # outer: metrics
+  alpha <- function(pct) max(0.18, min(1, (pct %||% 0) / 100))
+
+  op <- graphics::par(mar = c(0.5, 0.5, 2.6, 0.5)); on.exit(graphics::par(op), add = TRUE)
+  graphics::plot.new()
+  graphics::plot.window(xlim = c(-1.34, 1.34), ylim = c(-1.16, 1.16), asp = 1)
+
+  cursor <- 0
+  for (cat in levels(df$category)) {
+    idx <- which(df$category == cat)
+    if (!length(idx)) next
+    a0 <- cursor * step
+    a1 <- (cursor + length(idx)) * step
+    col <- colors[[cat]] %||% "#94a3b8"
+    cpct <- s$percent[s$category == cat]
+
+    # inner category sector
+    p <- .sector_poly(r_in[1], r_in[2], a0 + gap / 2, a1 - gap / 2)
+    graphics::polygon(p$x, p$y, col = grDevices::adjustcolor(col, alpha.f = alpha(cpct)),
+                      border = "white", lwd = 1.4)
+
+    # category label outside
+    mid <- (a0 + a1) / 2
+    lx <- (r_out[2] + 0.13) * sin(mid * pi / 180)
+    ly <- (r_out[2] + 0.13) * cos(mid * pi / 180)
+    adj <- if (abs(sin(mid * pi / 180)) < 0.3) 0.5 else if (sin(mid * pi / 180) > 0) 0 else 1
+    graphics::text(lx, ly, .fair_cat_labels[[cat]], adj = c(adj, 0.5), cex = 0.78,
+                   font = 2, col = "#475569")
+
+    # outer per-metric sectors
+    for (k in seq_along(idx)) {
+      i <- idx[k]
+      m0 <- (cursor + k - 1) * step
+      m1 <- (cursor + k) * step
+      po <- .sector_poly(r_out[1], r_out[2], m0 + gap / 2, m1 - gap / 2)
+      graphics::polygon(po$x, po$y,
+                        col = grDevices::adjustcolor(col, alpha.f = alpha(df$percent[i])),
+                        border = "white", lwd = 1.2)
+      mm <- (m0 + m1) / 2
+      rr <- mean(r_out)
+      graphics::text(rr * sin(mm * pi / 180), rr * cos(mm * pi / 180),
+                     .fair_short_id(df$metric_identifier[i]), cex = 0.6,
+                     col = "#1f2937", font = 2)
+    }
+    cursor <- cursor + length(idx)
+  }
+
+  # center score
+  fp <- if (nrow(fair)) fair$percent[1] else NA_real_
+  graphics::text(0, 0.06, sprintf("%.0f", fp %||% 0), cex = 2.7, font = 2, col = "#0f172a")
+  graphics::text(0, -0.16, "% FAIR", cex = 0.75, col = "#94a3b8")
+  graphics::title(main = main, cex.main = 1.0, col.main = "#0f172a", line = 1.0)
+  invisible(NULL)
 }
 
 #' @noRd
