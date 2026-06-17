@@ -30,6 +30,6 @@ npm run typecheck
 
 ## Deploy
 
-`.github/workflows/deploy-app.yaml` builds this app and publishes `dist/` to the
+`.github/workflows/deploy.yaml` builds this app and publishes `dist/` to the
 `gh-pages` branch under `/app`, so it is served at
 `https://choxos.github.io/rfuji/app/` alongside the pkgdown docs at the root.
