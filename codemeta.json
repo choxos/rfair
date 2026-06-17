@@ -1,0 +1,67 @@
+{
+  "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
+  "@type": "SoftwareSourceCode",
+  "@id": "https://github.com/choxos/rfuji",
+  "identifier": "https://github.com/choxos/rfuji",
+  "name": "rfuji",
+  "description": "Native R implementation of F-UJI and FAIRsFAIR research data object assessment metrics, including legacy metric versions, software FAIR metrics, and reusable JSON/RDF outputs.",
+  "codeRepository": "https://github.com/choxos/rfuji",
+  "url": "https://choxos.github.io/rfuji/",
+  "issueTracker": "https://github.com/choxos/rfuji/issues",
+  "license": "https://spdx.org/licenses/MIT.html",
+  "version": "2.3.0",
+  "softwareVersion": "2.3.0",
+  "programmingLanguage": "R",
+  "runtimePlatform": "R >= 4.1",
+  "operatingSystem": "OS Independent",
+  "applicationCategory": "FAIR assessment",
+  "developmentStatus": "active",
+  "keywords": [
+    "FAIR",
+    "F-UJI",
+    "FAIRsFAIR",
+    "research data",
+    "research software",
+    "FAIR metrics",
+    "R"
+  ],
+  "softwareRequirements": [
+    "R >= 4.1",
+    "digest",
+    "httr2",
+    "jsonlite",
+    "mime",
+    "plumber",
+    "rvest",
+    "stringdist",
+    "xml2",
+    "yaml"
+  ],
+  "author": [
+    {
+      "@type": "Person",
+      "givenName": "Ahmad",
+      "familyName": "Sofi-Mahmudi",
+      "email": "a.sofimahmudi@gmail.com",
+      "@id": "https://orcid.org/0000-0001-6829-0823"
+    },
+    {
+      "@type": "Person",
+      "givenName": "Steffen",
+      "familyName": "Neumann"
+    }
+  ],
+  "contributor": [
+    {
+      "@type": "Organization",
+      "name": "PANGAEA"
+    }
+  ],
+  "isBasedOn": [
+    "https://github.com/pangaea-data-publisher/fuji",
+    "https://doi.org/10.5281/zenodo.3775793"
+  ],
+  "readme": "https://github.com/choxos/rfuji/blob/main/README.md",
+  "contIntegration": "https://github.com/choxos/rfuji/actions",
+  "buildInstructions": "https://github.com/choxos/rfuji#installation"
+}

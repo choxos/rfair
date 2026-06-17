@@ -13,6 +13,8 @@
 ^pkgdown$
 ^tests/conformance$
 ^README\.Rmd$
+^CITATION\.cff$
+^codemeta\.json$
 ^cran-comments\.md$
 ^CRAN-SUBMISSION$
 ^ROADMAP\.md$
