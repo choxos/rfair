@@ -22,17 +22,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Verify npm lockfile
+        run: test -f package-lock.json
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
+          cache-dependency-path: package-lock.json
 
       - name: Install
-        # npm install (not npm ci) so the Linux runner can reconcile the
-        # platform-specific optional native deps (rollup/esbuild) that a
-        # lockfile generated on another OS does not enumerate. Versions stay
-        # pinned by the committed lockfile; the audit step below still gates.
-        run: npm install --no-audit --no-fund
+        run: npm ci
 
       - name: Security audit
         run: npm audit --audit-level=moderate
