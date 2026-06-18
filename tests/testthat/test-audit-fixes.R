@@ -40,6 +40,22 @@ test_that("plot and as.data.frame survive metric sets missing a category / empty
   expect_equal(nrow(d), 0L)
 })
 
+test_that("passed test scores sum and cap at total (F-UJI scoring, not max)", {
+  # FsF-F1-02MD is labelled 'alternative' but total 1 = test -1 (0.5) + -2 (0.5);
+  # a max rule would wrongly score it 0.5. F-UJI sums and caps.
+  d <- Filter(function(m) m$metric_identifier == "FsF-F1-02MD",
+              load_metrics("0.8")$metrics)[[1]]
+  res <- new_metric_evaluation(d)
+  crit_pass(res, "FsF-F1-02MD-1")
+  crit_pass(res, "FsF-F1-02MD-2")
+  fin <- finalize_result(res)
+  expect_equal(fin$score$earned, 1)        # 0.5 + 0.5
+  # and the cap holds: passing a third 0.5 test cannot exceed total 1
+  res2 <- new_metric_evaluation(d)
+  for (t in c("FsF-F1-02MD-1", "FsF-F1-02MD-2", "FsF-F1-02MD-4")) crit_pass(res2, t)
+  expect_equal(finalize_result(res2)$score$earned, 1)
+})
+
 test_that("collect_metadata_service is a no-op without an endpoint", {
   ctx <- new.env()
   ctx$metadata_service_endpoint <- ""
