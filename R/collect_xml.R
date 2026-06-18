@@ -136,8 +136,10 @@ collect_xml_doc <- function(ctx, content, url, mimetype = "application/xml") {
     md <- map_eml_xml(found_node("eml")); src <- "eml_xml"; schema <- "https://eml.ecoinformatics.org"
   } else if (has(found_node("MD_Metadata"))) {
     md <- map_iso_xml(found_node("MD_Metadata")); src <- "iso19139_xml"; schema <- "http://www.isotc211.org/2005/gmd"
-  } else if (length(xml2::xml_find_all(doc, ".//*[local-name()='title']")) ||
-             length(xml2::xml_find_all(doc, ".//*[local-name()='identifier']"))) {
+  } else if ((length(xml2::xml_find_all(doc, ".//*[local-name()='title']")) ||
+              length(xml2::xml_find_all(doc, ".//*[local-name()='identifier']"))) &&
+             !identical(tolower(xml2::xml_name(xml2::xml_root(doc))), "html")) {
+    # an (X)HTML landing page also has a <title>; do not mine it as Dublin Core
     md <- map_dc_xml(xml2::xml_root(doc)); src <- "dublincore_xml"; schema <- "http://purl.org/dc/elements/1.1/"
   } else {
     return(invisible(FALSE))

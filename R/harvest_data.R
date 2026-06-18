@@ -23,8 +23,12 @@ harvest_data <- function(ctx, timeout = 10, limit = 3) {
         req <- httr2::req_error(req, is_error = function(resp) FALSE)
         req <- httr2::req_user_agent(req, "F-UJI (rfuji R package)")
         resp <- httr2::req_perform(req)
-        list(type = tryCatch(httr2::resp_content_type(resp), error = function(e) NA_character_),
-             size = httr2::resp_header(resp, "content-length"))
+        if (httr2::resp_status(resp) >= 400L) {
+          NULL  # an error page's content-type/length is not the data file's
+        } else {
+          list(type = tryCatch(httr2::resp_content_type(resp), error = function(e) NA_character_),
+               size = httr2::resp_header(resp, "content-length"))
+        }
       }, error = function(e) NULL)
       if (!is.null(info)) {
         if (is.null(entry$type) && is_nonempty_string(info$type)) entry$type <- info$type
