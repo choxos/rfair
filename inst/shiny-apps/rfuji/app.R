@@ -70,7 +70,9 @@ badge <- function(text, color) {
 
 cat_card <- function(cat, row) {
   pct <- row$percent %||% 0
+  if (is.na(pct)) pct <- 0
   ml <- maturity_label(row$maturity)
+  ml_col <- if (is.na(ml)) "#9ca3af" else MATURITY_COLORS[[ml]]
   div(class = "card border-0 shadow-sm h-100",
       style = sprintf("border-left:4px solid %s !important", CAT_COLORS[[cat]]),
       div(class = "card-body py-2 px-3",
@@ -79,7 +81,7 @@ cat_card <- function(cat, row) {
                         CAT_NAMES[[cat]]),
               tags$span(class = "fs-4 fw-bold", sprintf("%.0f%%", pct))),
           div(class = "text-muted small", sprintf("%g of %g points", row$earned %||% 0, row$total %||% 0)),
-          div(class = "mt-1", HTML(badge(ml, MATURITY_COLORS[[ml]])))))
+          div(class = "mt-1", HTML(badge(if (is.na(ml)) "n/a" else ml, ml_col)))))
 }
 
 ui <- page_sidebar(
@@ -137,15 +139,19 @@ server <- function(input, output, session) {
     }
     s <- summary(a)
     fair <- s[s$category == "FAIR", ]
-    cats <- intersect(c("F", "A", "I", "R"), s$category)
+    fair_pct <- fair$percent %||% 0; if (length(fair_pct) && is.na(fair_pct)) fair_pct <- 0
+    fair_ml <- maturity_label(fair$maturity)
+    fair_col <- if (length(fair_ml) && !is.na(fair_ml)) MATURITY_COLORS[[fair_ml]] else "#9ca3af"
+    # only show category cards for principles the metric set actually defines
+    cats <- intersect(c("F", "A", "I", "R"), s$category[!is.na(s$total)])
     tagList(
       layout_columns(
         col_widths = c(3, 3, 6), class = "mb-1",
-        value_box("FAIR score", sprintf("%.0f%%", fair$percent %||% 0),
+        value_box("FAIR score", sprintf("%.0f%%", fair_pct),
                   showcase = icon("award"), theme = "primary"),
-        value_box("Maturity", maturity_label(fair$maturity),
+        value_box("Maturity", if (length(fair_ml) && !is.na(fair_ml)) fair_ml else "n/a",
                   showcase = icon("layer-group"),
-                  theme = value_box_theme(bg = MATURITY_COLORS[[maturity_label(fair$maturity)]], fg = "#fff")),
+                  theme = value_box_theme(bg = fair_col, fg = "#fff")),
         value_box("Resolved", tags$small(a$resolved_url %||% a$id),
                   showcase = icon("link"), theme = "light")
       ),

@@ -161,7 +161,9 @@ plot.fair_assessment <- function(x, type = c("category", "metric", "sunburst"),
 
 #' @noRd
 .draw_bar <- function(y, frac, color, height = 0.62) {
-  frac <- max(0, min(1, frac %||% 0))
+  frac <- frac %||% 0
+  if (is.na(frac)) frac <- 0
+  frac <- max(0, min(1, frac))
   graphics::rect(0, y - height / 2, 1, y + height / 2, col = "#eef2f6",
                  border = NA)
   if (frac > 0) {
@@ -175,6 +177,10 @@ plot.fair_assessment <- function(x, type = c("category", "metric", "sunburst"),
   s <- summary(x)
   cats <- s[s$category %in% c("F", "A", "I", "R"), , drop = FALSE]
   fair <- s[s$category == "FAIR", , drop = FALSE]
+  # categories absent from a metric set arrive as NA rows; show them as 0
+  na0 <- function(v) ifelse(is.na(v), 0, v)
+  cats$percent <- na0(cats$percent); cats$earned <- na0(cats$earned)
+  cats$total <- na0(cats$total); cats$maturity <- na0(cats$maturity)
   n <- nrow(cats)
 
   op <- graphics::par(mar = c(2.5, 7.5, 3.2, 1.2), xpd = NA)

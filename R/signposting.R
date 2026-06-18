@@ -21,13 +21,17 @@ parse_link_header <- function(link_str) {
     seg <- trimws(strsplit(part, ";", fixed = TRUE)[[1]])
     url <- sub("^<(.*)>$", "\\1", seg[1])
     if (!nzchar(url)) next
+    params <- seg[-1]  # only the link-params, not the <URL> (which may have a query)
     getp <- function(name) {
-      m <- regmatches(seg, regexpr(sprintf('%s\\s*=\\s*"?([^,;"]+)"?', name), seg, perl = TRUE))
+      m <- regmatches(params, regexpr(sprintf('%s\\s*=\\s*"?([^,;"]+)"?', name), params, perl = TRUE))
       if (length(m)) sub(sprintf('.*%s\\s*=\\s*"?([^,;"]+)"?.*', name), "\\1", m[1], perl = TRUE) else NA_character_
     }
     rel <- getp("rel")
-    if (is.na(rel) || !(rel %in% SIGNPOSTING_RELS)) next
-    out[[length(out) + 1L]] <- list(url = url, rel = rel, type = getp("type"),
+    if (is.na(rel)) next
+    # a Link rel can be space-separated (RFC 8288), e.g. rel="describedby alternate"
+    matched <- intersect(strsplit(rel, "\\s+")[[1]], SIGNPOSTING_RELS)
+    if (!length(matched)) next
+    out[[length(out) + 1L]] <- list(url = url, rel = matched[1], type = getp("type"),
                                     profile = getp("profile"), origin = "header")
   }
   out
@@ -42,9 +46,11 @@ extract_typed_links <- function(html, base_url) {
   out <- list()
   for (lk in links) {
     rel <- xml2::xml_attr(lk, "rel"); href <- xml2::xml_attr(lk, "href")
-    if (is.na(rel) || is.na(href) || !(rel %in% .TYPED_LINK_RELS)) next
+    if (is.na(rel) || is.na(href)) next
+    matched <- intersect(strsplit(rel, "\\s+")[[1]], .TYPED_LINK_RELS)
+    if (!length(matched)) next
     href <- tryCatch(xml2::url_absolute(href, base_url), error = function(e) href)
-    out[[length(out) + 1L]] <- list(url = href, rel = rel,
+    out[[length(out) + 1L]] <- list(url = href, rel = matched[1],
                                     type = xml2::xml_attr(lk, "type"),
                                     profile = xml2::xml_attr(lk, "profile"),
                                     origin = "content")

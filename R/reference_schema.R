@@ -44,7 +44,10 @@ ARCHIVE_COMPRESS_MIMETYPES <- c(
 #' @noRd
 map_access_right <- function(value) {
   if (!is_nonempty_string(value)) return(NA_character_)
-  safe <- function(k) if (k %in% names(ACCESS_RIGHT_CODES)) unname(ACCESS_RIGHT_CODES[[k]]) else NA_character_
+  # match case-insensitively: eu-repo URIs use lowercase-initial tokens
+  # (info:eu-repo/semantics/openAccess) while the code table is capitalized.
+  codes <- stats::setNames(unname(ACCESS_RIGHT_CODES), tolower(names(ACCESS_RIGHT_CODES)))
+  safe <- function(k) { k <- tolower(k); if (k %in% names(codes)) unname(codes[[k]]) else NA_character_ }
   v <- safe(value)                       # try direct code
   if (!is.na(v)) return(v)
   safe(sub(".*[/#]", "", value))         # else the trailing path segment of a URI
