@@ -11,6 +11,16 @@
 - [`rfuji_metric_versions()`](https://choxos.github.io/rfuji/reference/rfuji_metric_versions.md)
   : List the metric versions bundled with rfuji.
 
+## Batch assessment and rtransparent
+
+- [`assess_data_code()`](https://choxos.github.io/rfuji/reference/assess_data_code.md)
+  : Assess the FAIRness of the data and code shared in articles
+  (rtransparent)
+- [`assess_fair_batch()`](https://choxos.github.io/rfuji/reference/assess_fair_batch.md)
+  : Assess the FAIRness of a batch of identifiers
+- [`split_identifiers()`](https://choxos.github.io/rfuji/reference/split_identifiers.md)
+  : Split a joined identifier string into individual identifiers.
+
 ## Assessment object
 
 - [`fair_assessment`](https://choxos.github.io/rfuji/reference/fair_assessment.md)

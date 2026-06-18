@@ -41,22 +41,22 @@ cat(as_fuji_json(a))
 #>     "metadata_service_type": "",
 #>     "test_debug": false
 #>   },
-#>   "start_timestamp": "2026-06-18T04:01:29+0000",
-#>   "end_timestamp": "2026-06-18T04:01:34+0000",
-#>   "software_version": "2.5.0",
+#>   "start_timestamp": "2026-06-18T18:06:13+0000",
+#>   "end_timestamp": "2026-06-18T18:06:19+0000",
+#>   "software_version": "2.6.0",
 #>   "metric_version": "0.8",
 #>   "metric_specification": "https://doi.org/10.5281/zenodo.15045911",
 #>   "total_metrics": 17,
 #>   "summary": {
 #>     "score_earned": {
 #>       "A": 7,
-#>       "F": 6.5,
+#>       "F": 7,
 #>       "I": 4,
 #>       "R": 5,
 #>       "A1": 3,
 #>       "A1.1": 2,
 #>       "A1.2": 2,
-#>       "F1": 1.5,
+#>       "F1": 2,
 #>       "F2": 2,
 #>       "F3": 1,
 #>       "F4": 2,
@@ -67,7 +67,7 @@ cat(as_fuji_json(a))
 #>       "R1.1": 1,
 #>       "R1.2": 1,
 #>       "R1.3": 1,
-#>       "FAIR": 22.5
+#>       "FAIR": 23
 #>     },
 #>     "score_total": {
 #>       "A": 7,
@@ -92,13 +92,13 @@ cat(as_fuji_json(a))
 #>     },
 #>     "score_percent": {
 #>       "A": 100,
-#>       "F": 92.86,
+#>       "F": 100,
 #>       "I": 66.67,
 #>       "R": 83.33,
 #>       "A1": 100,
 #>       "A1.1": 100,
 #>       "A1.2": 100,
-#>       "F1": 75,
+#>       "F1": 100,
 #>       "F2": 100,
 #>       "F3": 100,
 #>       "F4": 100,
@@ -109,7 +109,7 @@ cat(as_fuji_json(a))
 #>       "R1.1": 100,
 #>       "R1.2": 100,
 #>       "R1.3": 50,
-#>       "FAIR": 86.54
+#>       "FAIR": 88.46
 #>     },
 #>     "maturity": {
 #>       "A": 3,
@@ -274,9 +274,9 @@ cat(as_fuji_json(a))
 #>       },
 #>       "test_status": "pass",
 #>       "score": {
-#>         "earned": 0.5,
+#>         "earned": 1,
 #>         "total": 1,
-#>         "percent": 50
+#>         "percent": 100
 #>       },
 #>       "maturity": 3,
 #>       "output": {

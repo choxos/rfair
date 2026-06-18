@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">rfuji</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.5.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">2.6.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -124,9 +124,18 @@
 <p>These results are attached to every assessment (<code>a$reuse</code>, <code>a$access</code>, <code>a$identifier_hygiene</code>) and shown in the app.</p>
 </div>
 <div class="section level2">
+<h2 id="batch-assessment-and-rtransparent">Batch assessment and rtransparent<a class="anchor" aria-label="anchor" href="#batch-assessment-and-rtransparent"></a>
+</h2>
+<p><code><a href="reference/assess_fair_batch.html">assess_fair_batch()</a></code> scores a vector of identifiers and returns one tidy row per identifier. <code><a href="reference/assess_data_code.html">assess_data_code()</a></code> bridges <a href="https://github.com/choxos/rtransparent" class="external-link">rtransparent</a>: it takes the data and code identifiers rtransparent extracts from articles (its <code>open_data_links</code> and <code>open_code_links</code> columns; DOIs, repository URLs, and identifiers.org <code>prefix:accession</code> codes such as <code>geo:GSE…</code>) and scores each, using the FsF data metrics for data and the FRSM software metrics for code.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">rt</span> <span class="op">&lt;-</span> <span class="fu">rtransparent</span><span class="fu">::</span><span class="fu">rt_data_code_pmc</span><span class="op">(</span><span class="va">xml</span><span class="op">)</span>          <span class="co"># is_open_data, open_data_links, ...</span></span>
+<span><span class="va">scores</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/assess_data_code.html">assess_data_code</a></span><span class="op">(</span><span class="va">rt</span>, id_col <span class="op">=</span> <span class="st">"pmid"</span><span class="op">)</span>    <span class="co"># one row per (article, data/code link)</span></span></code></pre></div>
+<p><code><a href="reference/split_identifiers.html">split_identifiers()</a></code> parses the <code>" ; "</code>-joined link strings on their own.</p>
+</div>
+<div class="section level2">
 <h2 id="interactive-app">Interactive app<a class="anchor" aria-label="anchor" href="#interactive-app"></a>
 </h2>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/launch_rfuji.html">launch_rfuji</a></span><span class="op">(</span><span class="op">)</span>   <span class="co"># bslib Shiny app: scores, per-metric report, reuse/access panels</span></span></code></pre></div>
 <p>A browser version (registry-only, no install) is published at <strong><a href="https://choxos.github.io/rfuji/app/" class="uri">https://choxos.github.io/rfuji/app/</a></strong>.</p>
 </div>
@@ -134,12 +143,12 @@
 <h2 id="http-api-scaffold">HTTP API scaffold<a class="anchor" aria-label="anchor" href="#http-api-scaffold"></a>
 </h2>
 <p><code>rfuji</code> also ships a Plumber scaffold and OpenAPI contract for teams that want to expose the same assessment engine over HTTP:</p>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">api</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"plumber"</span>, <span class="st">"rfuji-api.R"</span>, package <span class="op">=</span> <span class="st">"rfuji"</span><span class="op">)</span></span>
 <span><span class="va">pr</span> <span class="op">&lt;-</span> <span class="fu">plumber</span><span class="fu">::</span><span class="fu"><a href="https://www.rplumber.io/reference/pr.html" class="external-link">pr</a></span><span class="op">(</span><span class="va">api</span><span class="op">)</span></span>
 <span><span class="va">pr</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span>port <span class="op">=</span> <span class="fl">8000</span><span class="op">)</span></span></code></pre></div>
 <p>The machine-readable API contract is installed at:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"openapi"</span>, <span class="st">"rfuji-openapi.yaml"</span>, package <span class="op">=</span> <span class="st">"rfuji"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">

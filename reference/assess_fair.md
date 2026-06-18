@@ -81,10 +81,10 @@ object.
 a <- assess_fair("https://doi.org/10.5281/zenodo.8347772")
 summary(a)
 #>   category earned total percent maturity
-#> 1        F    6.5     7   92.86      3.0
-#> 2        A    7.0     7  100.00      3.0
-#> 3        I    4.0     6   66.67      2.0
-#> 4        R    5.0     6   83.33      2.0
-#> 5     FAIR   22.5    26   86.54      2.5
+#> 1        F      7     7  100.00      3.0
+#> 2        A      7     7  100.00      3.0
+#> 3        I      4     6   66.67      2.0
+#> 4        R      5     6   83.33      2.0
+#> 5     FAIR     23    26   88.46      2.5
 # }
 ```
