@@ -93,6 +93,23 @@ fair_principles("R")
 These results are attached to every assessment (`a$reuse`, `a$access`,
 `a$identifier_hygiene`) and shown in the app.
 
+## Batch assessment and rtransparent
+
+`assess_fair_batch()` scores a vector of identifiers and returns one tidy row
+per identifier. `assess_data_code()` bridges
+[rtransparent](https://github.com/choxos/rtransparent): it takes the data and
+code identifiers rtransparent extracts from articles (its `open_data_links` and
+`open_code_links` columns; DOIs, repository URLs, and identifiers.org
+`prefix:accession` codes such as `geo:GSE…`) and scores each, using the FsF data
+metrics for data and the FRSM software metrics for code.
+
+```r
+rt <- rtransparent::rt_data_code_pmc(xml)          # is_open_data, open_data_links, ...
+scores <- assess_data_code(rt, id_col = "pmid")    # one row per (article, data/code link)
+```
+
+`split_identifiers()` parses the `" ; "`-joined link strings on their own.
+
 ## Interactive app
 
 ```r

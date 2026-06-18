@@ -21,6 +21,11 @@ reference:
       - as_fuji_json
       - id_parse
       - rfuji_metric_versions
+  - title: Batch assessment and rtransparent
+    contents:
+      - assess_data_code
+      - assess_fair_batch
+      - split_identifiers
   - title: Assessment object
     contents:
       - fair_assessment
