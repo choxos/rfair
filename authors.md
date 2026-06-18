@@ -14,7 +14,7 @@
 ## Citation
 
 Source:
-[`inst/CITATION`](https://github.com/choxos/rfuji/blob/v2.4.0/inst/CITATION)
+[`inst/CITATION`](https://github.com/choxos/rfuji/blob/v2.5.0/inst/CITATION)
 
 Sofi-Mahmudi A, Neumann S (2026). *rfuji: Native R FAIR Assessment
 Metrics*. R package version 2.3.5, <https://github.com/choxos/rfuji>.

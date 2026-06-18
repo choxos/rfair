@@ -46,7 +46,7 @@ cat(as_rdf(a))
 #>   "dc:creator": "rfuji",
 #>   "dc:title": "FAIR assessment results for https://doi.org/10.5281/zenodo.8347772",
 #>   "dc:source": "https://doi.org/10.5281/zenodo.8347772",
-#>   "schema:ratingValue": 88.46,
+#>   "schema:ratingValue": 86.54,
 #>   "schema:bestRating": 100,
 #>   "schema:worstRating": 0,
 #>   "schema:reviewAspect": "FAIRness",
@@ -55,11 +55,11 @@ cat(as_rdf(a))
 #>     "prov:used": "https://doi.org/10.5281/zenodo.8347772"
 #>   },
 #>   "rfuji:metricVersion": "0.8",
-#>   "rfuji:softwareVersion": "2.4.0",
+#>   "rfuji:softwareVersion": "2.5.0",
 #>   "dqv:hasQualityMeasurement": [
 #>     {
 #>       "@type": "dqv:QualityMeasurement",
-#>       "dqv:value": 100,
+#>       "dqv:value": 92.86,
 #>       "dqv:isMeasurementOf": "https://w3id.org/fair/principles/terms/F"
 #>     },
 #>     {
@@ -79,7 +79,7 @@ cat(as_rdf(a))
 #>     },
 #>     {
 #>       "@type": "dqv:QualityMeasurement",
-#>       "dqv:value": 88.46,
+#>       "dqv:value": 86.54,
 #>       "dqv:isMeasurementOf": "https://w3id.org/fair/principles/terms/FAIR"
 #>     }
 #>   ]
