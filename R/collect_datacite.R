@@ -31,6 +31,42 @@ collect_datacite <- function(ctx, timeout = 15) {
   invisible()
 }
 
+#' Harvest a user-supplied metadata service endpoint or metadata document.
+#'
+#' The user passes `metadata_service_endpoint` (a URL that returns a metadata
+#' document, or a ready protocol query URL such as an OAI-PMH `GetRecord` URL)
+#' and a `metadata_service_type` hint. The response is harvested with the same
+#' format-gated collectors used for content negotiation: schema.org JSON-LD via
+#' the RDF/JSON-LD path, everything else as an XML/metadata document first, then
+#' RDF as a fallback. Format detection (recognized schema/root in `collect_xml`,
+#' valid RDF in `collect_rdf`) prevents arbitrary 200 responses from scoring.
+#' @noRd
+collect_metadata_service <- function(ctx, timeout = 15) {
+  url <- ctx$metadata_service_endpoint
+  if (!is_nonempty_string(url)) return(invisible())
+  type <- ctx$metadata_service_type %||% "other"
+  before <- length(ctx$metadata_sources)
+
+  if (identical(type, "schema_org")) {
+    collect_rdf_from_url(ctx, url, jsonld = TRUE, timeout = timeout)
+  } else {
+    collect_xml_from_url(ctx, url, timeout = timeout)
+    if (length(ctx$metadata_sources) == before) {
+      collect_rdf_from_url(ctx, url, jsonld = TRUE, timeout = timeout)
+    }
+  }
+
+  if (length(ctx$metadata_sources) > before) {
+    ctx$metadata_merged$metadata_service <- url
+    ctx_log(ctx, "FsF-F2-01M", "info",
+            sprintf("Harvested metadata service (%s): %s", type, url))
+  } else {
+    ctx_log(ctx, "FsF-F2-01M", "warning",
+            sprintf("Metadata service endpoint returned no usable metadata (%s): %s", type, url))
+  }
+  invisible()
+}
+
 #' Run all metadata collectors over the engine state.
 #'
 #' Collectors run in F-UJI's priority order; later collectors only fill gaps via
@@ -38,16 +74,25 @@ collect_datacite <- function(ctx, timeout = 15) {
 #' GitHub, and the data-file probe.
 #' @noRd
 harvest_all_metadata <- function(ctx, timeout = 15) {
+  # isolate each collector: a malformed response from one source must not abort
+  # the whole harvest (later collectors only fill gaps, so a skipped source just
+  # means fewer signals, not a failed assessment).
+  run <- function(label, expr) {
+    tryCatch(expr, error = function(e)
+      ctx_log(ctx, "FsF-F2-01M", "warning",
+              sprintf("collector '%s' failed: %s", label, conditionMessage(e))))
+  }
   # embedded (landing page) first, then typed links / signposting, then
   # content-negotiated structured formats (DataCite JSON/XML, RDF/JSON-LD).
   if (is_nonempty_string(ctx$landing_html)) {
-    collect_html_meta(ctx)
-    collect_signposting(ctx)
+    run("html", collect_html_meta(ctx))
+    run("signposting", collect_signposting(ctx))
   }
-  collect_datacite(ctx, timeout = timeout)
-  collect_xml(ctx, timeout = timeout)
-  collect_rdf(ctx, timeout = timeout)
-  collect_github(ctx, timeout = timeout)
-  harvest_data(ctx, timeout = timeout)
+  run("metadata_service", collect_metadata_service(ctx, timeout = timeout))
+  run("datacite", collect_datacite(ctx, timeout = timeout))
+  run("xml", collect_xml(ctx, timeout = timeout))
+  run("rdf", collect_rdf(ctx, timeout = timeout))
+  run("github", collect_github(ctx, timeout = timeout))
+  run("data", harvest_data(ctx, timeout = timeout))
   invisible()
 }

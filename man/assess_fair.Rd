@@ -23,12 +23,16 @@ assess_fair(
 
 \item{use_datacite}{Whether to query DataCite for registry metadata.}
 
-\item{metadata_service_endpoint}{Optional metadata service endpoint or
-metadata document URL (for example OAI-PMH, OGC CSW, SPARQL, DCAT,
-schema.org JSON-LD, DataCite, Crossref, Signposting, typed links,
-RO-Crate, or CKAN).}
+\item{metadata_service_endpoint}{Optional URL of an additional metadata
+document to harvest, or a ready protocol query URL (for example an OAI-PMH
+\code{GetRecord} URL, an OGC CSW \code{GetRecordById} URL, a SPARQL query URL, or a
+DCAT / schema.org JSON-LD / RO-Crate / DataCite / Crossref / CKAN document).
+The response is parsed with the same format-gated collectors used for
+content negotiation, so only a recognized metadata document contributes.}
 
-\item{metadata_service_type}{Type of \code{metadata_service_endpoint}.}
+\item{metadata_service_type}{Type hint for \code{metadata_service_endpoint}.
+\code{"schema_org"} is harvested as JSON-LD; the others are tried as an XML
+metadata document, then RDF.}
 
 \item{test_debug}{If \code{TRUE}, collect debug log messages in the result.}
 
