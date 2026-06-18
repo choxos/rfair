@@ -314,7 +314,7 @@ export async function harvestSoftware(gh: { owner: string; repo: string }): Prom
   const sig: SoftwareSignals = {
     identifier: j.html_url, name: j.name, description: j.description ?? undefined,
     language: j.language ?? undefined, topics: j.topics ?? [], contributors: 0,
-    has_license: spdxIds(githubLicenseRefs).length > 0,
+    has_license: spdxIds(githubLicenseRefs).length > 0 || !!j.license,
     has_readme: false, has_citation: false, has_tests: false, has_ci: false,
     has_requirements: false, has_docs: false, has_api: false,
     has_spdx_license: false, has_metadata_spdx_license: false,

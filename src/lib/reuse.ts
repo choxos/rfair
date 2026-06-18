@@ -99,12 +99,22 @@ export function classifyAccess(accessLevel: unknown, urls: string[], data: RefDa
 
 export function identifierHygiene(id: string): HygieneInfo {
   const issues: string[] = [];
-  const layered = /^rrid:/i.test(id) || (/^[A-Za-z]+:[A-Za-z]+:[^:/]+$/.test(id) && !/^(urn|info):/i.test(id));
+  const s = id.trim();
+  const layered = /^rrid:/i.test(s) || (/^[A-Za-z]+:[A-Za-z]+:[^:/]+$/.test(s) && !/^(urn|info):/i.test(s));
   if (layered) issues.push("Compound/layered identifier (e.g. RRID:MGI:...) reduces interoperability; prefer the underlying source PID.");
-  const isDoi = /(10\.\d{2,9}\/)/.test(id);
-  const scheme = isDoi ? "doi" : /^https?:\/\//.test(id) ? "url" : null;
-  const persistent = isDoi || /hdl\.handle\.net|\/ark:/.test(id);
+
+  // recognize the persistent-identifier schemes id_parse() handles
+  let scheme: string | null = null;
+  if (/(10\.\d{2,9}\/)/.test(s)) scheme = "doi";
+  else if (/^hdl:|hdl\.handle\.net/i.test(s)) scheme = "handle";
+  else if (/(^|\/)ark:/i.test(s)) scheme = "ark";
+  else if (/^urn:/i.test(s)) scheme = "urn";
+  else if (/identifiers\.org\//i.test(s) || /w3id\.org\//i.test(s)) scheme = "pid";
+  else if (!/^https?:\/\//i.test(s) && /^[A-Za-z][A-Za-z0-9.]*:[^/\s]+$/.test(s)) scheme = s.split(":")[0].toLowerCase(); // geo:GSE..., bioproject:...
+  else if (/^https?:\/\//i.test(s)) scheme = "url";
+
+  const persistent = scheme != null && scheme !== "url";
   if (!scheme) issues.push("Identifier scheme not recognized; may not follow identifier best practices.");
-  else if (!persistent) issues.push("Not a persistent identifier; prefer a DOI, Handle, or ARK.");
+  else if (!persistent) issues.push("Not a persistent identifier; prefer a DOI, Handle, ARK, or registered PID.");
   return { scheme, is_persistent: persistent, hygiene_ok: issues.length === 0, issues };
 }
