@@ -89,8 +89,32 @@ function contentUrls(md: Reference): string[] {
   return asList(md.object_content_identifier).map((x: any) => (x && typeof x === "object" ? x.url : x)).filter((u): u is string => !!u);
 }
 
+// The required metadata-element names for a metric test, read from the metric
+// definition (matches R's crit_required_names_suffix) so the descriptive-metadata
+// checks are driven by the selected metric version rather than hardcoded.
+function requiredNames(def: any, suffix: string): string[] | null {
+  const t = (def?.metric_tests ?? []).find((x: any) =>
+    normalizedTestId(String(x.metric_test_identifier ?? "")).endsWith(suffix));
+  const req = t?.metric_test_requirements?.[0]?.required;
+  const names = req?.name ?? req;
+  return Array.isArray(names) ? names : null;
+}
+
+// Access-right codes recognized by R's map_access_right (lowercased), used to
+// gate the FsF-A1-01M registration test (a value that matches the broad access
+// regex but maps to no known code must not earn that test).
+const ACCESS_CODES = new Set([
+  "c_abf2", "c_f1cf", "c_16ec", "c_14cb", "openaccess", "closedaccess",
+  "restrictedaccess", "non_public", "op_datpro", "public", "restricted",
+  "sensitive", "embargoedaccess",
+]);
+const mapsAccessCode = (a: string): boolean => {
+  const v = a.toLowerCase();
+  return ACCESS_CODES.has(v) || ACCESS_CODES.has(v.replace(/.*[/#]/, ""));
+};
+
 // Evaluators that score from registry (DataCite/Crossref) metadata.
-function runEvaluator(mid: string, e: Eval, ctx: Ctx, data: RefData) {
+function runEvaluator(mid: string, e: Eval, ctx: Ctx, data: RefData, def: any) {
   const md = ctx.metadata;
   const stdProto = (s: string) => !!s && s in data.protocols;
   const protoAuth = (s: string) => stdProto(s) && !!data.protocols[s]?.auth;
@@ -106,11 +130,12 @@ function runEvaluator(mid: string, e: Eval, ctx: Ctx, data: RefData) {
       break;
     case "FsF-F2-01M": {
       const found = Object.keys(md);
-      const citation = ["creator", "title", "object_identifier", "publication_date", "publisher", "object_type"];
-      const desc = [...citation, "summary", "keywords"];
+      const fallbackCit = ["creator", "title", "object_identifier", "publication_date", "publisher", "object_type"];
+      const citation = requiredNames(def, "-2") ?? fallbackCit;
+      const desc = requiredNames(def, "-3") ?? [...fallbackCit, "summary", "keywords"];
       if (ctx.sources.length) passSuffix(e, mid, "-1");
-      if (citation.every((k) => found.includes(k))) passSuffix(e, mid, "-2");
-      if (desc.every((k) => found.includes(k))) passSuffix(e, mid, "-3");
+      if (citation.length && citation.every((k) => found.includes(k))) passSuffix(e, mid, "-2");
+      if (desc.length && desc.every((k) => found.includes(k))) passSuffix(e, mid, "-3");
       break;
     }
     case "FsF-F3-01M":
@@ -123,10 +148,16 @@ function runEvaluator(mid: string, e: Eval, ctx: Ctx, data: RefData) {
       if (ctx.sources.length) passSuffix(e, mid, "-3");
       break;
     case "FsF-A1-01M": {
-      const real = asList(md.access_level).filter((a: any) => typeof a === "string"
+      const real = (asList(md.access_level).filter((a: any) => typeof a === "string"
         && !/creativecommons|legalcode|spdx\.org\/licenses/i.test(a)
-        && /(open|closed|restricted|embargoed)Access|eu-repo\/semantics/i.test(a));
-      if (real.length) { passSuffix(e, mid, "-1"); passSuffix(e, mid, "-2"); passSuffix(e, mid, "-3"); }
+        && /(open|closed|restricted|embargoed)Access|eu-repo\/semantics/i.test(a))) as string[];
+      if (real.length) {
+        passSuffix(e, mid, "-1");
+        passSuffix(e, mid, "-3");
+        // -2 (registration) requires the value to map to a known access-right code
+        if (real.some(mapsAccessCode)) passSuffix(e, mid, "-2");
+        e.output = { access_level: real };
+      }
       break;
     }
     case "FsF-A1-03D":
@@ -173,11 +204,14 @@ function runEvaluator(mid: string, e: Eval, ctx: Ctx, data: RefData) {
       if (has(md, "object_format") || has(md, "object_size") || contentUrls(md).length) passSuffix(e, mid, "-3");
       if (has(md, "measured_variable")) passSuffix(e, mid, "-4");
       break;
-    case "FsF-R1.1-01M":
-      if (reuseFromMetadata(md.license, data).length) {
+    case "FsF-R1.1-01M": {
+      const lic = reuseFromMetadata(md.license, data);
+      if (lic.length) {
         passSuffix(e, mid, "-1");
         passSuffix(e, mid, "-2");
+        e.output = { license: lic.map((l) => l.license) };
       }
+    }
       break;
     case "FsF-R1.2-01M": {
       const prov = ["contributor", "creator", "publisher", "created_date", "modified_date", "publication_date", "related_resources"];
@@ -191,7 +225,8 @@ function runEvaluator(mid: string, e: Eval, ctx: Ctx, data: RefData) {
     case "FsF-R1.3-02D": {
       const fmts = new Set([...data.formats.science, ...data.formats.long_term, ...data.formats.open]);
       const cand = [md.object_format, ...contentUrls(md)].filter((x): x is string => typeof x === "string").map((x) => x.toLowerCase());
-      if (cand.some((c) => fmts.has(c))) passSuffix(e, mid, "-1");
+      const hit = cand.filter((c) => fmts.has(c));
+      if (hit.length) { passSuffix(e, mid, "-1"); e.output = { recommended_formats: hit }; }
       break;
     }
   }
@@ -342,7 +377,7 @@ async function assessData(input: string, data: RefData, version: MetricVersion, 
 
   const results: MetricResult[] = (metrics.metrics ?? []).map((def: any) => {
     const e = newEval(def);
-    runEvaluator(def.metric_identifier, e, ctx, data);
+    runEvaluator(def.metric_identifier, e, ctx, data, def);
     return buildResult(def, e);
   }).filter((r: MetricResult) => r.category)
     .sort((a: MetricResult, b: MetricResult) => a.id - b.id);
