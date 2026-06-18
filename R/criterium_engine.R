@@ -111,15 +111,11 @@ crit_pass <- function(res, test_id, evidence = NULL) {
   res$tests[[test_id]]$metric_test_status <- "pass"
   res$tests[[test_id]]$metric_test_score$earned <- score
   if (!is.null(evidence)) res$tests[[test_id]]$evidence <- as_chr(evidence)
-  # cumulative metrics sum passed-test scores; alternative metrics award the
-  # single best passed test (F-UJI's `test_scoring_mechanism`). Both then clamp
-  # to total_score in finalize_result.
-  mech <- res$metric_def$test_scoring_mechanism %||% "cumulative"
-  res$score_earned <- if (identical(mech, "alternative")) {
-    max(res$score_earned, score)
-  } else {
-    res$score_earned + score
-  }
+  # F-UJI sums the passed tests' scores and caps the metric at total_score in
+  # finalize_result; it does not special-case `test_scoring_mechanism`
+  # (e.g. FsF-F1-02MD is "alternative" yet total 1 = 0.5 + 0.5, so a max rule
+  # would wrongly score it 0.5).
+  res$score_earned <- res$score_earned + score
   res$maturity     <- max(res$maturity, mat)
   res$test_status  <- "pass"
   invisible(res)

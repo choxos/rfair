@@ -54,11 +54,14 @@ each is covered by a regression test or verified live. Released in 2.5.0.
   documents whose root element is `html`.
 
 ### Latent / API honesty
-- **`test_scoring_mechanism` was ignored** (`R/criterium_engine.R`). All passed
-  tests were summed; correctness relied on the clamp coinciding with
-  `total_score == max(test_scores)` for alternative metrics. `crit_pass` now
-  awards the best passed test for `alternative` and sums for `cumulative`
-  (score-identical on all bundled versions, robust to future YAML edits).
+- **`test_scoring_mechanism`** (`R/criterium_engine.R`). 2.5.0 changed
+  `crit_pass` to award `max` for `alternative` metrics. **Reverted in 2.6.0**:
+  F-UJI's evaluator does not read `test_scoring_mechanism` (it sums passed-test
+  scores and caps at `total_score`), and the premise `total_score ==
+  max(test_scores)` is false for `FsF-F1-02MD` (total 1 = 0.5 + 0.5), so `max`
+  scored it 0.5 instead of 1 and broke R/TS parity. The engine now sums and
+  caps, matching F-UJI; a regression test pins `FsF-F1-02MD = 1` and the R/TS
+  parity harness is back to 30/30.
 - **`metadata_service_endpoint` / `metadata_service_type` were accepted and
   documented but never harvested** (`R/assess.R`, new
   `collect_metadata_service`). The endpoint is now fetched and parsed with the
