@@ -69,9 +69,9 @@ eval_data_provenance <- function(ctx, res) {
 #' FsF-R1.3-02D: data is in a community-recommended file format.
 #' @noRd
 eval_data_file_format <- function(ctx, res) {
-  recommended <- c(names(ref_data("science_file_formats")),
-                   names(ref_data("long_term_file_formats")),
-                   names(ref_data("open_file_formats")))
+  recommended <- tolower(c(names(ref_data("science_file_formats")),
+                           names(ref_data("long_term_file_formats")),
+                           names(ref_data("open_file_formats"))))
   candidates <- tolower(as_chr(c(ctx$metadata_merged$object_format,
                                  ctx$metadata_merged$object_content_identifier)))
   hit <- candidates[candidates %in% recommended]

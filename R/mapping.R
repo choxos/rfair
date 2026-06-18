@@ -27,9 +27,17 @@ jfilter <- function(lst, key, value) {
   Filter(function(e) is.list(e) && identical(e[[key]], value), lst)
 }
 
-#' Drop NULL/empty entries from a mapped list.
+#' Drop NULL/empty/all-NA entries from a mapped list.
+#'
+#' XPath/JMESPath extractors return a scalar `NA` when a field is absent; an NA
+#' scalar must be dropped (not merged) so it is not later counted as a present
+#' metadata element by the core-metadata evaluator.
 #' @noRd
-compact <- function(x) x[!vapply(x, function(v) is.null(v) || length(v) == 0L, logical(1))]
+compact <- function(x) {
+  x[!vapply(x, function(v) {
+    is.null(v) || length(v) == 0L || (is.atomic(v) && length(v) == 1L && is.na(v))
+  }, logical(1))]
+}
 
 #' Map a content-negotiated DataCite JSON document to reference-schema keys.
 #'

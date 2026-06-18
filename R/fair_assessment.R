@@ -62,6 +62,13 @@ principle_of <- function(metric_identifier) {
 #' @return A data frame with one row per metric.
 #' @export
 as.data.frame.fair_assessment <- function(x, ...) {
+  empty <- data.frame(
+    metric_identifier = character(), principle = character(),
+    category = character(), metric_name = character(), earned = numeric(),
+    total = numeric(), percent = numeric(), maturity = integer(),
+    status = character(), stringsAsFactors = FALSE
+  )
+  if (!length(x$results)) return(empty)
   rows <- lapply(x$results, function(r) {
     pc <- principle_of(r$metric_identifier %||% "")
     data.frame(

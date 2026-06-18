@@ -77,11 +77,15 @@ run_evaluators <- function(ctx, metrics_meta) {
 #' @param id A persistent identifier or URL (DOI, Handle, ARK, URN, ...).
 #' @param metric_version Metric version to use (see [rfuji_metric_versions()]).
 #' @param use_datacite Whether to query DataCite for registry metadata.
-#' @param metadata_service_endpoint Optional metadata service endpoint or
-#'   metadata document URL (for example OAI-PMH, OGC CSW, SPARQL, DCAT,
-#'   schema.org JSON-LD, DataCite, Crossref, Signposting, typed links,
-#'   RO-Crate, or CKAN).
-#' @param metadata_service_type Type of `metadata_service_endpoint`.
+#' @param metadata_service_endpoint Optional URL of an additional metadata
+#'   document to harvest, or a ready protocol query URL (for example an OAI-PMH
+#'   `GetRecord` URL, an OGC CSW `GetRecordById` URL, a SPARQL query URL, or a
+#'   DCAT / schema.org JSON-LD / RO-Crate / DataCite / Crossref / CKAN document).
+#'   The response is parsed with the same format-gated collectors used for
+#'   content negotiation, so only a recognized metadata document contributes.
+#' @param metadata_service_type Type hint for `metadata_service_endpoint`.
+#'   `"schema_org"` is harvested as JSON-LD; the others are tried as an XML
+#'   metadata document, then RDF.
 #' @param test_debug If `TRUE`, collect debug log messages in the result.
 #' @param resolve If `TRUE`, resolve the identifier to its landing page.
 #' @param timeout Per-request timeout in seconds.

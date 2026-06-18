@@ -53,9 +53,10 @@ get_assessment_summary <- function(results, input_id = NULL) {
   score_total <- c(as_named_list(st_cat), as_named_list(st_pri))
   score_total[["FAIR"]] <- round(sum(total), 2)
 
-  score_percent <- c(as_named_list(round(se_cat / st_cat * 100, 2)),
-                     as_named_list(round(se_pri / st_pri * 100, 2)))
-  score_percent[["FAIR"]] <- round(sum(earned) / sum(total) * 100, 2)
+  safe_pct <- function(e, t) ifelse(t > 0, round(e / t * 100, 2), 0)
+  score_percent <- c(as_named_list(safe_pct(se_cat, st_cat)),
+                     as_named_list(safe_pct(se_pri, st_pri)))
+  score_percent[["FAIR"]] <- safe_pct(sum(earned), sum(total))
 
   mat_cat <- tapply(mat, cat_, clamp_mat); mat_pri <- tapply(mat, prin, clamp_mat)
   maturity <- c(as_named_list(mat_cat), as_named_list(mat_pri))
