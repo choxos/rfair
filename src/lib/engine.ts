@@ -274,6 +274,18 @@ function runFrsm(mid: string, e: Eval, s: SoftwareSignals, metaLicense: boolean)
   }
 }
 
+// Round-half-to-even (banker's rounding) to match R's round(), used for every
+// percent (2 decimals) and maturity value so the browser engine agrees with the
+// R reference engine.
+function bround(x: number, digits = 0): number {
+  const f = Math.pow(10, digits);
+  const v = x * f;
+  const fl = Math.floor(v);
+  const r = Math.abs(v - fl - 0.5) < 1e-9 ? (fl % 2 === 0 ? fl : fl + 1) : Math.round(v);
+  return r / f;
+}
+const pct2 = (earned: number, total: number) => (total ? bround((earned / total) * 100, 2) : 0);
+
 function buildResult(def: any, e: Eval): MetricResult {
   const earned = Math.min(e.earned, e.total);
   const pc = principleOf(def.metric_identifier);
@@ -283,7 +295,7 @@ function buildResult(def: any, e: Eval): MetricResult {
     metric_identifier: def.metric_identifier,
     metric_name: def.metric_name ?? "",
     principle: pc.principle, category: pc.category,
-    earned, total: e.total, percent: e.total ? Math.round((earned / e.total) * 1000) / 10 : 0,
+    earned, total: e.total, percent: pct2(earned, e.total),
     maturity: e.maturity, status: e.status, tests, output: e.output, debug: [],
   };
 }
@@ -299,12 +311,12 @@ function summarize(results: MetricResult[]): CategoryScore[] {
     const earned = rs.reduce((s, r) => s + r.earned, 0);
     const total = rs.reduce((s, r) => s + r.total, 0);
     const meanMat = rs.reduce((s, r) => s + r.maturity, 0) / rs.length;
-    const maturity = meanMat > 0 && meanMat < 1 ? 1 : Math.round(meanMat);
-    out.push({ category: c, earned, total, percent: total ? Math.round((earned / total) * 1000) / 10 : 0, maturity });
+    const maturity = meanMat > 0 && meanMat < 1 ? 1 : bround(meanMat);
+    out.push({ category: c, earned, total, percent: pct2(earned, total), maturity });
     te += earned; tt += total; mats.push(maturity);
   }
-  const fairMat = mats.length ? (() => { const m = mats.reduce((a, b) => a + b, 0) / 4; return m > 0 && m < 1 ? 1 : Math.round(m); })() : 0;
-  out.push({ category: "FAIR", earned: te, total: tt, percent: tt ? Math.round((te / tt) * 1000) / 10 : 0, maturity: fairMat });
+  const fairMat = mats.length ? (() => { const m = mats.reduce((a, b) => a + b, 0) / 4; return m > 0 && m < 1 ? 1 : bround(m); })() : 0;
+  out.push({ category: "FAIR", earned: te, total: tt, percent: pct2(te, tt), maturity: fairMat });
   return out;
 }
 

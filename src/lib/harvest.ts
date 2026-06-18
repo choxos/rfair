@@ -6,7 +6,9 @@ import type { AssessmentOptions, Reference, SoftwareSignals } from "./types";
 
 export function parseDoi(input: string): string | null {
   const m = input.match(/(10\.\d{2,9}\/[^\s"'<>]+)/);
-  return m ? decodeURIComponent(m[1]) : null;
+  if (!m) return null;
+  // DOI suffixes may contain a bare '%', which decodeURIComponent would throw on
+  try { return decodeURIComponent(m[1]); } catch { return m[1]; }
 }
 
 export function parseGithub(input: string): { owner: string; repo: string } | null {
@@ -51,8 +53,10 @@ function mapDatacite(a: any, doi: string, out: Reference) {
   out.publisher = typeof pub === "object" && pub ? pub.name : pub;
   const kw = listText(a.subjects, "subject");
   if (kw.length) out.keywords = kw;
-  const avail = (a.dates ?? []).filter((d: any) => d.dateType === "Available").map((d: any) => d.date);
-  out.publication_date = avail[0] ?? (a.publicationYear ? String(a.publicationYear) : undefined);
+  const dateOf = (t: string) => (a.dates ?? []).filter((d: any) => d.dateType === t).map((d: any) => d.date)[0];
+  out.publication_date = dateOf("Available") ?? (a.publicationYear ? String(a.publicationYear) : undefined);
+  const created = dateOf("Created"); if (created) out.created_date = created;
+  const updated = dateOf("Updated"); if (updated) out.modified_date = updated;
   const rights = (a.rightsList ?? []).map((r: any) => r.rightsUri || r.rights).filter(Boolean);
   if (rights.length) {
     out.license = rights;
@@ -133,7 +137,7 @@ function licenseRefs(v: any): string[] {
 function spdxIds(v: any): string[] {
   return [...new Set(licenseRefs(v).map((ref) => {
     if (ref === "NOASSERTION") return null;
-    const m = ref.match(/^https?:\/\/(?:www\.)?spdx\.org\/licenses\/([A-Za-z0-9.+-]+)(?:\.(?:html|json))?$/i);
+    const m = ref.match(/^https?:\/\/(?:www\.)?spdx\.org\/licenses\/([A-Za-z0-9.+-]+?)(?:\.(?:html|json))?$/i);
     if (m) return m[1];
     return /^[A-Za-z0-9.+-]+$/.test(ref) ? ref : null;
   }).filter((x): x is string => !!x))];
@@ -219,7 +223,9 @@ function hasJsonLdMetadata(j: any): boolean {
 
 function applyJsonLd(j: any, out: Reference) {
   const node = findJsonLdNode(j);
-  setIfMissing(out, "object_type", literal(node?.["@type"]) ?? "Dataset");
+  // @type is commonly an array (e.g. ["Dataset","Thing"]); literal() returns
+  // undefined for an array, so read the first typed value
+  setIfMissing(out, "object_type", literals(node?.["@type"])[0] ?? "Dataset");
   setIfMissing(out, "title", literal(node?.name ?? node?.headline));
   setIfMissing(out, "summary", literal(node?.description));
   const kw = Array.isArray(node?.keywords) ? literals(node.keywords) :
@@ -229,8 +235,10 @@ function applyJsonLd(j: any, out: Reference) {
   setIfMissing(out, "publication_date", literal(node?.datePublished ?? node?.dateCreated));
   setIfMissing(out, "creator", literals(node?.creator ?? node?.author));
   setIfMissing(out, "publisher", literal(node?.publisher));
-  const content = literals(node?.contentUrl ?? node?.distribution?.contentUrl)
-    .map((url) => ({ url }));
+  const content = [
+    ...literals(node?.contentUrl),
+    ...asArray(node?.distribution).flatMap((d: any) => literals(d?.contentUrl)),
+  ].map((url) => ({ url }));
   setIfMissing(out, "object_content_identifier", content);
 }
 
@@ -402,7 +410,8 @@ export async function harvest(input: string, options: AssessmentOptions): Promis
       if (r.ok) {
         const a = (await r.json())?.data?.attributes ?? {};
         mapDatacite(a, doi, metadata);
-        resolved = (metadata.landing_url as string) ?? null;
+        // keep a prior resolved (e.g. GitHub html_url); fall back to the DOI URL
+        resolved = (metadata.landing_url as string) ?? resolved ?? `https://doi.org/${doi}`;
         sources.push({ source: "DataCite", method: "content_negotiation" });
       }
     } catch { /* network/CORS */ }
@@ -440,9 +449,12 @@ export async function harvest(input: string, options: AssessmentOptions): Promis
       if (r.ok) {
         const txt = await r.text();
         const raw = /json|ld\+json/i.test(r.headers.get("content-type") ?? "") ? tryJson(txt) : null;
-        const scripts = raw ? [raw] : [...txt.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)]
-          .map((m) => tryJson(m[1]))
-          .filter((j) => j && hasJsonLdMetadata(j));
+        // validate the direct-JSON path too, so an arbitrary JSON 200 is not
+        // accepted as schema.org service evidence
+        const scripts = raw && hasJsonLdMetadata(raw) ? [raw]
+          : [...txt.matchAll(/<script[^>]+type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)]
+              .map((m) => tryJson(m[1]))
+              .filter((j) => j && hasJsonLdMetadata(j));
         if (scripts.length) {
           try {
             const j = scripts.length === 1 ? scripts[0] : scripts;
@@ -563,7 +575,7 @@ export async function harvest(input: string, options: AssessmentOptions): Promis
       const r = await fetch(serviceEndpoint);
       if (r.ok) {
         const j = await r.json();
-        if (j?.["@graph"]) {
+        if (hasJsonLdMetadata(j)) {   // require real metadata, not just an empty @graph
           applyJsonLd(j, metadata);
           recordMetadataService(metadata, serviceEndpoint, options.metadataServiceType);
           addServiceSource(sources, "RO-Crate");
