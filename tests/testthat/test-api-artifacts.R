@@ -1,5 +1,5 @@
 api_artifact <- function(...) {
-  installed <- system.file(..., package = "rfuji")
+  installed <- system.file(..., package = "rfair")
   if (nzchar(installed)) return(installed)
   candidates <- c(
     file.path("inst", ...),
@@ -15,8 +15,8 @@ expected_metric_versions <- c("0.8", "0.5", "0.5ssv2", "0.5ss", "0.5env",
                               "0.6a2a", "0.4", "0.3", "0.2")
 
 test_that("machine-readable API artifacts are packaged", {
-  openapi <- api_artifact("openapi", "rfuji-openapi.yaml")
-  plumber <- api_artifact("plumber", "rfuji-api.R")
+  openapi <- api_artifact("openapi", "rfair-openapi.yaml")
+  plumber <- api_artifact("plumber", "rfair-api.R")
 
   expect_true(file.exists(openapi))
   expect_true(file.exists(plumber))
@@ -38,7 +38,7 @@ test_that("machine-readable API artifacts are packaged", {
 
 test_that("Plumber scaffold validates request enum parameters as 400s", {
   testthat::skip_if_not_installed("plumber")
-  plumber_file <- api_artifact("plumber", "rfuji-api.R")
+  plumber_file <- api_artifact("plumber", "rfair-api.R")
   route <- plumber::plumb(plumber_file)$routes[["assess"]]
   assess <- route$getFunc()
 
@@ -73,7 +73,7 @@ test_that("Plumber scaffold validates request enum parameters as 400s", {
 
 test_that("Plumber scaffold validates boolean query parameters as 400s", {
   testthat::skip_if_not_installed("plumber")
-  plumber_file <- api_artifact("plumber", "rfuji-api.R")
+  plumber_file <- api_artifact("plumber", "rfair-api.R")
   route <- plumber::plumb(plumber_file)$routes[["assess"]]
   assess <- route$getFunc()
 

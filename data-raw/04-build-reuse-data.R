@@ -1,11 +1,11 @@
 # data-raw/04-build-reuse-data.R
 #
-# Bundle two reference datasets that let rfuji address known limitations of
+# Bundle two reference datasets that let rfair address known limitations of
 # F-UJI (raised in peer review of the COVID-19 FAIR-assessment paper):
 #   1. fair_principles  -- the canonical FAIR principle definitions, from the
 #      FAIR-nanopubs vocabulary (w3id.org/fair/principles, cited by go-fair.org).
 #   2. reusabledata     -- the (Re)usable Data Project curations of data-source
-#      license *reusability* (license presence != open for reuse), so rfuji can
+#      license *reusability* (license presence != open for reuse), so rfair can
 #      surface real reuse barriers and controlled-access / sensitive sources.
 #
 # These augment R/sysdata.rda (built by 01-build-sysdata.R), which must exist.

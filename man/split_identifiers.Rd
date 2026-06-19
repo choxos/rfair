@@ -17,7 +17,7 @@ A character vector of individual identifiers.
 \description{
 rtransparent joins the data/code identifiers it extracts with \code{" ; "}. This
 splits such a string (or a vector of them) into a trimmed character vector,
-dropping empties. rfuji's \code{\link[=id_parse]{id_parse()}} already understands the forms it emits
+dropping empties. rfair's \code{\link[=id_parse]{id_parse()}} already understands the forms it emits
 (doi.org URLs, repository URLs, and identifiers.org \code{prefix:accession} codes
 such as \code{geo:GSE123} or \code{bioproject:PRJEB123}).
 }

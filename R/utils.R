@@ -13,7 +13,7 @@ utils::globalVariables("rfuji_data")
 #' @noRd
 ref_data <- function(key) {
   d <- rfuji_data[[key]]
-  if (is.null(d)) stop(sprintf("rfuji reference data '%s' not found; reinstall the package.", key))
+  if (is.null(d)) stop(sprintf("rfair reference data '%s' not found; reinstall the package.", key))
   d
 }
 

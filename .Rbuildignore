@@ -27,6 +27,6 @@
 ^doc$
 ^\.lintr$
 ^audit$
-^rfuji\.Rcheck$
-^rfuji_[0-9].*\.tar\.gz$
+^rfair\.Rcheck$
+^rfair_[0-9].*\.tar\.gz$
 ^\.\.Rcheck$

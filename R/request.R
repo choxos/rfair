@@ -25,7 +25,7 @@ content_negotiate <- function(url, accept = "default", timeout = 15,
 
   req <- httr2::request(request_url)
   req <- httr2::req_headers(req, Accept = accept_str)
-  req <- httr2::req_user_agent(req, "F-UJI (rfuji R package; https://github.com/choxos/rfuji)")
+  req <- httr2::req_user_agent(req, "F-UJI (rfair R package; https://github.com/choxos/rfuji)")
   req <- httr2::req_timeout(req, timeout)
   req <- httr2::req_error(req, is_error = function(resp) FALSE)
   if (!is.null(auth) && is_nonempty_string(auth$token)) {

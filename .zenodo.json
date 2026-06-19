@@ -1,0 +1,33 @@
+{
+  "title": "rfair: native R FAIR assessment metrics",
+  "description": "A native R implementation of the F-UJI / FAIRsFAIR research data object assessment metrics and the FRSM research-software metrics, including legacy metric versions and reusable JSON/RDF outputs. rfair began as a fork of the rfuji F-UJI API client and reimplements the assessment engine natively in R.",
+  "upload_type": "software",
+  "license": "MIT",
+  "creators": [
+    {
+      "name": "Sofi-Mahmudi, Ahmad",
+      "orcid": "0000-0001-6829-0823"
+    }
+  ],
+  "keywords": [
+    "FAIR",
+    "F-UJI",
+    "FAIRsFAIR",
+    "FRSM",
+    "research data",
+    "research software",
+    "R"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "https://github.com/choxos/rfuji",
+      "relation": "isSupplementTo",
+      "scheme": "url"
+    },
+    {
+      "identifier": "10.5281/zenodo.3775793",
+      "relation": "isBasedOn",
+      "scheme": "doi"
+    }
+  ]
+}

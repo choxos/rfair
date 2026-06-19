@@ -23,7 +23,7 @@ collect_github <- function(ctx, timeout = 15) {
   req <- httr2::request(api)
   req <- httr2::req_headers(req, Accept = "application/vnd.github+json",
                             `X-GitHub-Api-Version` = "2022-11-28")
-  req <- httr2::req_user_agent(req, "rfuji R package")
+  req <- httr2::req_user_agent(req, "rfair R package")
   req <- httr2::req_timeout(req, timeout)
   req <- httr2::req_error(req, is_error = function(resp) FALSE)
   token <- Sys.getenv("GITHUB_TOKEN", "")
@@ -120,6 +120,9 @@ harvest_software_signals <- function(api, repo, branch, j, ver, cm, token = "", 
     has_ci = any_match("^\\.github/workflows/|^\\.travis|^\\.circleci|^azure-pipelines|^\\.gitlab-ci"),
     has_requirements = any_match("^(requirements.*\\.txt|setup\\.py|setup\\.cfg|pyproject\\.toml|package\\.json|description|environment\\.ya?ml|renv\\.lock|cargo\\.toml|go\\.mod|pom\\.xml|build\\.gradle)$"),
     has_docs = any_match("^docs?/|readthedocs|mkdocs\\.ya?ml"),
+    has_coverage = any_match("codecov|coveralls|(^|/)test-coverage|\\.codecov|(^|/)covr(\\.|/)"),
+    is_public = !isTRUE(j$private),
+    has_issue_tracker = isTRUE(j$has_issues),
     has_api = path_signals$has_api,
     has_open_api = path_signals$has_open_api,
     has_machine_readable_api = path_signals$has_machine_readable_api,
@@ -138,7 +141,7 @@ software_path_signals <- function(paths, private = FALSE) {
   has_open_data_format <- any_match("(^|/)(openapi|swagger).*\\.(ya?ml|json)$|jsonld|json-ld|rdf|rdfs|\\.ttl$|\\.turtle$|\\.csv$|\\.tsv$|\\.parquet$|\\.feather$|\\.hdf5?$|\\.nc$|\\.netcdf$|\\.xml$")
   has_schema_reference <- any_match("(^|/)(openapi|swagger).*\\.(ya?ml|json)$|json-schema|schema\\.json|\\.schema\\.json$|\\.xsd$|rdfs|\\.proto$|graphql")
   has_format_docs <- has_open_data_format || has_schema_reference ||
-    any_match("as_fuji_json|as_rdf|jsonld|rdf|json-schema|schema\\.json")
+    any_match("as_fair_json|as_rdf|jsonld|rdf|json-schema|schema\\.json")
   list(
     has_api = has_interface_definition,
     has_open_api = has_interface_definition && !isTRUE(private),
@@ -180,7 +183,7 @@ software_spdx_ids <- function(x) {
 github_json <- function(url, token = "", timeout = 15) {
   req <- httr2::request(url)
   req <- httr2::req_headers(req, Accept = "application/vnd.github+json")
-  req <- httr2::req_user_agent(req, "rfuji R package")
+  req <- httr2::req_user_agent(req, "rfair R package")
   req <- httr2::req_timeout(req, timeout)
   req <- httr2::req_error(req, is_error = function(resp) FALSE)
   if (nzchar(token)) req <- httr2::req_auth_bearer_token(req, token)

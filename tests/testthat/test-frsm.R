@@ -44,7 +44,7 @@ test_that("FRSM software license signals handle structured metadata", {
 })
 
 test_that("FRSM software path signals distinguish API, format, and schema evidence", {
-  openapi <- software_path_signals("inst/openapi/rfuji-openapi.yaml")
+  openapi <- software_path_signals("inst/openapi/rfair-openapi.yaml")
   expect_true(openapi$has_api)
   expect_true(openapi$has_open_data_formats)
   expect_true(openapi$has_schema_reference)

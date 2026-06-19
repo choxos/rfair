@@ -3,7 +3,7 @@
 # -2 applies: vocabulary namespaces used in the metadata (after excluding common
 # default namespaces like RDF/XSD/DC/schema.org) must be listed in a registry.
 #
-# Because rfuji maps metadata into its reference schema, the property-level
+# Because rfair maps metadata into its reference schema, the property-level
 # vocabulary namespaces of plain DataCite/Dublin Core records reduce to default
 # namespaces and this metric correctly scores 0 (matching F-UJI). It passes when
 # genuine domain vocabularies are present (e.g. via RDF harvesting).

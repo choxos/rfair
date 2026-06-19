@@ -1,4 +1,4 @@
 library(testthat)
-library(rfuji)
+library(rfair)
 
-test_check("rfuji")
+test_check("rfair")

@@ -1,24 +1,22 @@
-Package: rfuji
-Title: Assess the FAIRness of Research Data Objects
-Version: 2.6.0
+Package: rfair
+Title: Assess the FAIRness of Research Data Objects and Software
+Version: 0.1.0
 Authors@R: c(
     person("Ahmad", "Sofi-Mahmudi", email = "a.sofimahmudi@gmail.com",
            role = c("aut", "cre"), comment = c(ORCID = "0000-0001-6829-0823")),
-    person("Steffen", "Neumann", email = "sneumann@ipb-halle.de", role = "aut",
-           comment = "Author of the original rfuji F-UJI API client"),
+    person("Steffen", "Neumann", email = "sneumann@ipb-halle.de", role = "ctb",
+           comment = "Author of the original rfuji F-UJI API client that rfair grew from"),
     person("PANGAEA", role = "cph",
-           comment = "Copyright holder of the F-UJI service whose metrics rfuji reimplements"))
-Author: Ahmad Sofi-Mahmudi [aut, cre] (<https://orcid.org/0000-0001-6829-0823>),
-    Steffen Neumann [aut],
-    PANGAEA [cph]
-Maintainer: Ahmad Sofi-Mahmudi <a.sofimahmudi@gmail.com>
+           comment = "Copyright holder of the F-UJI service whose metrics rfair reimplements"))
 Description: A native R implementation of the F-UJI (FAIRsFAIR Research Data
-    Object Assessment) metrics for evaluating how well a research data object
+    Object Assessment) and FRSM (FAIR for Research Software) metrics for
+    evaluating how well a research data object or piece of research software
     satisfies the FAIR principles (Findable, Accessible, Interoperable,
-    Reusable). Given a persistent identifier or URL, rfuji resolves it,
-    harvests metadata from landing pages and registries, and scores it against
-    the FAIRsFAIR metrics (<doi:10.5281/zenodo.3775793>) entirely in R, without
-    requiring an external assessment server.
+    Reusable). Given a persistent identifier, URL, or code repository, rfair
+    resolves it, harvests metadata from landing pages and registries, and scores
+    it against the FAIRsFAIR metrics (<doi:10.5281/zenodo.3775793>) entirely in
+    R, without requiring an external assessment server. rfair began as a fork of
+    the 'rfuji' F-UJI API client and reimplements the assessment engine natively.
 License: MIT + file LICENSE
 URL: https://github.com/choxos/rfuji, https://choxos.github.io/rfuji/
 BugReports: https://github.com/choxos/rfuji/issues
@@ -38,6 +36,7 @@ Imports:
 Suggests:
     bslib,
     chromote,
+    covr,
     DT,
     httptest2,
     jqr,

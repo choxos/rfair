@@ -1,6 +1,6 @@
-# Conformance harness (rfuji vs F-UJI)
+# Conformance harness (rfair vs F-UJI)
 
-Measures how closely the native rfuji engine matches upstream F-UJI, per metric,
+Measures how closely the native rfair engine matches upstream F-UJI, per metric,
 over the fixture identifiers in `identifiers.yaml`. Not run by `R CMD check`
 (needs network + a running reference server).
 
@@ -19,7 +19,7 @@ python -m fuji_server -c fuji_server/config/server.ini   # serves http://localho
 ## 2. Run the harness
 
 ```sh
-cd ~/Documents/GitHub/rfuji
+cd ~/Documents/GitHub/rfair
 Rscript tests/conformance/run.R                 # all fixtures
 Rscript tests/conformance/run.R https://doi.org/10.5281/zenodo.8347772
 ```
@@ -45,7 +45,7 @@ live F-UJI at `localhost:1071`.
 
 The only consistent divergence is **FsF-R1.3-02D** (data file format), which
 depends on deeper data-file harvesting (F-UJI uses Tika content detection;
-rfuji uses HTTP HEAD content-type). This met the ≥85% Phase 1 gate at that time.
+rfair uses HTTP HEAD content-type). This met the ≥85% Phase 1 gate at that time.
 
 The R↔TS parity harness (`parity.R`) compares the R engine against the
 TypeScript engine, which lives on the separate **`webapp` branch**. Materialize

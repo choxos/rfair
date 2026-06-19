@@ -3,7 +3,7 @@
 # Sourced from the FAIR-nanopubs vocabulary (https://w3id.org/fair/principles),
 # the machine-readable encoding of the FAIR Guiding Principles (Wilkinson et al.
 # 2016) referenced by the canonical FAIR website, https://www.go-fair.org. This
-# grounds rfuji's metrics in the authoritative principle definitions.
+# grounds rfair's metrics in the authoritative principle definitions.
 
 #' The canonical FAIR (sub)principles.
 #'

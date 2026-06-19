@@ -26,7 +26,7 @@ test_that("parse_link_header handles space-separated rel and ignores URL query p
 })
 
 test_that("plot and as.data.frame survive metric sets missing a category / empty results", {
-  data(fair_example, package = "rfuji")
+  data(fair_example, package = "rfair")
   x2 <- fair_example
   x2$results <- Filter(function(r) !grepl("FsF-A", r$metric_identifier %||% ""),
                        fair_example$results)

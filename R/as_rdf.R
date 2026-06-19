@@ -18,10 +18,10 @@ build_dqv <- function(x) {
       dcat = "http://www.w3.org/ns/dcat#", dc = "http://purl.org/dc/terms/",
       schema = "http://schema.org/", dqv = "http://www.w3.org/ns/dqv#",
       prov = "http://www.w3.org/ns/prov#",
-      rfuji = "https://github.com/choxos/rfuji#"
+      rfair = "https://github.com/choxos/rfuji#"
     ),
     "@type" = c("schema:Dataset", "dqv:QualityMetadata", "schema:Rating"),
-    "dc:creator" = "rfuji",
+    "dc:creator" = "rfair",
     "dc:title" = paste("FAIR assessment results for", x$id),
     "dc:source" = x$id,
     "schema:ratingValue" = fair$percent %||% 0,
@@ -29,8 +29,8 @@ build_dqv <- function(x) {
     "schema:worstRating" = 0,
     "schema:reviewAspect" = "FAIRness",
     "prov:wasGeneratedBy" = list("@type" = "prov:Activity", "prov:used" = x$id),
-    "rfuji:metricVersion" = x$metric_version,
-    "rfuji:softwareVersion" = x$software_version,
+    "rfair:metricVersion" = x$metric_version,
+    "rfair:softwareVersion" = x$software_version,
     "dqv:hasQualityMeasurement" = measurements
   )
 }

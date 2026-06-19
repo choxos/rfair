@@ -1,8 +1,8 @@
-# rfuji roadmap
+# rfair roadmap
 
 Native, pure-R reimplementation of the F-UJI FAIR assessment engine, plus a
 Shiny app and a static JS/TS web app. This file tracks everything still to do so
-nothing is forgotten. See `~/.claude/plans/i-forked-rfuji-r-deep-backus.md` for
+nothing is forgotten. See `~/.claude/plans/i-forked-rfair-r-deep-backus.md` for
 the approved plan and design rationale.
 
 Legend: `[x]` done · `[~]` partial · `[ ]` todo
@@ -50,7 +50,7 @@ Fidelity gate (blocks "Phase 1 done")
 - [x] R1.3-01M community metadata standard: detect generic (DataCite/schema.org/DC, RDA-endorsed → test-3) vs disciplinary (→ test-1) from harvested namespaces (`eval_community.R`)
 - [x] I2-01M semantic vocabulary: namespace match minus default namespaces vs a registered-vocab set (faithful 0 for plain DataCite, matching F-UJI) (`eval_semantic.R`)
 - [x] GitHub harvester: enrich GitHub repos from the REST API (license, description, topics, dates) (`collect_github.R`)
-- [x] **All 17 v0.8 metrics now score.** Fidelity vs real F-UJI on figshare DOI: rfuji 14/26 vs F-UJI 12.5/26 (gap = environment-dependent PID resolution)
+- [x] **All 17 v0.8 metrics now score.** Fidelity vs real F-UJI on figshare DOI: rfair 14/26 vs F-UJI 12.5/26 (gap = environment-dependent PID resolution)
 - [x] FRSM software metric version bundled + selectable (`assess_fair(metric_version = "0.7_software")`); deeper GitHub harvest (codemeta.json, CITATION.cff, latest release version, language)
 - [x] FRSM-* evaluators (all 17 software metrics) implemented in `eval_frsm.R`, scoring from GitHub file-tree signals (license/tests/CI/requirements/registry-DOI/version); heuristic — not yet validated against an upstream FRSM reference
 - [ ] re3data/OAI-PMH/SPARQL/CSW metadata-service endpoints for richer R1.3-01M (disciplinary standards via repository services)
@@ -63,7 +63,7 @@ Fidelity gate (blocks "Phase 1 done")
 - [ ] Deeper libmagic content sniffing via `wand` (currently HEAD content-type + extension only)
 
 ## Phase 5 — Shiny app  `[~]`
-- [x] `inst/shiny-apps/rfuji/app.R` (bslib `page_sidebar`, value boxes, cards, tabs) + `launch_rfuji()`
+- [x] `inst/shiny-apps/rfair/app.R` (bslib `page_sidebar`, value boxes, cards, tabs) + `launch_rfair()`
 - [x] Input DOI/PID/URL + metric version; FAIR doughnut; per-principle table; per-metric DT (pass/fail row colors); debug log
 - [x] Reviewer-driven panels: license reusability, access/sensitivity, identifier hygiene
 - [x] Download results as F-UJI JSON; boots headless without errors; CRAN-safe parse test
@@ -95,7 +95,7 @@ historical manual runs that need a reference service to reproduce.
 - [x] testthat suite (identifier, merge, scorer, assess, reuse, phase3, xml-signposting, shiny, frsm, integration, plot)
 - [x] R↔TS cross-engine parity harness (`tests/conformance/parity.R`) runs from a clean install: `esbuild` is an explicit `webapp` devDependency, the harness bundles `parity-entry.mts` and diffs registry-core metrics R vs TS
 - [x] GitHub Actions: `R-CMD-check.yaml` (mac/win/linux + devel), `pkgdown.yaml` (gh-pages root, `clean:false`), and the `webapp` branch `.github/workflows/deploy.yaml` workflow (`deploy-app`); live site at `choxos.github.io/rfuji` + `/app`
-- [x] roxygen links resolve clean; README; vignettes (`rfuji`, `methodology`, `beyond-fuji`, `illustrating-fairness`); `fair_assessment` class + `plot` method docs; `R CMD build` succeeds
+- [x] roxygen links resolve clean; README; vignettes (`rfair`, `methodology`, `beyond-fuji`, `illustrating-fairness`); `fair_assessment` class + `plot` method docs; `R CMD build` succeeds
 
 **Historical / manual evidence (not reproduced by CI; needs a reference server):**
 - [~] **Conformance vs upstream F-UJI 4.0.0 (metrics v0.8)**, measured manually on 2026-06-16 against a locally run F-UJI: 94.1% on a Zenodo DOI (16/17 metrics exact), 85.3% over PANGAEA+Dryad; only FsF-R1.3-02D (data file format) diverged (Tika vs HEAD). Reproduce with `tests/conformance/run.R` after starting a local F-UJI at `localhost:1071`. CI does **not** start a reference server, so treat this as historical until automated.
