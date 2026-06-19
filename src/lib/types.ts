@@ -171,6 +171,9 @@ export interface SoftwareSignals {
   has_ci: boolean;
   has_requirements: boolean;
   has_docs: boolean;
+  has_coverage: boolean;
+  is_public: boolean;
+  has_issue_tracker: boolean;
   has_api: boolean;
   has_spdx_license: boolean;
   has_metadata_spdx_license: boolean;
