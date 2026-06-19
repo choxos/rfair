@@ -1,8 +1,8 @@
 openapi: 3.1.0
 info:
-  title: rfuji FAIR assessment API
+  title: rfair FAIR assessment API
   version: 2.3.5
-  description: Machine-readable HTTP contract for services that expose rfuji FAIR assessments.
+  description: Machine-readable HTTP contract for services that expose rfair FAIR assessments.
   license:
     name: MIT
     url: https://spdx.org/licenses/MIT.html
@@ -31,13 +31,13 @@ paths:
                     example: ok
                   package:
                     type: string
-                    example: rfuji
+                    example: rfair
                   version:
                     type: string
                     example: 2.3.5
   /metric-versions:
     get:
-      summary: List metric versions bundled by rfuji
+      summary: List metric versions bundled by rfair
       operationId: getMetricVersions
       responses:
         "200":
@@ -68,7 +68,7 @@ paths:
         - name: metric_version
           in: query
           required: false
-          description: Metric version accepted by rfuji_metric_versions().
+          description: Metric version accepted by rfair_metric_versions().
           schema:
             type: string
             default: "0.8"

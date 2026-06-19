@@ -45,7 +45,7 @@ vignettes/*.pdf
 /comments/
 
 # Local fuji reference server venv (for tests/conformance)
-.venv_rfuji/
+.venv_rfair/
 .gstack/
 
 # Local worktree for the standalone web app branch.

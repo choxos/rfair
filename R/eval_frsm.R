@@ -62,6 +62,9 @@ eval_frsm_persistent_metadata <- function(ctx, res) {       # FRSM-08-F4
 eval_frsm_standard_protocol_repo <- function(ctx, res) {    # FRSM-09-A1
   sw <- .sw(ctx)
   if (is_nonempty_string(sw$identifier) && grepl("^https", sw$identifier) && .def(res, 1)) .p(res, 1)
+  # a public repository is reachable without authentication, satisfying the
+  # "authentication, if required, is handled/documented" test
+  if (isTRUE(sw$is_public) && .def(res, 2)) .p(res, 2)
 }
 #' @noRd
 eval_frsm_open_formats <- function(ctx, res) {              # FRSM-10-I1
@@ -92,6 +95,7 @@ eval_frsm_test_cases <- function(ctx, res) {                # FRSM-14-R1
   sw <- .sw(ctx)
   if (isTRUE(sw$has_tests) && .def(res, 1)) .p(res, 1)
   if (isTRUE(sw$has_ci) && .def(res, 2)) .p(res, 2)
+  if (isTRUE(sw$has_coverage) && .def(res, 3)) .p(res, 3)  # code coverage reported
 }
 #' @noRd
 eval_frsm_source_license <- function(ctx, res) {            # FRSM-15-R1.1
@@ -109,6 +113,8 @@ eval_frsm_metadata_license <- function(ctx, res) {          # FRSM-16-R1.1
 eval_frsm_provenance <- function(ctx, res) {                # FRSM-17-R1.2
   sw <- .sw(ctx)
   if ((isTRUE(sw$contributors > 0) || is_nonempty_string(sw$version)) && .def(res, 1)) .p(res, 1)
+  # an issue tracker links commits to issues/PRs (forge auto-links them)
+  if (isTRUE(sw$has_issue_tracker) && .def(res, 2)) .p(res, 2)
 }
 
 #' Register all FRSM software evaluators.

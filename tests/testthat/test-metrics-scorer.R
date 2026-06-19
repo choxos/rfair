@@ -3,14 +3,14 @@ test_that("metrics load and expose agnostic identifiers", {
   expect_gt(length(m$metrics), 10)
   expect_true("FsF-F1-01MD" %in% names(m$custom))
   expect_identical(m$version, "0.8")
-  expect_true("0.8" %in% rfuji_metric_versions())
+  expect_true("0.8" %in% rfair_metric_versions())
 })
 
 test_that("all bundled F-UJI metric versions load with exact version labels", {
   expected <- c("0.8", "0.5", "0.5ssv2", "0.5ss", "0.5env",
                 "0.7_software", "0.7_software_cessda",
                 "0.6a2a", "0.4", "0.3", "0.2")
-  expect_true(all(expected %in% rfuji_metric_versions()))
+  expect_true(all(expected %in% rfair_metric_versions()))
   for (v in expected) {
     m <- load_metrics(v)
     expect_identical(m$version, v)

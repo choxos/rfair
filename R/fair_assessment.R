@@ -6,7 +6,7 @@
 #' [assess_fair()] returns an object of class `fair_assessment`. It has
 #' `print()`, `format()`, [summary()][summary.fair_assessment], and
 #' [as.data.frame()][as.data.frame.fair_assessment] methods, and can be exported
-#' with [as_fuji_json()] and [as_rdf()].
+#' with [as_fair_json()] and [as_rdf()].
 #'
 #' Useful list elements: `summary` (F/A/I/R scores), `results` (per-metric),
 #' `metadata` (harvested), `reuse` (license reusability), `access`
@@ -28,7 +28,7 @@ new_fair_assessment <- function(id, request, results, summary, resolved_url,
       id = id,
       resolved_url = resolved_url,
       request = request,
-      software_version = as.character(utils::packageVersion("rfuji")),
+      software_version = as.character(utils::packageVersion("rfair")),
       metric_version = metrics_meta$version,
       metric_specification = metrics_meta$metric_specification,
       start_timestamp = start_time,

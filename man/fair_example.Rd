@@ -25,7 +25,7 @@ without contacting any network service.
 \details{
 The verbose per-test debug log has been stripped to keep the installed size
 small; all elements used by the \code{print}, \code{summary}, \code{as.data.frame},
-\link[=plot.fair_assessment]{plot}, \code{\link[=as_fuji_json]{as_fuji_json()}}, and \code{\link[=as_rdf]{as_rdf()}} methods are
+\link[=plot.fair_assessment]{plot}, \code{\link[=as_fair_json]{as_fair_json()}}, and \code{\link[=as_rdf]{as_rdf()}} methods are
 retained.
 }
 \examples{

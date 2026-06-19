@@ -1,8 +1,8 @@
 ---
-title: "Getting started with rfuji"
+title: "Getting started with rfair"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Getting started with rfuji}
+  %\VignetteIndexEntry{Getting started with rfair}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -11,13 +11,13 @@ vignette: >
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>", eval = FALSE)
 ```
 
-`rfuji` assesses how well a research data object satisfies the FAIR principles
+`rfair` assesses how well a research data object satisfies the FAIR principles
 (Findable, Accessible, Interoperable, Reusable), entirely in R. It is a native
 port of the [F-UJI](https://github.com/pangaea-data-publisher/fuji) metrics, so
 it needs no external assessment server.
 
 ```{r}
-library(rfuji)
+library(rfair)
 ```
 
 ## Assessing an object
@@ -46,7 +46,7 @@ summary(a)
 
 ## Interpreting beyond the score
 
-Automated FAIR scores have well-known blind spots. `rfuji` surfaces three:
+Automated FAIR scores have well-known blind spots. `rfair` surfaces three:
 
 ```{r}
 # A license being *present* does not mean the data is open for reuse.
@@ -71,14 +71,14 @@ fair_principles()          # canonical FAIR principle definitions
 ## Exporting results
 
 ```{r}
-as_fuji_json(a)            # F-UJI-compatible FAIRResults JSON
+as_fair_json(a)            # F-UJI-compatible FAIRResults JSON
 as_rdf(a)                  # W3C DQV + schema.org Rating (JSON-LD)
 ```
 
 ## Interactive use
 
 ```{r}
-launch_rfuji()             # Shiny app
+launch_rfair()             # Shiny app
 ```
 
 A no-install browser version is at <https://choxos.github.io/rfuji/app/>; because

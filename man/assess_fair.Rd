@@ -19,7 +19,7 @@ assess_fair(
 \arguments{
 \item{id}{A persistent identifier or URL (DOI, Handle, ARK, URN, ...).}
 
-\item{metric_version}{Metric version to use (see \code{\link[=rfuji_metric_versions]{rfuji_metric_versions()}}).}
+\item{metric_version}{Metric version to use (see \code{\link[=rfair_metric_versions]{rfair_metric_versions()}}).}
 
 \item{use_datacite}{Whether to query DataCite for registry metadata.}
 

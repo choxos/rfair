@@ -1,5 +1,5 @@
-#* @apiTitle rfuji FAIR assessment API
-#* @apiDescription HTTP API scaffold for running rfuji FAIR assessments.
+#* @apiTitle rfair FAIR assessment API
+#* @apiDescription HTTP API scaffold for running rfair FAIR assessments.
 
 parse_bool <- function(x, default = FALSE) {
   value <- parse_string(x, "")
@@ -41,8 +41,8 @@ bad_request <- function(res, message, parameter, allowed = NULL) {
 function() {
   list(
     status = "ok",
-    package = "rfuji",
-    version = as.character(utils::packageVersion("rfuji"))
+    package = "rfair",
+    version = as.character(utils::packageVersion("rfair"))
   )
 }
 
@@ -50,12 +50,12 @@ function() {
 #* @serializer unboxedJSON
 #* @get /metric-versions
 function() {
-  list(metric_versions = rfuji::rfuji_metric_versions())
+  list(metric_versions = rfair::rfair_metric_versions())
 }
 
 #* Assess the FAIRness of an identifier or URL
 #* @param id Persistent identifier, DOI, Handle, ARK, URN, or URL to assess.
-#* @param metric_version Metric version accepted by rfuji_metric_versions().
+#* @param metric_version Metric version accepted by rfair_metric_versions().
 #* @param use_datacite Whether to query DataCite metadata.
 #* @param metadata_service_endpoint Optional metadata service endpoint or document URL.
 #* @param metadata_service_type Metadata service type such as oai_pmh, ogc_csw, sparql, dcat, schema_org, datacite, crossref, signposting, typed_links, ro_crate, ckan, or other.
@@ -79,7 +79,7 @@ function(id,
   metric_version <- parse_string(metric_version, "0.8")
   metadata_service_type <- parse_string(metadata_service_type, "oai_pmh")
 
-  metric_versions <- rfuji::rfuji_metric_versions()
+  metric_versions <- rfair::rfair_metric_versions()
   if (!metric_version %in% metric_versions) {
     return(bad_request(
       res,
@@ -130,7 +130,7 @@ function(id,
     ))
   }
 
-  assessment <- rfuji::assess_fair(
+  assessment <- rfair::assess_fair(
     id = id,
     metric_version = metric_version,
     use_datacite = use_datacite,
@@ -140,5 +140,5 @@ function(id,
     timeout = parse_timeout(timeout, 15),
     use_headless = use_headless
   )
-  jsonlite::fromJSON(rfuji::as_fuji_json(assessment), simplifyVector = FALSE)
+  jsonlite::fromJSON(rfair::as_fair_json(assessment), simplifyVector = FALSE)
 }

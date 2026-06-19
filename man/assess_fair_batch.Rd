@@ -9,7 +9,7 @@ assess_fair_batch(ids, metric_version = "0.8", quiet = FALSE, ...)
 \arguments{
 \item{ids}{Character vector of DOIs, PIDs, URLs, or identifiers.org codes.}
 
-\item{metric_version}{Metric version (see \code{\link[=rfuji_metric_versions]{rfuji_metric_versions()}}).}
+\item{metric_version}{Metric version (see \code{\link[=rfair_metric_versions]{rfair_metric_versions()}}).}
 
 \item{quiet}{If \code{FALSE} (default), print per-identifier progress.}
 

@@ -23,7 +23,7 @@ find_pkg_root <- function(start = getwd()) {
 }
 pkg_root <- find_pkg_root()
 
-# Metric versions rfuji supports (default first). These mirror the public
+# Metric versions rfair supports (default first). These mirror the public
 # f-uji.net selector plus older release-specific YAMLs kept in upstream tags.
 supported <- c(
   "metrics_v0.8.yaml",

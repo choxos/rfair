@@ -75,7 +75,7 @@ run_evaluators <- function(ctx, metrics_meta) {
 #' against the FAIRsFAIR metrics, entirely in R.
 #'
 #' @param id A persistent identifier or URL (DOI, Handle, ARK, URN, ...).
-#' @param metric_version Metric version to use (see [rfuji_metric_versions()]).
+#' @param metric_version Metric version to use (see [rfair_metric_versions()]).
 #' @param use_datacite Whether to query DataCite for registry metadata.
 #' @param metadata_service_endpoint Optional URL of an additional metadata
 #'   document to harvest, or a ready protocol query URL (for example an OAI-PMH

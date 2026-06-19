@@ -1,6 +1,6 @@
-# rfuji <-> F-UJI conformance harness  (non-CRAN; requires network)
+# rfair <-> F-UJI conformance harness  (non-CRAN; requires network)
 #
-# Runs a fixed set of identifiers through both the native rfuji engine and a
+# Runs a fixed set of identifiers through both the native rfair engine and a
 # reference F-UJI server, then reports per-metric agreement and an overall
 # fidelity %. Use it to track how closely the R port matches upstream as
 # evaluators are added.
@@ -45,7 +45,7 @@ fuji_reference <- function(id, timeout = 120) {
     stringsAsFactors = FALSE)))
 }
 
-#' Compare rfuji vs reference for one identifier.
+#' Compare rfair vs reference for one identifier.
 compare_one <- function(id) {
   message("- ", id)
   rf <- as.data.frame(assess_fair(id, timeout = 60))[

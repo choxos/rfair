@@ -21,7 +21,7 @@ harvest_data <- function(ctx, timeout = 10, limit = 3) {
         req <- httr2::req_method(req, "HEAD")
         req <- httr2::req_timeout(req, timeout)
         req <- httr2::req_error(req, is_error = function(resp) FALSE)
-        req <- httr2::req_user_agent(req, "F-UJI (rfuji R package)")
+        req <- httr2::req_user_agent(req, "F-UJI (rfair R package)")
         resp <- httr2::req_perform(req)
         if (httr2::resp_status(resp) >= 400L) {
           NULL  # an error page's content-type/length is not the data file's

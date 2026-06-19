@@ -46,7 +46,7 @@ A data frame with one row per (article, kind, identifier): \code{source}
 \code{\link[=assess_fair_batch]{assess_fair_batch()}}. Each unique identifier is assessed once.
 }
 \description{
-Bridges \pkg{rtransparent} and rfuji: takes the data/code identifiers
+Bridges \pkg{rtransparent} and rfair: takes the data/code identifiers
 rtransparent extracts from articles (its \code{open_data_links} and
 \code{open_code_links} columns) and scores each against the FAIR metrics. Data
 identifiers are scored with the FsF data metrics and code repositories with

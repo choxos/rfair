@@ -1,10 +1,10 @@
-# rfuji Shiny app: assess the FAIRness of a research data object or research
+# rfair Shiny app: assess the FAIRness of a research data object or research
 # software, and explore the results, license reusability, access/sensitivity,
-# and identifier hygiene. Launched via rfuji::launch_rfuji().
+# and identifier hygiene. Launched via rfair::launch_rfair().
 
 library(shiny)
 library(bslib)
-library(rfuji)
+library(rfair)
 
 `%||%` <- function(x, y) if (is.null(x) || length(x) == 0L) y else x
 
@@ -35,7 +35,7 @@ metric_label <- function(v) {
 
 # Group the available metric versions for the selector (data / software / legacy).
 metric_version_choices <- function() {
-  vers <- rfuji_metric_versions()
+  vers <- rfair_metric_versions()
   is_sw <- grepl("software", vers)
   is_legacy <- vers %in% c("0.5", "0.5ss", "0.5ssv2", "0.5env", "0.6a2a", "0.4", "0.3", "0.2")
   grp <- function(keys) {
@@ -85,7 +85,7 @@ cat_card <- function(cat, row) {
 }
 
 ui <- page_sidebar(
-  title = tags$span(tags$b("rfuji"), tags$span(class = "text-muted", " - FAIR assessment")),
+  title = tags$span(tags$b("rfair"), tags$span(class = "text-muted", " - FAIR assessment")),
   theme = bs_theme(version = 5, primary = "#118AB2", success = "#06D6A0",
                    "border-radius" = "0.6rem"),
   sidebar = sidebar(
@@ -128,13 +128,13 @@ server <- function(input, output, session) {
                     metadata_service_endpoint = trimws(input$service_url),
                     metadata_service_type = input$service_type,
                     test_debug = input$debug),
-        error = function(e) structure(list(error = conditionMessage(e)), class = "rfuji_error"))
+        error = function(e) structure(list(error = conditionMessage(e)), class = "rfair_error"))
     })
   })
 
   output$results <- renderUI({
     a <- assessment()
-    if (inherits(a, "rfuji_error")) {
+    if (inherits(a, "rfair_error")) {
       return(div(class = "alert alert-danger mt-3", tags$b("Assessment failed: "), a$error))
     }
     s <- summary(a)
@@ -178,13 +178,13 @@ server <- function(input, output, session) {
 
   output$sunburst <- renderPlot({
     a <- assessment()
-    if (inherits(a, "rfuji_error")) return(invisible())
+    if (inherits(a, "rfair_error")) return(invisible())
     plot(a, type = "sunburst", main = NULL)
   }, res = 96)
 
   output$scorecard <- renderPlot({
     a <- assessment()
-    if (inherits(a, "rfuji_error")) return(invisible())
+    if (inherits(a, "rfair_error")) return(invisible())
     plot(a, type = "metric", main = NULL)
   }, res = 96)
 
@@ -262,8 +262,8 @@ server <- function(input, output, session) {
   })
 
   output$download <- downloadHandler(
-    filename = function() paste0("rfuji-", digest::digest(assessment()$id, algo = "crc32"), ".json"),
-    content = function(file) writeLines(as_fuji_json(assessment()), file)
+    filename = function() paste0("rfair-", digest::digest(assessment()$id, algo = "crc32"), ".json"),
+    content = function(file) writeLines(as_fair_json(assessment()), file)
   )
 }
 

@@ -58,9 +58,9 @@ load_metrics <- function(version = "0.8") {
   fname <- metric_file_name(version)
   if (!is.null(.metrics_cache[[fname]])) return(.metrics_cache[[fname]])
 
-  path <- system.file("extdata", "metrics", fname, package = "rfuji")
+  path <- system.file("extdata", "metrics", fname, package = "rfair")
   if (!nzchar(path)) {
-    stop(sprintf("Metric version '%s' is not bundled with rfuji (looked for %s).",
+    stop(sprintf("Metric version '%s' is not bundled with rfair (looked for %s).",
                  version, fname), call. = FALSE)
   }
   spec <- yaml::read_yaml(path)
@@ -102,13 +102,13 @@ build_custom_metrics <- function(metrics) {
   out
 }
 
-#' List the metric versions bundled with rfuji.
+#' List the metric versions bundled with rfair.
 #' @return Character vector of available metric versions (e.g. "0.8").
 #' @export
 #' @examples
-#' rfuji_metric_versions()
-rfuji_metric_versions <- function() {
-  dir <- system.file("extdata", "metrics", package = "rfuji")
+#' rfair_metric_versions()
+rfair_metric_versions <- function() {
+  dir <- system.file("extdata", "metrics", package = "rfair")
   files <- list.files(dir, pattern = "^metrics_v.*\\.yaml$")
   versions <- sub("^metrics_v(.*)\\.yaml$", "\\1", files)
   preferred <- c("0.8", "0.5", "0.5ssv2", "0.5ss", "0.5env",

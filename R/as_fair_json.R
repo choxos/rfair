@@ -2,7 +2,7 @@
 # for interoperability with existing F-UJI clients and the conformance harness.
 
 #' @noRd
-as_fuji_list <- function(x) {
+as_fair_list <- function(x) {
   list(
     test_id = digest::digest(x$id, algo = "sha1", serialize = FALSE),
     request = x$request,
@@ -30,12 +30,12 @@ as_fuji_list <- function(x) {
 #' @examples
 #' \donttest{
 #' a <- assess_fair("https://doi.org/10.5281/zenodo.8347772")
-#' cat(as_fuji_json(a))
+#' cat(as_fair_json(a))
 #' }
-as_fuji_json <- function(x, pretty = TRUE) {
+as_fair_json <- function(x, pretty = TRUE) {
   if (!inherits(x, "fair_assessment")) {
     stop("`x` must be a <fair_assessment> (from assess_fair()).", call. = FALSE)
   }
-  jsonlite::toJSON(as_fuji_list(x), auto_unbox = TRUE, null = "null",
+  jsonlite::toJSON(as_fair_list(x), auto_unbox = TRUE, null = "null",
                    na = "null", pretty = pretty)
 }

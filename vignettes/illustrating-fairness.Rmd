@@ -10,13 +10,13 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(collapse = TRUE, comment = "#>", fig.width = 7,
                       fig.height = 4.2, dpi = 96, fig.align = "center")
-library(rfuji)
+library(rfair)
 ```
 
 This vignette shows how to *read* the output of an assessment: the scorecard
 plot, the score tables, the maturity levels, and the reuse/access context that
-`rfuji` adds on top of the F-UJI metrics. For how the scores are computed see
-`vignette("methodology")`; for a quick tour see `vignette("rfuji")`.
+`rfair` adds on top of the F-UJI metrics. For how the scores are computed see
+`vignette("methodology")`; for a quick tour see `vignette("rfair")`.
 
 So the vignette renders offline and deterministically, it uses the bundled
 example assessment `fair_example` (a real assessment of a Zenodo deposit,
@@ -103,9 +103,9 @@ df[df$earned < df$total, c("metric_identifier", "metric_name", "earned", "total"
   unlicensed object can be perfectly legitimate; the score tells you what a
   machine could and could not verify from the metadata.
 
-## 4. The context rfuji adds beyond the score
+## 4. The context rfair adds beyond the score
 
-A single FAIR percentage hides *why* an object is or is not reusable. `rfuji`
+A single FAIR percentage hides *why* an object is or is not reusable. `rfair`
 surfaces that separately (see `vignette("beyond-fuji")`); the same information
 is in the assessment object and worth showing alongside the scorecard.
 
@@ -132,11 +132,11 @@ x$identifier_hygiene[c("scheme", "is_persistent", "hygiene_ok")]
 
 ## 5. Exporting the illustration
 
-The assessment serializes for downstream tools. `as_fuji_json()` emits a payload
+The assessment serializes for downstream tools. `as_fair_json()` emits a payload
 matching the upstream F-UJI `FAIRResults` schema:
 
 ```{r}
-js <- as_fuji_json(x)
+js <- as_fair_json(x)
 substr(js, 1, 220)
 ```
 

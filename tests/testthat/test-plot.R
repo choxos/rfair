@@ -1,5 +1,5 @@
 test_that("fair_example dataset is a usable assessment object", {
-  data(fair_example, package = "rfuji")
+  data(fair_example, package = "rfair")
   expect_s3_class(fair_example, "fair_assessment")
   s <- summary(fair_example)
   expect_true(all(c("F", "A", "I", "R", "FAIR") %in% s$category))
@@ -7,7 +7,7 @@ test_that("fair_example dataset is a usable assessment object", {
 })
 
 test_that("plot.fair_assessment draws both types without error", {
-  data(fair_example, package = "rfuji")
+  data(fair_example, package = "rfair")
   tmp <- tempfile(fileext = ".png")
 
   grDevices::png(tmp, width = 700, height = 450)
@@ -28,6 +28,6 @@ test_that("plot.fair_assessment draws both types without error", {
 })
 
 test_that("plot validates its type argument", {
-  data(fair_example, package = "rfuji")
+  data(fair_example, package = "rfair")
   expect_error(plot(fair_example, type = "nope"))
 })

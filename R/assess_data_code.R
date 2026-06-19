@@ -7,7 +7,7 @@
 #'
 #' rtransparent joins the data/code identifiers it extracts with `" ; "`. This
 #' splits such a string (or a vector of them) into a trimmed character vector,
-#' dropping empties. rfuji's [id_parse()] already understands the forms it emits
+#' dropping empties. rfair's [id_parse()] already understands the forms it emits
 #' (doi.org URLs, repository URLs, and identifiers.org `prefix:accession` codes
 #' such as `geo:GSE123` or `bioproject:PRJEB123`).
 #'
@@ -62,7 +62,7 @@ split_identifiers <- function(x, sep = " ; ") {
 #' than aborting the batch.
 #'
 #' @param ids Character vector of DOIs, PIDs, URLs, or identifiers.org codes.
-#' @param metric_version Metric version (see [rfuji_metric_versions()]).
+#' @param metric_version Metric version (see [rfair_metric_versions()]).
 #' @param quiet If `FALSE` (default), print per-identifier progress.
 #' @param ... Passed to [assess_fair()].
 #' @return A data frame with one row per unique identifier: `identifier`,
@@ -116,7 +116,7 @@ assess_fair_batch <- function(ids, metric_version = "0.8", quiet = FALSE, ...) {
 
 #' Assess the FAIRness of the data and code shared in articles (rtransparent)
 #'
-#' Bridges \pkg{rtransparent} and rfuji: takes the data/code identifiers
+#' Bridges \pkg{rtransparent} and rfair: takes the data/code identifiers
 #' rtransparent extracts from articles (its `open_data_links` and
 #' `open_code_links` columns) and scores each against the FAIR metrics. Data
 #' identifiers are scored with the FsF data metrics and code repositories with

@@ -18,9 +18,9 @@ reference:
   - title: Assessment
     contents:
       - assess_fair
-      - as_fuji_json
+      - as_fair_json
       - id_parse
-      - rfuji_metric_versions
+      - rfair_metric_versions
   - title: Batch assessment and rtransparent
     contents:
       - assess_data_code
@@ -47,4 +47,4 @@ reference:
       - as_rdf
   - title: App
     contents:
-      - launch_rfuji
+      - launch_rfair

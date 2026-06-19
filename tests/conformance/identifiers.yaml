@@ -1,4 +1,4 @@
-# Fixture identifiers for the rfuji <-> F-UJI conformance harness, grouped by
+# Fixture identifiers for the rfair <-> F-UJI conformance harness, grouped by
 # repository archetype. Used by tests/conformance/run.R (non-CRAN, network).
 - https://doi.org/10.5281/zenodo.8347772      # Zenodo (software)
 - https://doi.org/10.1594/PANGAEA.902845      # PANGAEA (dataset)

@@ -6,7 +6,7 @@
 # resource/creative-work types) into the package as internal data.
 #
 # The transformations mirror fuji_server/helper/preprocessor.py exactly so that
-# rfuji's lookups match upstream F-UJI.
+# rfair's lookups match upstream F-UJI.
 #
 # Usage (run from the package root; outputs are checked in):
 #   FUJI_SRC=~/Documents/GitHub/fuji/fuji_server Rscript data-raw/01-build-sysdata.R
