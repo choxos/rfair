@@ -317,6 +317,7 @@ export async function harvestSoftware(gh: { owner: string; repo: string }): Prom
     has_license: spdxIds(githubLicenseRefs).length > 0 || !!j.license,
     has_readme: false, has_citation: false, has_tests: false, has_ci: false,
     has_requirements: false, has_docs: false, has_api: false,
+    has_coverage: false, is_public: !j.private, has_issue_tracker: !!j.has_issues,
     has_spdx_license: false, has_metadata_spdx_license: false,
     has_open_api: false, has_machine_readable_api: false,
     has_data_format_docs: false, has_open_data_formats: false,
@@ -333,6 +334,7 @@ export async function harvestSoftware(gh: { owner: string; repo: string }): Prom
   sig.has_ci = any(/^\.github\/workflows\/|^\.travis|^\.circleci|^azure-pipelines|^\.gitlab-ci/);
   sig.has_requirements = any(/^(requirements.*\.txt|setup\.py|setup\.cfg|pyproject\.toml|package\.json|description|environment\.ya?ml|renv\.lock|cargo\.toml|go\.mod|pom\.xml|build\.gradle)$/);
   sig.has_docs = any(/^docs?\/|readthedocs|mkdocs\.ya?ml/);
+  sig.has_coverage = any(/codecov|coveralls|(^|\/)test-coverage|\.codecov|(^|\/)covr(\.|\/)/);
   const hasInterfaceDefinition = any(/openapi|swagger|\.proto$|graphql/);
   const hasOpenDataFormat = any(/(^|\/)(openapi|swagger).*\.(ya?ml|json)$|jsonld|json-ld|rdf|rdfs|\.ttl$|\.turtle$|\.csv$|\.tsv$|\.parquet$|\.feather$|\.hdf5?$|\.nc$|\.netcdf$|\.xml$/);
   const hasSchemaReference = any(/(^|\/)(openapi|swagger).*\.(ya?ml|json)$|json-schema|schema\.json|\.schema\.json$|\.xsd$|rdfs|\.proto$|graphql/);

@@ -274,6 +274,7 @@ function runFrsm(mid: string, e: Eval, s: SoftwareSignals, metaLicense: boolean)
       break;
     case "FRSM-09-A1":
       if (s.identifier && /^https/.test(s.identifier)) passSuffix(e, mid, "-1");
+      if (s.is_public) passSuffix(e, mid, "-2");  // public repo needs no auth
       break;
     case "FRSM-10-I1":
       if (s.has_data_format_docs || s.has_requirements) passSuffix(e, mid, "-1");
@@ -294,6 +295,7 @@ function runFrsm(mid: string, e: Eval, s: SoftwareSignals, metaLicense: boolean)
     case "FRSM-14-R1":
       if (s.has_tests) passSuffix(e, mid, "-1");
       if (s.has_ci) passSuffix(e, mid, "-2");
+      if (s.has_coverage) passSuffix(e, mid, "-3");  // coverage reported
       break;
     case "FRSM-15-R1.1":
       if (s.has_license) passSuffix(e, mid, "-1");
@@ -305,6 +307,7 @@ function runFrsm(mid: string, e: Eval, s: SoftwareSignals, metaLicense: boolean)
       break;
     case "FRSM-17-R1.2":
       if (s.contributors > 0 || s.version) passSuffix(e, mid, "-1");
+      if (s.has_issue_tracker) passSuffix(e, mid, "-2");  // issue tracker links commits
       break;
   }
 }
