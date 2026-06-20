@@ -196,6 +196,14 @@ rubric; FAIR principle definitions come from the
 vocabulary referenced by
 [go-fair.org](https://www.go-fair.org/fair-principles/).
 
+## Use of AI
+
+Parts of `rfair` were developed with the assistance of AI coding tools
+(Anthropic’s Claude, via Claude Code), including code drafting,
+documentation, and test scaffolding. All AI-assisted output was
+reviewed, tested, and verified by the author, who is solely responsible
+for the package and its correctness.
+
 ## License
 
 MIT © rfair authors. See `LICENSE`.
