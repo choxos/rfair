@@ -28,6 +28,6 @@
 ^\.lintr$
 ^audit$
 ^rfair\.Rcheck$
-^rfair_[0-9].*\.tar\.gz$
+^.*\.tar\.gz$
 ^\.\.Rcheck$
 ^\.zenodo\.json$
