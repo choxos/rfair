@@ -11,8 +11,8 @@ authors:
     orcid: "https://orcid.org/0000-0001-6829-0823"
   - family-names: Neumann
     given-names: Steffen
-repository-code: "https://github.com/choxos/rfuji"
-url: "https://choxos.github.io/rfuji/"
+repository-code: "https://github.com/choxos/rfair"
+url: "https://choxos.github.io/rfair/"
 license: MIT
 keywords:
   - FAIR

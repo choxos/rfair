@@ -22,7 +22,7 @@ whether identifiers follow best practices.
 
 ```r
 # install.packages("remotes")
-remotes::install_github("choxos/rfuji")
+remotes::install_github("choxos/rfair")
 ```
 
 ## Quick start
@@ -117,7 +117,7 @@ launch_rfair()   # bslib Shiny app: scores, per-metric report, reuse/access pane
 ```
 
 A browser version (registry-only, no install) is published at
-**<https://choxos.github.io/rfuji/app/>**.
+**<https://choxos.github.io/rfair/app/>**.
 
 ## HTTP API scaffold
 
