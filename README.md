@@ -1,7 +1,7 @@
 # rfair <img src="https://img.shields.io/badge/FAIR-assessment-118AB2" alt="FAIR assessment" align="right" />
 
 <!-- badges: start -->
-[![CRAN status](https://www.r-pkg.org/badges/version/rfair)](https://CRAN.R-project.org/package=rfair)
+<!-- CRAN status badge re-added after the package is accepted on CRAN -->
 [![R-CMD-check](https://github.com/choxos/rfair/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/choxos/rfair/actions/workflows/R-CMD-check.yaml)
 [![pkgdown](https://github.com/choxos/rfair/actions/workflows/pkgdown.yaml/badge.svg)](https://choxos.github.io/rfair/)
 [![Codecov test coverage](https://codecov.io/gh/choxos/rfair/graph/badge.svg)](https://app.codecov.io/gh/choxos/rfair)
