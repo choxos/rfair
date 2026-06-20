@@ -9,6 +9,6 @@ bibentry(
   ),
   year = "2026",
   version = "0.1.0",
-  url = "https://github.com/choxos/rfuji",
+  url = "https://github.com/choxos/rfair",
   note = "R package version 0.1.0"
 )

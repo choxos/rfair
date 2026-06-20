@@ -8,7 +8,7 @@
 #' assessment entirely in R and does not require a running F-UJI server.
 #'
 #' The main entry point is [assess_fair()]. See the package vignettes and
-#' <https://choxos.github.io/rfuji/> for details.
+#' <https://choxos.github.io/rfair/> for details.
 #'
 #' @keywords internal
 "_PACKAGE"

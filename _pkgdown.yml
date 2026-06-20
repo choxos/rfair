@@ -1,4 +1,4 @@
-url: https://choxos.github.io/rfuji
+url: https://choxos.github.io/rfair
 
 template:
   bootstrap: 5
@@ -12,7 +12,7 @@ navbar:
   components:
     webapp:
       text: Web app
-      href: https://choxos.github.io/rfuji/app/
+      href: https://choxos.github.io/rfair/app/
 
 reference:
   - title: Assessment

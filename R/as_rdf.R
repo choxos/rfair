@@ -18,7 +18,7 @@ build_dqv <- function(x) {
       dcat = "http://www.w3.org/ns/dcat#", dc = "http://purl.org/dc/terms/",
       schema = "http://schema.org/", dqv = "http://www.w3.org/ns/dqv#",
       prov = "http://www.w3.org/ns/prov#",
-      rfair = "https://github.com/choxos/rfuji#"
+      rfair = "https://github.com/choxos/rfair#"
     ),
     "@type" = c("schema:Dataset", "dqv:QualityMetadata", "schema:Rating"),
     "dc:creator" = "rfair",
