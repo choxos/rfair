@@ -8,6 +8,7 @@
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20775127.svg)](https://doi.org/10.5281/zenodo.20775127)
+[![Archived on Software Heritage](https://archive.softwareheritage.org/badge/origin/https://github.com/choxos/rfair/)](https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/choxos/rfair)
 <!-- badges: end -->
 
 > Assess the FAIRness of research data objects and software, natively in R.

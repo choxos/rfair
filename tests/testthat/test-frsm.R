@@ -12,7 +12,10 @@ test_that("FRSM software metrics load and evaluators score from signals", {
     has_open_api = TRUE, has_machine_readable_api = TRUE,
     has_data_format_docs = TRUE, has_open_data_formats = TRUE,
     has_schema_reference = TRUE, has_spdx_license = TRUE,
-    has_metadata_spdx_license = TRUE)
+    has_metadata_spdx_license = TRUE, has_issue_tracker = TRUE,
+    has_coverage = TRUE, has_bundled_license_info = TRUE,
+    has_credit_roles = TRUE, has_multiple_archives = TRUE,
+    has_provenance_metadata = TRUE)
   ctx$metadata_merged <- list(license = "https://spdx.org/licenses/MIT.html")
   ctx$test_debug <- FALSE
   mk <- function(id) new_metric_evaluation(m$custom[[id]])
@@ -31,6 +34,17 @@ test_that("FRSM software metrics load and evaluators score from signals", {
 
   lic <- mk("FRSM-16-R1.1"); eval_frsm_metadata_license(ctx, lic)
   expect_identical(finalize_result(lic)$test_status, "pass") # SPDX license metadata
+
+  # metrics that reach full marks from the complete signal set above
+  full <- function(id, fn) {
+    r <- mk(id); fn(ctx, r); s <- finalize_result(r)$score
+    expect_equal(s$earned, s$total)
+  }
+  full("FRSM-02-F1.1", eval_frsm_component_identifiers) # single fully-identified component
+  full("FRSM-06-F2",   eval_frsm_contributor_metadata)  # contributors + CRediT roles
+  full("FRSM-08-F4",   eval_frsm_persistent_metadata)   # DOI + second archive
+  full("FRSM-15-R1.1", eval_frsm_source_license)        # license + bundled-component licenses + SPDX
+  full("FRSM-17-R1.2", eval_frsm_provenance)            # provenance + issue tracker + RO-Crate
 })
 
 test_that("FRSM software license signals handle structured metadata", {

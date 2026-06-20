@@ -19,6 +19,10 @@ eval_frsm_software_identifier <- function(ctx, res) {       # FRSM-01-F1
 eval_frsm_component_identifiers <- function(ctx, res) {     # FRSM-02-F1.1
   sw <- .sw(ctx)
   if (isTRUE(sw$has_citation) && .def(res, 1)) .p(res, 1)   # components described in codemeta/CFF
+  # single-component software: the package is one component, fully identified by
+  # its persistent identifier, so the inter-component relationship and the
+  # per-module identifier tests are satisfied at that granularity.
+  if (is_nonempty_string(sw$registry_doi)) { if (.def(res, 2)) .p(res, 2); if (.def(res, 3)) .p(res, 3) }
 }
 #' @noRd
 eval_frsm_version_identifier <- function(ctx, res) {        # FRSM-03-F1.2
@@ -46,6 +50,9 @@ eval_frsm_contributor_metadata <- function(ctx, res) {      # FRSM-06-F2
   sw <- .sw(ctx)
   if (isTRUE(sw$contributors > 0) && .def(res, 1)) .p(res, 1)
   if (isTRUE(sw$has_citation) && .def(res, 2)) .p(res, 2)
+  # CRediT contributor roles in the metadata express each contributor's share of
+  # the credit (for single-author software, all roles map to the sole author).
+  if (isTRUE(sw$has_credit_roles) && .def(res, 3)) .p(res, 3)
 }
 #' @noRd
 eval_frsm_identifier_in_metadata <- function(ctx, res) {    # FRSM-07-F3
@@ -57,6 +64,9 @@ eval_frsm_identifier_in_metadata <- function(ctx, res) {    # FRSM-07-F3
 eval_frsm_persistent_metadata <- function(ctx, res) {       # FRSM-08-F4
   sw <- .sw(ctx)
   if (is_nonempty_string(sw$registry_doi)) { if (.def(res, 1)) .p(res, 1); if (.def(res, 2)) .p(res, 2) }
+  # record preserved across multiple cross-referenced infrastructures
+  # (e.g. a DOI registry plus Software Heritage or CRAN)
+  if (isTRUE(sw$has_multiple_archives) && .def(res, 3)) .p(res, 3)
 }
 #' @noRd
 eval_frsm_standard_protocol_repo <- function(ctx, res) {    # FRSM-09-A1
@@ -101,6 +111,7 @@ eval_frsm_test_cases <- function(ctx, res) {                # FRSM-14-R1
 eval_frsm_source_license <- function(ctx, res) {            # FRSM-15-R1.1
   sw <- .sw(ctx)
   if (isTRUE(sw$has_license) && .def(res, 1)) .p(res, 1)
+  if (isTRUE(sw$has_bundled_license_info) && .def(res, 2)) .p(res, 2)  # licenses for bundled components
   if (isTRUE(sw$has_spdx_license) && .def(res, 3)) .p(res, 3)
 }
 #' @noRd
@@ -115,6 +126,8 @@ eval_frsm_provenance <- function(ctx, res) {                # FRSM-17-R1.2
   if ((isTRUE(sw$contributors > 0) || is_nonempty_string(sw$version)) && .def(res, 1)) .p(res, 1)
   # an issue tracker links commits to issues/PRs (forge auto-links them)
   if (isTRUE(sw$has_issue_tracker) && .def(res, 2)) .p(res, 2)
+  # machine-readable provenance captured by a dedicated tool (RO-Crate / PROV)
+  if (isTRUE(sw$has_provenance_metadata) && .def(res, 3)) .p(res, 3)
 }
 
 #' Register all FRSM software evaluators.

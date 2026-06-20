@@ -103,6 +103,22 @@ harvest_software_signals <- function(api, repo, branch, j, ver, cm, token = "", 
   }
   path_signals <- software_path_signals(paths, private = isTRUE(j$private))
 
+  # content-based signals: CRediT contributor roles, and whether the software is
+  # preserved on more than one archiving infrastructure (a DOI registry plus,
+  # e.g., Software Heritage or CRAN). Read the metadata/readme from the branch.
+  read_raw <- function(path) tryCatch({
+    u <- sprintf("https://raw.githubusercontent.com/%s/%s/%s/%s",
+                 repo$owner, repo$name, branch, path)
+    r <- content_negotiate(u, accept = "default", timeout = timeout)
+    if (isTRUE(r$ok)) as_chr(r$content) else ""
+  }, error = function(e) "")
+  meta_text <- paste(read_raw("codemeta.json"), read_raw("CITATION.cff"),
+                     read_raw("README.md"), collapse = " ")
+  has_credit_roles <- grepl("rolename|credit\\.niso\\.org", meta_text, ignore.case = TRUE)
+  has_multiple_archives <- is_nonempty_string(registry_doi) &&
+    grepl("softwareheritage\\.org|swh:1:|cran\\.r-project\\.org/package",
+          meta_text, ignore.case = TRUE)
+
   list(
     identifier = j$html_url,
     version = ver %||% cm$version,
@@ -128,7 +144,11 @@ harvest_software_signals <- function(api, repo, branch, j, ver, cm, token = "", 
     has_machine_readable_api = path_signals$has_machine_readable_api,
     has_data_format_docs = path_signals$has_data_format_docs,
     has_open_data_formats = path_signals$has_open_data_formats,
-    has_schema_reference = path_signals$has_schema_reference
+    has_schema_reference = path_signals$has_schema_reference,
+    has_bundled_license_info = any_match("(^|/)(notice|copyrights?|authors)(\\.[a-z0-9]+)?$|licen[sc]e\\.note$|(^|/)licen[sc]es?/|third[-_]?party"),
+    has_credit_roles = has_credit_roles,
+    has_multiple_archives = has_multiple_archives,
+    has_provenance_metadata = any_match("ro-crate-metadata\\.json$|(^|/)ro-crate|\\.prov(\\.|$)|(^|/)provenance|(^|/)attestations?/|(^|/)slsa")
   )
 }
 

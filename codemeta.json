@@ -53,6 +53,27 @@
   ],
   "contributor": [
     {
+      "@type": "Role",
+      "roleName": [
+        "Conceptualization",
+        "Data curation",
+        "Formal analysis",
+        "Methodology",
+        "Software",
+        "Validation",
+        "Visualization",
+        "Writing - original draft",
+        "Writing - review & editing",
+        "Project administration"
+      ],
+      "url": "https://credit.niso.org/",
+      "description": "rfair has a single author; all CRediT contributor roles are attributed to Ahmad Sofi-Mahmudi.",
+      "schema:author": {
+        "@id": "https://orcid.org/0000-0001-6829-0823",
+        "name": "Ahmad Sofi-Mahmudi"
+      }
+    },
+    {
       "@type": "Organization",
       "name": "PANGAEA"
     }
@@ -60,6 +81,10 @@
   "isBasedOn": [
     "https://github.com/pangaea-data-publisher/fuji",
     "https://doi.org/10.5281/zenodo.3775793"
+  ],
+  "relatedLink": [
+    "https://doi.org/10.5281/zenodo.20775127",
+    "https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/choxos/rfair"
   ],
   "readme": "https://github.com/choxos/rfair/blob/main/README.md",
   "contIntegration": "https://github.com/choxos/rfair/actions",

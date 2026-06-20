@@ -1,0 +1,57 @@
+{
+  "@context": "https://w3id.org/ro/crate/1.1/context",
+  "@graph": [
+    {
+      "@type": "CreativeWork",
+      "@id": "ro-crate-metadata.json",
+      "conformsTo": { "@id": "https://w3id.org/ro/crate/1.1" },
+      "about": { "@id": "./" },
+      "description": "Machine-readable provenance and packaging metadata for the rfair R package, following the RO-Crate 1.1 specification."
+    },
+    {
+      "@type": "Dataset",
+      "@id": "./",
+      "name": "rfair: native R FAIR assessment metrics",
+      "description": "A native R implementation of the F-UJI / FAIRsFAIR research data object assessment metrics and the FRSM research-software metrics.",
+      "datePublished": "2026-06-20",
+      "license": { "@id": "https://spdx.org/licenses/MIT.html" },
+      "author": { "@id": "https://orcid.org/0000-0001-6829-0823" },
+      "identifier": { "@id": "https://doi.org/10.5281/zenodo.20775127" },
+      "mainEntity": { "@id": "#rfair" },
+      "hasPart": [
+        { "@id": "#rfair" },
+        { "@id": "https://github.com/choxos/rfair" }
+      ]
+    },
+    {
+      "@type": "SoftwareSourceCode",
+      "@id": "#rfair",
+      "name": "rfair",
+      "programmingLanguage": { "@id": "https://www.r-project.org" },
+      "codeRepository": "https://github.com/choxos/rfair",
+      "version": "0.1.0",
+      "license": { "@id": "https://spdx.org/licenses/MIT.html" },
+      "author": { "@id": "https://orcid.org/0000-0001-6829-0823" },
+      "identifier": "https://doi.org/10.5281/zenodo.20775127",
+      "isBasedOn": "https://doi.org/10.5281/zenodo.3775793"
+    },
+    {
+      "@type": "Person",
+      "@id": "https://orcid.org/0000-0001-6829-0823",
+      "name": "Ahmad Sofi-Mahmudi",
+      "roleName": [
+        "Conceptualization",
+        "Methodology",
+        "Software",
+        "Validation",
+        "Writing - original draft",
+        "Project administration"
+      ]
+    },
+    {
+      "@type": "CreativeWork",
+      "@id": "https://w3id.org/ro/crate/1.1",
+      "name": "RO-Crate 1.1"
+    }
+  ]
+}

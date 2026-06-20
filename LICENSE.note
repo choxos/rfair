@@ -1,0 +1,48 @@
+Third-party material bundled with rfair
+========================================
+
+rfair itself is released under the MIT License (see the LICENSE file). The
+package additionally bundles reference data and rubrics derived from external
+projects. Each is redistributed under its own license, reproduced or referenced
+below. The bundled artifacts live in R/sysdata.rda and inst/extdata/ and are
+generated from the upstream sources by the scripts in data-raw/.
+
+--------------------------------------------------------------------------------
+1. F-UJI (FAIRsFAIR Research Data Object Assessment service)
+   Source:  https://github.com/pangaea-data-publisher/fuji
+   DOI:     https://doi.org/10.5281/zenodo.3775793
+   Holder:  PANGAEA / FAIRsFAIR
+   License: MIT
+   Use:     metric definitions (metrics_v0.x.yaml), and the reference tables
+            for SPDX licenses, file formats, access rights, communication
+            protocols, and metadata standards.
+
+--------------------------------------------------------------------------------
+2. SPDX License List
+   Source:  https://github.com/spdx/license-list-data
+   Holder:  The Linux Foundation
+   License: CC0-1.0
+   Use:     the bundled SPDX license identifier and name tables.
+
+--------------------------------------------------------------------------------
+3. (Re)usable Data Project rubric
+   Source:  https://reusabledata.org
+   Holder:  The (Re)usable Data Project
+   License: CC-BY-4.0
+   Use:     the license-reusability taxonomy and curated repository ratings
+            used by license_reuse() and reusabledata_rating().
+
+--------------------------------------------------------------------------------
+4. FAIR principle definitions
+   Source:  https://peta-pico.github.io/FAIR-nanopubs/principles/
+            referenced by https://www.go-fair.org/fair-principles/
+   Holder:  GO FAIR / FAIR-nanopubs contributors
+   License: CC-BY-4.0
+   Use:     the canonical FAIR principle text returned by fair_principles()
+            and principle_definition().
+
+--------------------------------------------------------------------------------
+The full text of the MIT, CC0-1.0, and CC-BY-4.0 licenses is available from the
+SPDX License List at https://spdx.org/licenses/. No upstream copyright notice
+has been removed; this file records provenance and licensing for the bundled
+components as required for redistribution.
