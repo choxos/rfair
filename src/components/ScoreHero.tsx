@@ -33,8 +33,8 @@ export function ScoreHero({ result }: { result: Assessment }) {
     a.click();
     URL.revokeObjectURL(a.href);
   };
-  const download = () => save(JSON.stringify(result, null, 2), "rfuji-result.json", "application/json");
-  const downloadJsonLd = () => save(asJsonLd(result), "rfuji-result.jsonld", "application/ld+json");
+  const download = () => save(JSON.stringify(result, null, 2), "rfair-result.json", "application/json");
+  const downloadJsonLd = () => save(asJsonLd(result), "rfair-result.jsonld", "application/ld+json");
   const copyJson = async () => {
     await navigator.clipboard.writeText(JSON.stringify(result, null, 2));
     note("JSON copied");

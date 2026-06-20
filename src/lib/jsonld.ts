@@ -22,10 +22,10 @@ export function asJsonLd(a: Assessment): string {
       schema: "http://schema.org/",
       dqv: "http://www.w3.org/ns/dqv#",
       prov: "http://www.w3.org/ns/prov#",
-      rfuji: "https://github.com/choxos/rfuji#",
+      rfair: "https://github.com/choxos/rfair#",
     },
     "@type": [subjectType, "dqv:QualityMetadata", "schema:Rating"],
-    "dc:creator": "rfuji (web)",
+    "dc:creator": "rfair (web)",
     "dc:title": `FAIR assessment results for ${a.id}`,
     "dc:source": a.id,
     "schema:url": a.resolved_url ?? a.id,
@@ -34,7 +34,7 @@ export function asJsonLd(a: Assessment): string {
     "schema:worstRating": 0,
     "schema:reviewAspect": "FAIRness",
     "prov:wasGeneratedBy": { "@type": "prov:Activity", "prov:used": a.id },
-    "rfuji:metricVersion": a.metric_version,
+    "rfair:metricVersion": a.metric_version,
     "dqv:hasQualityMeasurement": measurements,
   };
   return JSON.stringify(doc, null, 2);

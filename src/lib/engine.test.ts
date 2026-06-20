@@ -327,7 +327,7 @@ describe("software assessment", () => {
             { path: "tests/engine.test.ts" },
             { path: ".github/workflows/ci.yml" },
             { path: "CITATION.cff" },
-            { path: "inst/openapi/rfuji-openapi.yaml" },
+            { path: "inst/openapi/rfair-openapi.yaml" },
           ] }
         : href.includes("/contributors")
           ? [{ login: "a" }, { login: "b" }]

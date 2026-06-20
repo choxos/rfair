@@ -15,7 +15,7 @@ const DATA_EXAMPLES = [
 ];
 const SOFTWARE_EXAMPLES = [
     { label: "F-UJI", id: "https://github.com/pangaea-data-publisher/fuji" },
-    { label: "rfuji", id: "https://github.com/choxos/rfuji" },
+    { label: "rfair", id: "https://github.com/choxos/rfair" },
     { label: "datacite", id: "https://github.com/datacite/datacite" },
 ];
 
@@ -49,8 +49,8 @@ export function SearchPanel({
       </h1>
       <p className="mx-auto mt-3 max-w-xl text-sm text-slate-500 dark:text-slate-400">
         {software
-          ? "Paste a code repository URL. rfuji scores it against the FRSM (FAIR for Research Software) metrics, in your browser."
-          : "Paste a DOI, persistent identifier, or URL. rfuji scores it against the F-UJI FAIR metrics, in your browser."}
+          ? "Paste a code repository URL. rfair scores it against the FRSM (FAIR for Research Software) metrics, in your browser."
+          : "Paste a DOI, persistent identifier, or URL. rfair scores it against the F-UJI FAIR metrics, in your browser."}
       </p>
 
       <div className="card mt-6 p-2 text-left shadow-md">

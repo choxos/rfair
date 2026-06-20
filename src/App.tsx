@@ -158,12 +158,12 @@ export default function App() {
 
       <footer className="border-t border-slate-200/60 py-6 text-center text-xs text-slate-400 dark:border-white/10">
         <p>
-          rfuji · a native R implementation of the F-UJI FAIR metrics ·{" "}
-          <a className="font-medium text-fair-f hover:underline dark:text-fair-a" href="https://github.com/choxos/rfuji" target="_blank" rel="noreferrer">
+          rfair · a native R implementation of the F-UJI FAIR metrics ·{" "}
+          <a className="font-medium text-fair-f hover:underline dark:text-fair-a" href="https://github.com/choxos/rfair" target="_blank" rel="noreferrer">
             GitHub
           </a>{" "}
           ·{" "}
-          <a className="font-medium text-fair-f hover:underline dark:text-fair-a" href="https://choxos.github.io/rfuji/" target="_blank" rel="noreferrer">
+          <a className="font-medium text-fair-f hover:underline dark:text-fair-a" href="https://choxos.github.io/rfair/" target="_blank" rel="noreferrer">
             Docs
           </a>
         </p>

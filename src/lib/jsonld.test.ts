@@ -20,7 +20,7 @@ describe("asJsonLd", () => {
     expect(doc["schema:ratingValue"]).toBe(88.5);
     expect(doc["schema:bestRating"]).toBe(100);
     expect(doc["dqv:hasQualityMeasurement"]).toHaveLength(2);
-    expect(doc["rfuji:metricVersion"]).toBe("0.8");
+    expect(doc["rfair:metricVersion"]).toBe("0.8");
     expect(doc["dc:source"]).toBe(base.id);
   });
 

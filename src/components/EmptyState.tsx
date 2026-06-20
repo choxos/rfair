@@ -25,7 +25,7 @@ export function EmptyState() {
         harvesting is blocked by browser security, so scores can be lower than
         the full R engine{" "}
         <code className="rounded bg-slate-100 px-1 py-0.5 dark:bg-white/10">
-          rfuji::assess_fair()
+          rfair::assess_fair()
         </code>
         .
       </p>

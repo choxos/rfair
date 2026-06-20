@@ -5,7 +5,7 @@ export type Theme = "light" | "dark";
 /** Dark-mode state, persisted to localStorage, defaulting to the OS preference. */
 export function useTheme(): [Theme, () => void] {
   const [theme, setTheme] = useState<Theme>(() => {
-    const saved = localStorage.getItem("rfuji-theme");
+    const saved = localStorage.getItem("rfair-theme");
     if (saved === "light" || saved === "dark") return saved;
     return window.matchMedia("(prefers-color-scheme: dark)").matches
       ? "dark"
@@ -14,7 +14,7 @@ export function useTheme(): [Theme, () => void] {
 
   useEffect(() => {
     document.documentElement.classList.toggle("dark", theme === "dark");
-    localStorage.setItem("rfuji-theme", theme);
+    localStorage.setItem("rfair-theme", theme);
   }, [theme]);
 
   return [theme, () => setTheme((t) => (t === "dark" ? "light" : "dark"))];

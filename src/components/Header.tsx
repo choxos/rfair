@@ -25,17 +25,17 @@ export function Header({ theme, onToggle }: { theme: Theme; onToggle: () => void
             r
           </span>
           <span className="leading-tight">
-            <span className="block text-base font-bold tracking-tight">rfuji</span>
+            <span className="block text-base font-bold tracking-tight">rfair</span>
             <span className="block text-[11px] text-slate-400">FAIR data assessment</span>
           </span>
         </a>
         <nav className="ml-auto flex items-center gap-1 text-sm">
           <a className="hidden rounded-lg px-3 py-1.5 font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-800 sm:block dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-white"
-            href="https://choxos.github.io/rfuji/" target="_blank" rel="noreferrer">
+            href="https://choxos.github.io/rfair/" target="_blank" rel="noreferrer">
             Docs
           </a>
           <a className="rounded-lg px-3 py-1.5 font-medium text-slate-500 hover:bg-slate-100 hover:text-slate-800 dark:text-slate-400 dark:hover:bg-white/10 dark:hover:text-white"
-            href="https://github.com/choxos/rfuji" target="_blank" rel="noreferrer">
+            href="https://github.com/choxos/rfair" target="_blank" rel="noreferrer">
             GitHub
           </a>
           <button
