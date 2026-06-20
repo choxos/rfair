@@ -1,5 +1,14 @@
 # rfair <img src="https://img.shields.io/badge/FAIR-assessment-118AB2" alt="FAIR assessment" align="right" />
 
+<!-- badges: start -->
+[![CRAN status](https://www.r-pkg.org/badges/version/rfair)](https://CRAN.R-project.org/package=rfair)
+[![R-CMD-check](https://github.com/choxos/rfair/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/choxos/rfair/actions/workflows/R-CMD-check.yaml)
+[![pkgdown](https://github.com/choxos/rfair/actions/workflows/pkgdown.yaml/badge.svg)](https://choxos.github.io/rfair/)
+[![Codecov test coverage](https://codecov.io/gh/choxos/rfair/graph/badge.svg)](https://app.codecov.io/gh/choxos/rfair)
+[![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+<!-- badges: end -->
+
 > Assess the FAIRness of research data objects and software, natively in R.
 
 `rfair` is a native R implementation of the
@@ -23,6 +32,10 @@ whether identifiers follow best practices.
 ## Installation
 
 ```r
+# From CRAN (when available)
+install.packages("rfair")
+
+# Development version from GitHub
 # install.packages("remotes")
 remotes::install_github("choxos/rfair")
 ```
@@ -104,7 +117,7 @@ These results are attached to every assessment (`a$reuse`, `a$access`,
 
 `assess_fair_batch()` scores a vector of identifiers and returns one tidy row
 per identifier. `assess_data_code()` bridges
-[rtransparent](https://github.com/choxos/rtransparent): it takes the data and
+[rtransparent](https://github.com/choxos/rtransparency): it takes the data and
 code identifiers rtransparent extracts from articles (its `open_data_links` and
 `open_code_links` columns; DOIs, repository URLs, and identifiers.org
 `prefix:accession` codes such as `geo:GSE…`) and scores each, using the FsF data
