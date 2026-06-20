@@ -3,6 +3,14 @@ message: "If you use rfair, please cite the software repository and the version 
 type: software
 title: "rfair: native R FAIR assessment metrics"
 version: 0.1.0
+doi: 10.5281/zenodo.20775127
+identifiers:
+  - type: doi
+    value: 10.5281/zenodo.20775127
+    description: "Concept DOI (resolves to the latest version)"
+  - type: doi
+    value: 10.5281/zenodo.20775128
+    description: "Version DOI (v0.1.0)"
 abstract: "rfair is a native R implementation of the F-UJI and FAIRsFAIR research data object assessment metrics and the FRSM research-software metrics, including legacy metric versions and reusable JSON/RDF outputs. rfair began as a fork of the rfuji F-UJI API client."
 authors:
   - family-names: Sofi-Mahmudi
