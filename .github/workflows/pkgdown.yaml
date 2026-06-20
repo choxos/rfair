@@ -30,8 +30,11 @@ jobs:
 
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
-          extra-packages: any::pkgdown, local::.
-          needs: website
+          # Hard deps only: the docs build needs the package, pkgdown, and the
+          # vignette engine. Skipping Suggests avoids installing chromote, whose
+          # Chrome system requirement pulls in chromium and slows every run.
+          dependencies: '"hard"'
+          extra-packages: any::pkgdown, any::knitr, any::rmarkdown, local::.
 
       - name: Build site
         run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
