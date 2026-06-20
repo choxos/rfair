@@ -141,7 +141,7 @@ software_path_signals <- function(paths, private = FALSE) {
   has_open_data_format <- any_match("(^|/)(openapi|swagger).*\\.(ya?ml|json)$|jsonld|json-ld|rdf|rdfs|\\.ttl$|\\.turtle$|\\.csv$|\\.tsv$|\\.parquet$|\\.feather$|\\.hdf5?$|\\.nc$|\\.netcdf$|\\.xml$")
   has_schema_reference <- any_match("(^|/)(openapi|swagger).*\\.(ya?ml|json)$|json-schema|schema\\.json|\\.schema\\.json$|\\.xsd$|rdfs|\\.proto$|graphql")
   has_format_docs <- has_open_data_format || has_schema_reference ||
-    any_match("as_fair_json|as_rdf|jsonld|rdf|json-schema|schema\\.json")
+    any_match("as_fuji_json|as_rdf|jsonld|rdf|json-schema|schema\\.json")
   list(
     has_api = has_interface_definition,
     has_open_api = has_interface_definition && !isTRUE(private),

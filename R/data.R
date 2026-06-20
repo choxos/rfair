@@ -8,7 +8,7 @@
 #'
 #' The verbose per-test debug log has been stripped to keep the installed size
 #' small; all elements used by the `print`, `summary`, `as.data.frame`,
-#' [plot][plot.fair_assessment], [as_fair_json()], and [as_rdf()] methods are
+#' [plot][plot.fair_assessment], [as_fuji_json()], and [as_rdf()] methods are
 #' retained.
 #'
 #' @format A `fair_assessment` object (a list with S3 class `fair_assessment`);
