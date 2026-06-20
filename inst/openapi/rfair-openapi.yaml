@@ -1,7 +1,7 @@
 openapi: 3.1.0
 info:
   title: rfair FAIR assessment API
-  version: 2.3.5
+  version: 0.1.0
   description: Machine-readable HTTP contract for services that expose rfair FAIR assessments.
   license:
     name: MIT
@@ -34,7 +34,7 @@ paths:
                     example: rfair
                   version:
                     type: string
-                    example: 2.3.5
+                    example: 0.1.0
   /metric-versions:
     get:
       summary: List metric versions bundled by rfair
