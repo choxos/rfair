@@ -28,6 +28,10 @@ practices.
 
 ``` r
 
+# From CRAN (when available)
+install.packages("rfair")
+
+# Development version from GitHub
 # install.packages("remotes")
 remotes::install_github("choxos/rfair")
 ```
@@ -113,12 +117,12 @@ These results are attached to every assessment (`a$reuse`, `a$access`,
 [`assess_fair_batch()`](https://choxos.github.io/rfair/reference/assess_fair_batch.md)
 scores a vector of identifiers and returns one tidy row per identifier.
 [`assess_data_code()`](https://choxos.github.io/rfair/reference/assess_data_code.md)
-bridges [rtransparent](https://github.com/choxos/rtransparent): it takes
-the data and code identifiers rtransparent extracts from articles (its
-`open_data_links` and `open_code_links` columns; DOIs, repository URLs,
-and identifiers.org `prefix:accession` codes such as `geo:GSE…`) and
-scores each, using the FsF data metrics for data and the FRSM software
-metrics for code.
+bridges [rtransparent](https://github.com/choxos/rtransparency): it
+takes the data and code identifiers rtransparent extracts from articles
+(its `open_data_links` and `open_code_links` columns; DOIs, repository
+URLs, and identifiers.org `prefix:accession` codes such as `geo:GSE…`)
+and scores each, using the FsF data metrics for data and the FRSM
+software metrics for code.
 
 ``` r
 
