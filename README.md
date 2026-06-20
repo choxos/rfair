@@ -42,6 +42,16 @@ install.packages("rfair")
 remotes::install_github("choxos/rfair")
 ```
 
+## Interactive app
+
+No install required: a browser version (registry-only) is published at
+**<https://choxos.github.io/rfair/app/>**. Inside R, launch the bundled Shiny
+app:
+
+```r
+launch_rfair()   # bslib Shiny app: scores, per-metric report, reuse/access panels
+```
+
 ## Quick start
 
 ```r
@@ -131,15 +141,6 @@ scores <- assess_data_code(rt, id_col = "pmid")    # one row per (article, data/
 ```
 
 `split_identifiers()` parses the `" ; "`-joined link strings on their own.
-
-## Interactive app
-
-```r
-launch_rfair()   # bslib Shiny app: scores, per-metric report, reuse/access panels
-```
-
-A browser version (registry-only, no install) is published at
-**<https://choxos.github.io/rfair/app/>**.
 
 ## HTTP API scaffold
 
