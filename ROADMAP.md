@@ -118,13 +118,13 @@ subset)
 
 ## Phase 4 — Optional fidelity tail `[~]`
 
-[`as_rdf()`](https://choxos.github.io/rfuji/reference/as_rdf.md) result
+[`as_rdf()`](https://choxos.github.io/rfair/reference/as_rdf.md) result
 serialization: DQV quality measurements + schema.org Rating JSON-LD
 (Turtle via optional `rdflib`)
 
 Headless rendering via `chromote` (`use_headless = FALSE` default;
 gated, no-op if absent) wired into
-[`assess_fair()`](https://choxos.github.io/rfuji/reference/assess_fair.md)
+[`assess_fair()`](https://choxos.github.io/rfair/reference/assess_fair.md)
 
 Data-file harvester (`harvest_data`): HTTP HEAD content links for MIME
 type + size (improves R1-01M-2, R1.3-02D); `mime` fallback
@@ -136,7 +136,7 @@ content-type + extension only)
 
 `inst/shiny-apps/rfair/app.R` (bslib `page_sidebar`, value boxes, cards,
 tabs) +
-[`launch_rfair()`](https://choxos.github.io/rfuji/reference/launch_rfair.md)
+[`launch_rfair()`](https://choxos.github.io/rfair/reference/launch_rfair.md)
 
 Input DOI/PID/URL + metric version; FAIR doughnut; per-principle table;
 per-metric DT (pass/fail row colors); debug log
@@ -202,7 +202,7 @@ harness bundles `parity-entry.mts` and diffs registry-core metrics R vs
 TS - \[x\] GitHub Actions: `R-CMD-check.yaml` (mac/win/linux + devel),
 `pkgdown.yaml` (gh-pages root, `clean:false`), and the `webapp` branch
 `.github/workflows/deploy.yaml` workflow (`deploy-app`); live site at
-`choxos.github.io/rfuji` + `/app` - \[x\] roxygen links resolve clean;
+`choxos.github.io/rfair` + `/app` - \[x\] roxygen links resolve clean;
 README; vignettes (`rfair`, `methodology`, `beyond-fuji`,
 `illustrating-fairness`); `fair_assessment` class + `plot` method docs;
 `R CMD build` succeeds
@@ -229,32 +229,32 @@ clean); installed-size check
 
 ## Reviewer-driven extensions (Haendel review + comments/ folder) `[x]`
 
-[`license_reuse()`](https://choxos.github.io/rfuji/reference/license_reuse.md)
+[`license_reuse()`](https://choxos.github.io/rfair/reference/license_reuse.md)
 — license presence ≠ open for reuse (CC-BY-NC-ND etc.) + the
 **(Re)usable Data Project six-category taxonomy**
 (permissive/copyleft/restrictive/private-pool/copyright/unknown; Carbon
 et al. 2019, the paper in comments/) via `rdp_category` +
 `facilitates_reuse`
 
-[`classify_access()`](https://choxos.github.io/rfuji/reference/classify_access.md) +
-[`reusabledata_rating()`](https://choxos.github.io/rfuji/reference/reusabledata_rating.md)
+[`classify_access()`](https://choxos.github.io/rfair/reference/classify_access.md) +
+[`reusabledata_rating()`](https://choxos.github.io/rfair/reference/reusabledata_rating.md)
 — controlled-access / sensitive data not scored as FAIR failure
 
-[`identifier_hygiene()`](https://choxos.github.io/rfuji/reference/identifier_hygiene.md)
+[`identifier_hygiene()`](https://choxos.github.io/rfair/reference/identifier_hygiene.md)
 — layered/non-persistent PID anti-patterns (e.g. RRID:MGI:…)
 
-[`fair_principles()`](https://choxos.github.io/rfuji/reference/fair_principles.md)
+[`fair_principles()`](https://choxos.github.io/rfair/reference/fair_principles.md)
 /
-[`principle_definition()`](https://choxos.github.io/rfuji/reference/principle_definition.md)
+[`principle_definition()`](https://choxos.github.io/rfair/reference/principle_definition.md)
 — canonical FAIR principles (FAIR-nanopubs / go-fair, w3id.org/fair)
 
-**[`fair_tlc()`](https://choxos.github.io/rfuji/reference/fair_tlc.md) —
+**[`fair_tlc()`](https://choxos.github.io/rfair/reference/fair_tlc.md) —
 FAIR-TLC (Traceable, Licensed, Connected)**, Haendel et al.’s “FAIR+”
 framework (<doi:10.5281/zenodo.203295>, the Monarch/TransMed RFI
 response + FORCE11 blog in comments/)
 
 Wired into
-[`assess_fair()`](https://choxos.github.io/rfuji/reference/assess_fair.md)
+[`assess_fair()`](https://choxos.github.io/rfair/reference/assess_fair.md)
 output + print, the **Shiny app** (Reuse tab), and the **web app**
 (Reuse & access tab)
 

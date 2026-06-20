@@ -1,12 +1,12 @@
 # Plot a FAIR assessment as a scorecard
 
 Draws a compact, readable scorecard of a
-[fair_assessment](https://choxos.github.io/rfuji/reference/fair_assessment.md)
+[fair_assessment](https://choxos.github.io/rfair/reference/fair_assessment.md)
 using base graphics (no extra package dependencies). It is the quickest
 way to *see* an assessment: a horizontal progress bar per FAIR category
 (or per metric), each annotated with its score and CMMI maturity level.
 See
-[`vignette("illustrating-fairness")`](https://choxos.github.io/rfuji/articles/illustrating-fairness.md)
+[`vignette("illustrating-fairness")`](https://choxos.github.io/rfair/articles/illustrating-fairness.md)
 for worked examples.
 
 ## Usage
@@ -28,7 +28,7 @@ plot(
 - x:
 
   A `fair_assessment` object returned by
-  [`assess_fair()`](https://choxos.github.io/rfuji/reference/assess_fair.md).
+  [`assess_fair()`](https://choxos.github.io/rfair/reference/assess_fair.md).
 
 - type:
 
@@ -64,9 +64,9 @@ plot(
 
 ## See also
 
-[`assess_fair()`](https://choxos.github.io/rfuji/reference/assess_fair.md),
-[`summary.fair_assessment()`](https://choxos.github.io/rfuji/reference/summary.fair_assessment.md),
-[fair_example](https://choxos.github.io/rfuji/reference/fair_example.md)
+[`assess_fair()`](https://choxos.github.io/rfair/reference/assess_fair.md),
+[`summary.fair_assessment()`](https://choxos.github.io/rfair/reference/summary.fair_assessment.md),
+[fair_example](https://choxos.github.io/rfair/reference/fair_example.md)
 
 ## Examples
 

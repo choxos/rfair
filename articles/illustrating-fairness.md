@@ -4,9 +4,9 @@ This vignette shows how to *read* the output of an assessment: the
 scorecard plot, the score tables, the maturity levels, and the
 reuse/access context that `rfair` adds on top of the F-UJI metrics. For
 how the scores are computed see
-[`vignette("methodology")`](https://choxos.github.io/rfuji/articles/methodology.md);
+[`vignette("methodology")`](https://choxos.github.io/rfair/articles/methodology.md);
 for a quick tour see
-[`vignette("rfair")`](https://choxos.github.io/rfuji/articles/rfair.md).
+[`vignette("rfair")`](https://choxos.github.io/rfair/articles/rfair.md).
 
 So the vignette renders offline and deterministically, it uses the
 bundled example assessment `fair_example` (a real assessment of a Zenodo
@@ -175,7 +175,7 @@ df[df$earned < df$total, c("metric_identifier", "metric_name", "earned", "total"
 
 A single FAIR percentage hides *why* an object is or is not reusable.
 `rfair` surfaces that separately (see
-[`vignette("beyond-fuji")`](https://choxos.github.io/rfuji/articles/beyond-fuji.md));
+[`vignette("beyond-fuji")`](https://choxos.github.io/rfair/articles/beyond-fuji.md));
 the same information is in the assessment object and worth showing
 alongside the scorecard.
 
@@ -230,7 +230,7 @@ x$identifier_hygiene[c("scheme", "is_persistent", "hygiene_ok")]
 ## 5. Exporting the illustration
 
 The assessment serializes for downstream tools.
-[`as_fair_json()`](https://choxos.github.io/rfuji/reference/as_fair_json.md)
+[`as_fair_json()`](https://choxos.github.io/rfair/reference/as_fair_json.md)
 emits a payload matching the upstream F-UJI `FAIRResults` schema:
 
 ``` r
@@ -247,7 +247,7 @@ substr(js, 1, 220)
 #> 
 ```
 
-[`as_rdf()`](https://choxos.github.io/rfuji/reference/as_rdf.md) emits a
+[`as_rdf()`](https://choxos.github.io/rfair/reference/as_rdf.md) emits a
 machine-readable rating (W3C DQV plus a schema.org `Rating` as JSON-LD),
 suitable for embedding in a landing page:
 

@@ -14,7 +14,7 @@ library(rfair)
 ## Assessing an object
 
 Pass any DOI, persistent identifier, or URL to
-[`assess_fair()`](https://choxos.github.io/rfuji/reference/assess_fair.md).
+[`assess_fair()`](https://choxos.github.io/rfair/reference/assess_fair.md).
 It resolves the identifier, harvests metadata, and scores it against the
 FAIRsFAIR metrics.
 
@@ -83,6 +83,6 @@ launch_rfair()             # Shiny app
 ```
 
 A no-install browser version is at
-<https://choxos.github.io/rfuji/app/>; because browsers cannot fetch
+<https://choxos.github.io/rfair/app/>; because browsers cannot fetch
 landing pages cross-origin, it scores from registry metadata
 (DataCite/Crossref) only, so some metrics are lower than the R engine.

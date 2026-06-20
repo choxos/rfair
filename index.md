@@ -26,7 +26,7 @@ practices.
 ``` r
 
 # install.packages("remotes")
-remotes::install_github("choxos/rfuji")
+remotes::install_github("choxos/rfair")
 ```
 
 ## Quick start
@@ -102,9 +102,9 @@ These results are attached to every assessment (`a$reuse`, `a$access`,
 
 ## Batch assessment and rtransparent
 
-[`assess_fair_batch()`](https://choxos.github.io/rfuji/reference/assess_fair_batch.md)
+[`assess_fair_batch()`](https://choxos.github.io/rfair/reference/assess_fair_batch.md)
 scores a vector of identifiers and returns one tidy row per identifier.
-[`assess_data_code()`](https://choxos.github.io/rfuji/reference/assess_data_code.md)
+[`assess_data_code()`](https://choxos.github.io/rfair/reference/assess_data_code.md)
 bridges [rtransparent](https://github.com/choxos/rtransparent): it takes
 the data and code identifiers rtransparent extracts from articles (its
 `open_data_links` and `open_code_links` columns; DOIs, repository URLs,
@@ -118,7 +118,7 @@ rt <- rtransparent::rt_data_code_pmc(xml)          # is_open_data, open_data_lin
 scores <- assess_data_code(rt, id_col = "pmid")    # one row per (article, data/code link)
 ```
 
-[`split_identifiers()`](https://choxos.github.io/rfuji/reference/split_identifiers.md)
+[`split_identifiers()`](https://choxos.github.io/rfair/reference/split_identifiers.md)
 parses the `" ; "`-joined link strings on their own.
 
 ## Interactive app
@@ -129,7 +129,7 @@ launch_rfair()   # bslib Shiny app: scores, per-metric report, reuse/access pane
 ```
 
 A browser version (registry-only, no install) is published at
-**<https://choxos.github.io/rfuji/app/>**.
+**<https://choxos.github.io/rfair/app/>**.
 
 ## HTTP API scaffold
 

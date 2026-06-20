@@ -1,7 +1,7 @@
 # Assess the FAIRness of a batch of identifiers
 
 Runs
-[`assess_fair()`](https://choxos.github.io/rfuji/reference/assess_fair.md)
+[`assess_fair()`](https://choxos.github.io/rfair/reference/assess_fair.md)
 over a vector of identifiers and returns one tidy row per identifier
 (deduplicated). Failures are captured in an `error` column rather than
 aborting the batch.
@@ -21,7 +21,7 @@ assess_fair_batch(ids, metric_version = "0.8", quiet = FALSE, ...)
 - metric_version:
 
   Metric version (see
-  [`rfair_metric_versions()`](https://choxos.github.io/rfuji/reference/rfair_metric_versions.md)).
+  [`rfair_metric_versions()`](https://choxos.github.io/rfair/reference/rfair_metric_versions.md)).
 
 - quiet:
 
@@ -30,7 +30,7 @@ assess_fair_batch(ids, metric_version = "0.8", quiet = FALSE, ...)
 - ...:
 
   Passed to
-  [`assess_fair()`](https://choxos.github.io/rfuji/reference/assess_fair.md).
+  [`assess_fair()`](https://choxos.github.io/rfair/reference/assess_fair.md).
 
 ## Value
 
@@ -41,8 +41,8 @@ A data frame with one row per unique identifier: `identifier`,
 
 ## See also
 
-[`assess_data_code()`](https://choxos.github.io/rfuji/reference/assess_data_code.md),
-[`assess_fair()`](https://choxos.github.io/rfuji/reference/assess_fair.md)
+[`assess_data_code()`](https://choxos.github.io/rfair/reference/assess_data_code.md),
+[`assess_fair()`](https://choxos.github.io/rfair/reference/assess_fair.md)
 
 ## Examples
 

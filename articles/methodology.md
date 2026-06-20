@@ -2,9 +2,9 @@
 
 This vignette describes what rfair measures and how, in enough detail to
 interpret and reproduce its scores. For a quick tour see
-[`vignette("rfair")`](https://choxos.github.io/rfuji/articles/rfair.md);
+[`vignette("rfair")`](https://choxos.github.io/rfair/articles/rfair.md);
 for the reuse/sensitivity extensions see
-[`vignette("beyond-fuji")`](https://choxos.github.io/rfuji/articles/beyond-fuji.md).
+[`vignette("beyond-fuji")`](https://choxos.github.io/rfair/articles/beyond-fuji.md).
 
 ## 1. Background: FAIR, the FAIRsFAIR metrics, and F-UJI
 
@@ -28,7 +28,7 @@ server; this version (v2) is the engine itself.
 ## 2. The assessment pipeline
 
 A single call to
-[`assess_fair()`](https://choxos.github.io/rfuji/reference/assess_fair.md)
+[`assess_fair()`](https://choxos.github.io/rfair/reference/assess_fair.md)
 runs this pipeline:
 
     identifier
@@ -62,7 +62,7 @@ runs this pipeline:
 
 ### Identifier handling
 
-[`id_parse()`](https://choxos.github.io/rfuji/reference/id_parse.md)
+[`id_parse()`](https://choxos.github.io/rfair/reference/id_parse.md)
 recognizes DOIs, Handles, ARKs, URNs, UUIDs, `identifiers.org` PIDs,
 w3id, and plain URLs, normalizes them, and constructs a resolver URL.
 Persistence is inferred from the scheme.
@@ -120,7 +120,7 @@ advanced) when it passes. Metrics use one of two scoring mechanisms:
 
 The criterium engine (`criterium_engine.R`) builds each metric’s result
 from the YAML and lets evaluators mark tests passed;
-[`as_fair_json()`](https://choxos.github.io/rfuji/reference/as_fair_json.md)
+[`as_fair_json()`](https://choxos.github.io/rfair/reference/as_fair_json.md)
 then emits a payload matching the upstream F-UJI `FAIRResults` schema.
 
 ## 3. What each FAIR category measures (v0.8)
@@ -195,7 +195,7 @@ peer review of a COVID-19 FAIR study: license *reusability* (not just
 presence) with the (Re)usable Data Project taxonomy,
 controlled-access/sensitive-data flagging, identifier hygiene, and the
 **FAIR-TLC** (Traceable, Licensed, Connected) extension. See
-[`vignette("beyond-fuji")`](https://choxos.github.io/rfuji/articles/beyond-fuji.md).
+[`vignette("beyond-fuji")`](https://choxos.github.io/rfair/articles/beyond-fuji.md).
 
 ## 7. Limitations
 
@@ -205,7 +205,7 @@ controlled-access/sensitive-data flagging, identifier hygiene, and the
   uses only default namespaces (dc/schema.org/DataCite) — this matches
   F-UJI.
 - RDF Turtle/RDF-XML harvesting and
-  [`as_rdf()`](https://choxos.github.io/rfuji/reference/as_rdf.md)
+  [`as_rdf()`](https://choxos.github.io/rfair/reference/as_rdf.md)
   Turtle output need the optional `rdflib` package (system `librdf`);
   without it those paths are skipped.
 - Live scores depend on the object’s current metadata and on third-party

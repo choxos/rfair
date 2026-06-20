@@ -28,7 +28,7 @@ assess_fair(
 - metric_version:
 
   Metric version to use (see
-  [`rfair_metric_versions()`](https://choxos.github.io/rfuji/reference/rfair_metric_versions.md)).
+  [`rfair_metric_versions()`](https://choxos.github.io/rfair/reference/rfair_metric_versions.md)).
 
 - use_datacite:
 
@@ -71,7 +71,7 @@ assess_fair(
 ## Value
 
 A
-[fair_assessment](https://choxos.github.io/rfuji/reference/fair_assessment.md)
+[fair_assessment](https://choxos.github.io/rfair/reference/fair_assessment.md)
 object.
 
 ## Examples

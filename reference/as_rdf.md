@@ -15,7 +15,7 @@ as_rdf(x, format = c("jsonld", "turtle"))
 - x:
 
   A
-  [fair_assessment](https://choxos.github.io/rfuji/reference/fair_assessment.md)
+  [fair_assessment](https://choxos.github.io/rfair/reference/fair_assessment.md)
   object.
 
 - format:
@@ -40,7 +40,7 @@ cat(as_rdf(a))
 #>     "schema": "http://schema.org/",
 #>     "dqv": "http://www.w3.org/ns/dqv#",
 #>     "prov": "http://www.w3.org/ns/prov#",
-#>     "rfair": "https://github.com/choxos/rfuji#"
+#>     "rfair": "https://github.com/choxos/rfair#"
 #>   },
 #>   "@type": ["schema:Dataset", "dqv:QualityMetadata", "schema:Rating"],
 #>   "dc:creator": "rfair",

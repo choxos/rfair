@@ -60,20 +60,20 @@ assess_data_code(
 - ...:
 
   Passed to
-  [`assess_fair()`](https://choxos.github.io/rfuji/reference/assess_fair.md).
+  [`assess_fair()`](https://choxos.github.io/rfair/reference/assess_fair.md).
 
 ## Value
 
 A data frame with one row per (article, kind, identifier): `source`
 (article id), `kind` (`"data"` or `"code"`), and the columns of
-[`assess_fair_batch()`](https://choxos.github.io/rfuji/reference/assess_fair_batch.md).
+[`assess_fair_batch()`](https://choxos.github.io/rfair/reference/assess_fair_batch.md).
 Each unique identifier is assessed once.
 
 ## See also
 
-[`assess_fair_batch()`](https://choxos.github.io/rfuji/reference/assess_fair_batch.md),
-[`split_identifiers()`](https://choxos.github.io/rfuji/reference/split_identifiers.md),
-[`assess_fair()`](https://choxos.github.io/rfuji/reference/assess_fair.md)
+[`assess_fair_batch()`](https://choxos.github.io/rfair/reference/assess_fair_batch.md),
+[`split_identifiers()`](https://choxos.github.io/rfair/reference/split_identifiers.md),
+[`assess_fair()`](https://choxos.github.io/rfair/reference/assess_fair.md)
 
 ## Examples
 
@@ -91,8 +91,8 @@ assess_data_code(list(open_data_links = "https://doi.org/10.5281/zenodo.8347772"
 #>   scheme is_persistent                                   resolved_url
 #> 1    doi          TRUE             https://zenodo.org/records/8347772
 #> 2    url         FALSE https://github.com/pangaea-data-publisher/fuji
-#>   fair_percent   F   A     I     R maturity n_pass n_metrics error
-#> 1        88.46 100 100 66.67 83.33      2.5     15        17  <NA>
-#> 2         0.00   0   0  0.00  0.00      0.0      0        17  <NA>
+#>   fair_percent   F   A      I     R maturity n_pass n_metrics error
+#> 1        88.46 100 100  66.67 83.33     2.50     15        17  <NA>
+#> 2        71.11  55 100 100.00 75.00     2.25     16        17  <NA>
 # }
 ```

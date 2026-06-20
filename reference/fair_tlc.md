@@ -22,9 +22,9 @@ fair_tlc(x)
 - x:
 
   A
-  [fair_assessment](https://choxos.github.io/rfuji/reference/fair_assessment.md)
+  [fair_assessment](https://choxos.github.io/rfair/reference/fair_assessment.md)
   from
-  [`assess_fair()`](https://choxos.github.io/rfuji/reference/assess_fair.md).
+  [`assess_fair()`](https://choxos.github.io/rfair/reference/assess_fair.md).
 
 ## Value
 

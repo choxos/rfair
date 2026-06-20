@@ -11,7 +11,7 @@ exactly these.
 
 Detecting that a license exists says nothing about whether you may reuse
 the data.
-[`license_reuse()`](https://choxos.github.io/rfuji/reference/license_reuse.md)
+[`license_reuse()`](https://choxos.github.io/rfair/reference/license_reuse.md)
 classifies the actual permissions, and maps each license to the
 six-category taxonomy of the [(Re)usable Data
 Project](https://reusabledata.org) (Carbon et al. 2019).
@@ -46,7 +46,7 @@ CC-BY-NC-ND is present and standard, yet restrictive.
 Data behind a data-use agreement (e.g. human/clinical data) is
 legitimately restricted; it should be judged on metadata richness, not
 open download.
-[`classify_access()`](https://choxos.github.io/rfuji/reference/classify_access.md)
+[`classify_access()`](https://choxos.github.io/rfair/reference/classify_access.md)
 flags this, drawing on the (Re)usable Data Project curations.
 
 ``` r
@@ -83,7 +83,7 @@ The reviewer’s own framework extends FAIR with three principles
 ([Haendel et al., FAIR+](https://doi.org/10.5281/zenodo.203295)): data
 should be **Traceable** (provenance, attribution), **Licensed** (clearly
 and reusably), and **Connected** (qualified links to related entities).
-[`fair_tlc()`](https://choxos.github.io/rfuji/reference/fair_tlc.md)
+[`fair_tlc()`](https://choxos.github.io/rfair/reference/fair_tlc.md)
 computes these from an assessment.
 
 ``` r

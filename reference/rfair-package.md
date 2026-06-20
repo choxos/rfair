@@ -11,7 +11,7 @@ require a running F-UJI server.
 ## Details
 
 The main entry point is
-[`assess_fair()`](https://choxos.github.io/rfuji/reference/assess_fair.md).
+[`assess_fair()`](https://choxos.github.io/rfair/reference/assess_fair.md).
 See the package vignettes and <https://choxos.github.io/rfuji/> for
 details.
 
