@@ -7,7 +7,7 @@ template:
 
 navbar:
   structure:
-    left: [reference]
+    left: [reference, articles]
     right: [search, github, webapp]
   components:
     webapp:
