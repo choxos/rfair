@@ -41,8 +41,8 @@ cat(as_fair_json(a))
 #>     "metadata_service_type": "",
 #>     "test_debug": false
 #>   },
-#>   "start_timestamp": "2026-06-20T00:35:09+0000",
-#>   "end_timestamp": "2026-06-20T00:35:16+0000",
+#>   "start_timestamp": "2026-06-20T00:57:15+0000",
+#>   "end_timestamp": "2026-06-20T00:57:20+0000",
 #>   "software_version": "0.1.0",
 #>   "metric_version": "0.8",
 #>   "metric_specification": "https://doi.org/10.5281/zenodo.15045911",
