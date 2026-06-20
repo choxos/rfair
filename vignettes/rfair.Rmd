@@ -71,7 +71,7 @@ fair_principles()          # canonical FAIR principle definitions
 ## Exporting results
 
 ```{r}
-as_fair_json(a)            # F-UJI-compatible FAIRResults JSON
+as_fuji_json(a)            # F-UJI-compatible FAIRResults JSON
 as_rdf(a)                  # W3C DQV + schema.org Rating (JSON-LD)
 ```
 

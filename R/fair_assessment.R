@@ -6,7 +6,7 @@
 #' [assess_fair()] returns an object of class `fair_assessment`. It has
 #' `print()`, `format()`, [summary()][summary.fair_assessment], and
 #' [as.data.frame()][as.data.frame.fair_assessment] methods, and can be exported
-#' with [as_fair_json()] and [as_rdf()].
+#' with [as_fuji_json()] and [as_rdf()].
 #'
 #' Useful list elements: `summary` (F/A/I/R scores), `results` (per-metric),
 #' `metadata` (harvested), `reuse` (license reusability), `access`

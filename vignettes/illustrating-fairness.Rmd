@@ -132,11 +132,11 @@ x$identifier_hygiene[c("scheme", "is_persistent", "hygiene_ok")]
 
 ## 5. Exporting the illustration
 
-The assessment serializes for downstream tools. `as_fair_json()` emits a payload
+The assessment serializes for downstream tools. `as_fuji_json()` emits a payload
 matching the upstream F-UJI `FAIRResults` schema:
 
 ```{r}
-js <- as_fair_json(x)
+js <- as_fuji_json(x)
 substr(js, 1, 220)
 ```
 

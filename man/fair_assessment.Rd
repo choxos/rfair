@@ -7,7 +7,7 @@
 \code{\link[=assess_fair]{assess_fair()}} returns an object of class \code{fair_assessment}. It has
 \code{print()}, \code{format()}, \link[=summary.fair_assessment]{summary()}, and
 \link[=as.data.frame.fair_assessment]{as.data.frame()} methods, and can be exported
-with \code{\link[=as_fair_json]{as_fair_json()}} and \code{\link[=as_rdf]{as_rdf()}}.
+with \code{\link[=as_fuji_json]{as_fuji_json()}} and \code{\link[=as_rdf]{as_rdf()}}.
 }
 \details{
 Useful list elements: \code{summary} (F/A/I/R scores), \code{results} (per-metric),

@@ -1,6 +1,6 @@
 # rfair <img src="https://img.shields.io/badge/FAIR-assessment-118AB2" alt="FAIR assessment" align="right" />
 
-> Assess the FAIRness of research data objects, natively in R.
+> Assess the FAIRness of research data objects and software, natively in R.
 
 `rfair` is a native R implementation of the
 [F-UJI](https://github.com/pangaea-data-publisher/fuji) (FAIRsFAIR Research Data
@@ -10,8 +10,10 @@ Crossref, GitHub), and scores it against the FAIRsFAIR metrics
 ([v0.8](https://doi.org/10.5281/zenodo.15045911) by default) for Findability,
 Accessibility, Interoperability, and Reusability.
 
-Unlike the original `rfair` (an HTTP client for an external F-UJI server), this
-version performs the **entire assessment in R** — no Python, no server.
+`rfair` began as a fork of [`rfuji`](https://github.com/NFDI4Chem/rfuji), an HTTP
+client for an external F-UJI server; unlike that client it performs the **entire
+assessment in R** — no Python, no server. It also scores **research software**
+against the FRSM (FAIR for Research Software) metrics.
 
 It also goes **beyond F-UJI** with checks that automated FAIR tools usually miss
 (prompted by peer review of a COVID-19 FAIR-assessment study): whether a license
@@ -45,8 +47,13 @@ a
 
 summary(a)            # F/A/I/R score table
 as.data.frame(a)      # one row per metric
+plot(a, type = "sunburst")   # concentric FAIR sunburst (also "category" / "metric")
 as_fuji_json(a)       # F-UJI-compatible JSON
 as_rdf(a)             # DQV + schema.org Rating (JSON-LD)
+
+# Research software, scored against the FRSM metrics:
+sw <- assess_fair("https://github.com/pangaea-data-publisher/fuji",
+                  metric_version = "0.7_software")
 ```
 
 ## Metric versions and F-UJI options

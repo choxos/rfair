@@ -18,7 +18,7 @@ reference:
   - title: Assessment
     contents:
       - assess_fair
-      - as_fair_json
+      - as_fuji_json
       - id_parse
       - rfair_metric_versions
   - title: Batch assessment and rtransparent
