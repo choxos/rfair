@@ -93,6 +93,6 @@ assess_data_code(list(open_data_links = "https://doi.org/10.5281/zenodo.8347772"
 #> 2    url         FALSE https://github.com/pangaea-data-publisher/fuji
 #>   fair_percent   F   A      I     R maturity n_pass n_metrics error
 #> 1        88.46 100 100  66.67 83.33     2.50     15        17  <NA>
-#> 2        71.11  55 100 100.00 75.00     2.25     16        17  <NA>
+#> 2        73.33  55 100 100.00 81.25     2.25     16        17  <NA>
 # }
 ```
