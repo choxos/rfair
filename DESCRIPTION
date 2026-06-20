@@ -1,6 +1,6 @@
 Package: rfair
 Title: Assess the FAIRness of Research Data Objects and Software
-Version: 0.1.1
+Version: 0.1.0
 Authors@R: c(
     person("Ahmad", "Sofi-Mahmudi", email = "a.sofimahmudi@gmail.com",
            role = c("aut", "cre"), comment = c(ORCID = "0000-0001-6829-0823")),
