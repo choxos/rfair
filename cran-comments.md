@@ -14,6 +14,9 @@ libmagic content sniffing) and the package degrades gracefully without them.
 * This is the first CRAN submission of rfair 0.1.0. The package grew from the
   earlier rfuji F-UJI API client but now reimplements the FAIR assessment engine
   natively in R, with no external server.
+* The README carries the standard CRAN status badge; its package-page link
+  (https://CRAN.R-project.org/package=rfair) is not live yet and resolves once
+  the package is accepted.
 * All examples that require network access are wrapped in `\donttest{}` or
   `\dontrun{}`. The test suite does not access the network (assessments in tests
   use `resolve = FALSE`).
