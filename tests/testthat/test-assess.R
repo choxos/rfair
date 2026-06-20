@@ -19,9 +19,9 @@ test_that("assess_fair returns a valid baseline assessment offline", {
   expect_gt(s$total[s$category == "FAIR"], 0)
 })
 
-test_that("as_fair_json emits valid, schema-shaped JSON", {
+test_that("as_fuji_json emits valid, schema-shaped JSON", {
   a <- assess_fair("https://doi.org/10.5281/zenodo.8347772", resolve = FALSE)
-  js <- as_fair_json(a, pretty = FALSE)
+  js <- as_fuji_json(a, pretty = FALSE)
   expect_true(jsonlite::validate(js))
   obj <- jsonlite::fromJSON(js, simplifyVector = FALSE)
   expect_true(all(c("test_id", "request", "software_version", "metric_version",
@@ -59,9 +59,9 @@ test_that("print.fair_assessment is stable", {
   expect_output(print(a), "fair_assessment")
 })
 
-test_that("as_fair_json includes agnostic test identifiers (not null)", {
+test_that("as_fuji_json includes agnostic test identifiers (not null)", {
   a <- assess_fair("https://doi.org/10.5281/zenodo.8347772", resolve = FALSE)
-  js <- as_fair_json(a, pretty = FALSE)
+  js <- as_fuji_json(a, pretty = FALSE)
   expect_false(grepl('"agnostic_test_identifier":null', js, fixed = TRUE))
   obj <- jsonlite::fromJSON(js, simplifyVector = FALSE)
   r <- Find(function(x) identical(x$metric_identifier, "FsF-F1-01MD"), obj$results)

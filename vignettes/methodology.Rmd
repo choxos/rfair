@@ -66,7 +66,7 @@ scoring                     per-test scores -> per-metric -> F/A/I/R -> overall
    │  get_assessment_summary()
    ▼
 fair_assessment             tidy S3 object (print / summary / as.data.frame /
-                            as_fair_json / as_rdf)
+                            as_fuji_json / as_rdf)
 ```
 
 ### Identifier handling
@@ -110,7 +110,7 @@ when it passes. Metrics use one of two scoring mechanisms:
   score is capped at the metric total).
 
 The criterium engine (`criterium_engine.R`) builds each metric's result from the
-YAML and lets evaluators mark tests passed; `as_fair_json()` then emits a payload
+YAML and lets evaluators mark tests passed; `as_fuji_json()` then emits a payload
 matching the upstream F-UJI `FAIRResults` schema.
 
 ## 3. What each FAIR category measures (v0.8)

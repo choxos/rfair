@@ -140,5 +140,5 @@ function(id,
     timeout = parse_timeout(timeout, 15),
     use_headless = use_headless
   )
-  jsonlite::fromJSON(rfair::as_fair_json(assessment), simplifyVector = FALSE)
+  jsonlite::fromJSON(rfair::as_fuji_json(assessment), simplifyVector = FALSE)
 }

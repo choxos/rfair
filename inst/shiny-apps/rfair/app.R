@@ -263,7 +263,7 @@ server <- function(input, output, session) {
 
   output$download <- downloadHandler(
     filename = function() paste0("rfair-", digest::digest(assessment()$id, algo = "crc32"), ".json"),
-    content = function(file) writeLines(as_fair_json(assessment()), file)
+    content = function(file) writeLines(as_fuji_json(assessment()), file)
   )
 }
 

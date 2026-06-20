@@ -15,14 +15,14 @@ assessment entirely in R and does not require a running F-UJI server.
 }
 \details{
 The main entry point is \code{\link[=assess_fair]{assess_fair()}}. See the package vignettes and
-\url{https://choxos.github.io/rfuji/} for details.
+\url{https://choxos.github.io/rfair/} for details.
 }
 \seealso{
 Useful links:
 \itemize{
-  \item \url{https://github.com/choxos/rfuji}
-  \item \url{https://choxos.github.io/rfuji/}
-  \item Report bugs at \url{https://github.com/choxos/rfuji/issues}
+  \item \url{https://github.com/choxos/rfair}
+  \item \url{https://choxos.github.io/rfair/}
+  \item Report bugs at \url{https://github.com/choxos/rfair/issues}
 }
 
 }
