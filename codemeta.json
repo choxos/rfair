@@ -2,7 +2,7 @@
   "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
   "@type": "SoftwareSourceCode",
   "@id": "https://github.com/choxos/rfair",
-  "identifier": "https://github.com/choxos/rfair",
+  "identifier": "https://doi.org/10.5281/zenodo.20775127",
   "name": "rfair",
   "description": "Native R implementation of F-UJI and FAIRsFAIR research data object assessment metrics, including legacy metric versions, software FAIR metrics, and reusable JSON/RDF outputs.",
   "codeRepository": "https://github.com/choxos/rfair",

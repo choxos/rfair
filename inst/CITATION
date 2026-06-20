@@ -9,6 +9,7 @@ bibentry(
   ),
   year = "2026",
   version = "0.1.0",
+  doi = "10.5281/zenodo.20775127",
   url = "https://github.com/choxos/rfair",
   note = "R package version 0.1.0"
 )
