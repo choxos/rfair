@@ -77,9 +77,16 @@
 <span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"choxos/rfair"</span><span class="op">)</span></span></code></pre></div>
 </div>
 <div class="section level2">
+<h2 id="interactive-app">Interactive app<a class="anchor" aria-label="anchor" href="#interactive-app"></a>
+</h2>
+<p>No install required: a browser version (registry-only) is published at <strong><a href="https://choxos.github.io/rfair/app/" class="uri">https://choxos.github.io/rfair/app/</a></strong>. Inside R, launch the bundled Shiny app:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="reference/launch_rfair.html">launch_rfair</a></span><span class="op">(</span><span class="op">)</span>   <span class="co"># bslib Shiny app: scores, per-metric report, reuse/access panels</span></span></code></pre></div>
+</div>
+<div class="section level2">
 <h2 id="quick-start">Quick start<a class="anchor" aria-label="anchor" href="#quick-start"></a>
 </h2>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/choxos/rfair" class="external-link">rfair</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">a</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/assess_fair.html">assess_fair</a></span><span class="op">(</span><span class="st">"https://doi.org/10.5281/zenodo.8347772"</span><span class="op">)</span></span>
@@ -109,7 +116,7 @@
 <h2 id="metric-versions-and-f-uji-options">Metric versions and F-UJI options<a class="anchor" aria-label="anchor" href="#metric-versions-and-f-uji-options"></a>
 </h2>
 <p><code>rfair</code> bundles the current F-UJI website choices plus release-specific legacy metric files from upstream F-UJI:</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="reference/rfair_metric_versions.html">rfair_metric_versions</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="co">#&gt; 0.8 0.5 0.5ssv2 0.5ss 0.5env 0.7_software ...</span></span>
 <span></span>
@@ -125,7 +132,7 @@
 <div class="section level2">
 <h2 id="beyond-f-uji">Beyond F-UJI<a class="anchor" aria-label="anchor" href="#beyond-f-uji"></a>
 </h2>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># A license can be present yet NOT open for reuse</span></span>
 <span><span class="fu"><a href="reference/license_reuse.html">license_reuse</a></span><span class="op">(</span><span class="st">"https://creativecommons.org/licenses/by-nc-nd/4.0/"</span><span class="op">)</span><span class="op">$</span><span class="va">is_open</span></span>
 <span><span class="co">#&gt; [1] FALSE</span></span>
@@ -146,17 +153,10 @@
 <h2 id="batch-assessment-and-rtransparent">Batch assessment and rtransparent<a class="anchor" aria-label="anchor" href="#batch-assessment-and-rtransparent"></a>
 </h2>
 <p><code><a href="reference/assess_fair_batch.html">assess_fair_batch()</a></code> scores a vector of identifiers and returns one tidy row per identifier. <code><a href="reference/assess_data_code.html">assess_data_code()</a></code> bridges <a href="https://github.com/choxos/rtransparency" class="external-link">rtransparent</a>: it takes the data and code identifiers rtransparent extracts from articles (its <code>open_data_links</code> and <code>open_code_links</code> columns; DOIs, repository URLs, and identifiers.org <code>prefix:accession</code> codes such as <code>geo:GSE…</code>) and scores each, using the FsF data metrics for data and the FRSM software metrics for code.</p>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">rt</span> <span class="op">&lt;-</span> <span class="fu">rtransparent</span><span class="fu">::</span><span class="fu">rt_data_code_pmc</span><span class="op">(</span><span class="va">xml</span><span class="op">)</span>          <span class="co"># is_open_data, open_data_links, ...</span></span>
 <span><span class="va">scores</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/assess_data_code.html">assess_data_code</a></span><span class="op">(</span><span class="va">rt</span>, id_col <span class="op">=</span> <span class="st">"pmid"</span><span class="op">)</span>    <span class="co"># one row per (article, data/code link)</span></span></code></pre></div>
 <p><code><a href="reference/split_identifiers.html">split_identifiers()</a></code> parses the <code>" ; "</code>-joined link strings on their own.</p>
-</div>
-<div class="section level2">
-<h2 id="interactive-app">Interactive app<a class="anchor" aria-label="anchor" href="#interactive-app"></a>
-</h2>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="reference/launch_rfair.html">launch_rfair</a></span><span class="op">(</span><span class="op">)</span>   <span class="co"># bslib Shiny app: scores, per-metric report, reuse/access panels</span></span></code></pre></div>
-<p>A browser version (registry-only, no install) is published at <strong><a href="https://choxos.github.io/rfair/app/" class="uri">https://choxos.github.io/rfair/app/</a></strong>.</p>
 </div>
 <div class="section level2">
 <h2 id="http-api-scaffold">HTTP API scaffold<a class="anchor" aria-label="anchor" href="#http-api-scaffold"></a>
