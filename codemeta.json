@@ -8,7 +8,7 @@
   "codeRepository": "https://github.com/choxos/rfair",
   "url": "https://choxos.github.io/rfair/",
   "issueTracker": "https://github.com/choxos/rfair/issues",
-  "license": "https://spdx.org/licenses/MIT.html",
+  "license": "https://spdx.org/licenses/GPL-3.0-only.html",
   "version": "0.1.0",
   "softwareVersion": "0.1.0",
   "programmingLanguage": "R",

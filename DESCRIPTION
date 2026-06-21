@@ -17,7 +17,7 @@ Description: A native R implementation of the F-UJI (FAIRsFAIR Research Data
     it against the FAIRsFAIR metrics (<doi:10.5281/zenodo.3775793>) entirely in
     R, without requiring an external assessment server. rfair began as a fork of
     the 'rfuji' F-UJI API client and reimplements the assessment engine natively.
-License: MIT + file LICENSE
+License: GPL-3
 URL: https://github.com/choxos/rfair, https://choxos.github.io/rfair/
 BugReports: https://github.com/choxos/rfair/issues
 Depends:

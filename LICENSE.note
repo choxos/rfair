@@ -1,8 +1,9 @@
 Third-party material bundled with rfair
 ========================================
 
-rfair itself is released under the MIT License (see the LICENSE file). The
-package additionally bundles reference data and rubrics derived from external
+rfair itself is released under the GNU General Public License v3 (GPL-3; see the
+License field in DESCRIPTION). The package additionally bundles reference data
+and rubrics derived from external
 projects. Each is redistributed under its own license, reproduced or referenced
 below. The bundled artifacts live in R/sysdata.rda and inst/extdata/ and are
 generated from the upstream sources by the scripts in data-raw/.

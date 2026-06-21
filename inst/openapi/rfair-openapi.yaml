@@ -4,8 +4,8 @@ info:
   version: 0.1.0
   description: Machine-readable HTTP contract for services that expose rfair FAIR assessments.
   license:
-    name: MIT
-    url: https://spdx.org/licenses/MIT.html
+    name: GPL-3.0-only
+    url: https://spdx.org/licenses/GPL-3.0-only.html
   contact:
     name: Ahmad Sofi-Mahmudi
     email: a.sofimahmudi@gmail.com
