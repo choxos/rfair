@@ -14,7 +14,7 @@
       "name": "rfair: native R FAIR assessment metrics",
       "description": "A native R implementation of the F-UJI / FAIRsFAIR research data object assessment metrics and the FRSM research-software metrics.",
       "datePublished": "2026-06-20",
-      "license": { "@id": "https://spdx.org/licenses/MIT.html" },
+      "license": { "@id": "https://spdx.org/licenses/GPL-3.0-only.html" },
       "author": { "@id": "https://orcid.org/0000-0001-6829-0823" },
       "identifier": { "@id": "https://doi.org/10.5281/zenodo.20775127" },
       "mainEntity": { "@id": "#rfair" },
@@ -30,7 +30,7 @@
       "programmingLanguage": { "@id": "https://www.r-project.org" },
       "codeRepository": "https://github.com/choxos/rfair",
       "version": "0.1.0",
-      "license": { "@id": "https://spdx.org/licenses/MIT.html" },
+      "license": { "@id": "https://spdx.org/licenses/GPL-3.0-only.html" },
       "author": { "@id": "https://orcid.org/0000-0001-6829-0823" },
       "identifier": "https://doi.org/10.5281/zenodo.20775127",
       "isBasedOn": "https://doi.org/10.5281/zenodo.3775793"
