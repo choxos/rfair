@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: GitHub Discussions
+    url: https://github.com/choxos/rfair/discussions
+    about: Ask open-ended questions or discuss ideas before filing an issue.
+  - name: Security reports
+    url: https://github.com/choxos/rfair/security/advisories
+    about: Please report vulnerabilities privately rather than in public issues.

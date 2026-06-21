@@ -1,0 +1,28 @@
+name: Question
+description: Ask a usage or interpretation question
+title: "[Question]: "
+labels: ["question"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        For broad discussion, use GitHub Discussions if available. Use this form
+        when the question may require a documentation or package change.
+  - type: textarea
+    id: question
+    attributes:
+      label: Question
+      description: What would you like to understand?
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Include identifiers, metric versions, code, output, or documentation links where relevant.
+  - type: textarea
+    id: session
+    attributes:
+      label: Session information
+      description: Paste `sessionInfo()` output if this depends on your local R setup.
+      render: text
