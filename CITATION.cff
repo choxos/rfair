@@ -18,7 +18,7 @@ authors:
     given-names: Steffen
 repository-code: "https://github.com/choxos/rfair"
 url: "https://choxos.github.io/rfair/"
-license: MIT
+license: GPL-3.0-only
 keywords:
   - FAIR
   - F-UJI

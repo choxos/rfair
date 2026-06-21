@@ -6,7 +6,7 @@
 [![pkgdown](https://github.com/choxos/rfair/actions/workflows/pkgdown.yaml/badge.svg)](https://choxos.github.io/rfair/)
 [![Codecov test coverage](https://codecov.io/gh/choxos/rfair/graph/badge.svg)](https://app.codecov.io/gh/choxos/rfair)
 [![Lifecycle: experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://lifecycle.r-lib.org/articles/stages.html#experimental)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.20775127.svg)](https://doi.org/10.5281/zenodo.20775127)
 [![Archived on Software Heritage](https://archive.softwareheritage.org/badge/origin/https://github.com/choxos/rfair/)](https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/choxos/rfair)
 <!-- badges: end -->
@@ -200,4 +200,6 @@ by the author, who is solely responsible for the package and its correctness.
 
 ## License
 
-MIT © rfair authors. See `LICENSE`.
+GPL-3. See <https://www.gnu.org/licenses/gpl-3.0> for the full license text.
+rfair bundles reference data from external projects under their own (MIT,
+CC0-1.0, CC-BY-4.0) licenses; see `LICENSE.note` for the provenance and terms.
