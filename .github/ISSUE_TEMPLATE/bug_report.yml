@@ -1,0 +1,81 @@
+name: Bug report
+description: Report a reproducible problem in rfair
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for reporting a bug. Please include enough detail for the issue
+        to be reproduced without private data or credentials.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: What went wrong?
+    validations:
+      required: true
+  - type: textarea
+    id: reprex
+    attributes:
+      label: Minimal reproducible example
+      description: Include the smallest R example that shows the problem.
+      render: r
+    validations:
+      required: true
+  - type: input
+    id: identifier
+    attributes:
+      label: Identifier or URL assessed
+      description: DOI, URL, repository, or other identifier, if relevant.
+      placeholder: "https://doi.org/..."
+  - type: dropdown
+    id: metric_version
+    attributes:
+      label: Metric version
+      options:
+        - "0.8"
+        - "0.5"
+        - "0.5ssv2"
+        - "0.5ss"
+        - "0.5env"
+        - "0.7_software"
+        - "0.7_software_cessda"
+        - "0.6a2a"
+        - "0.4"
+        - "0.3"
+        - "0.2"
+        - "Not sure"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      description: What happened instead? Include errors or warnings.
+    validations:
+      required: true
+  - type: textarea
+    id: session
+    attributes:
+      label: Session information
+      description: Paste `sessionInfo()` output.
+      render: text
+    validations:
+      required: true
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Pre-submission checks
+      options:
+        - label: I searched existing issues.
+          required: true
+        - label: I removed private data, credentials, and restricted metadata.
+          required: true
