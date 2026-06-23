@@ -42,6 +42,7 @@ reference:
       - reusabledata_rating
       - identifier_hygiene
       - fair_principles
+      - fair4rs_principles
       - principle_definition
       - fair_tlc
       - as_rdf

@@ -21,7 +21,8 @@ metrics. It performs the entire assessment in R, with no external server.
 * Software FAIR: pass a GitHub repository with `metric_version = "0.7_software"`
   to score it against the FRSM metrics from its repository signals (license,
   README, citation/codemeta, tests, CI, dependencies, coverage, releases,
-  contributors).
+  contributors). The FRSM metrics operationalize the FAIR Principles for
+  Research Software (FAIR4RS; Chue Hong et al. 2022, <doi:10.15497/RDA00068>).
 * `id_parse()` recognizes DOI, Handle, ARK, URN, UUID, identifiers.org / w3id,
   and compact `prefix:accession` identifiers.
 
@@ -45,7 +46,9 @@ metrics. It performs the entire assessment in R, with no external server.
 * `identifier_hygiene()` checks identifiers for layered or non-persistent forms.
 * `fair_tlc()` reports the FAIR-TLC (Traceable, Licensed, Connected) indicators.
 * `fair_principles()` and `principle_definition()` provide the canonical FAIR
-  principle definitions.
+  principle definitions; `fair4rs_principles()` provides the FAIR4RS principles
+  for research software, and `principle_definition()` resolves FRSM software
+  metrics to their FAIR4RS statement.
 
 ## Batch assessment and rtransparent
 
