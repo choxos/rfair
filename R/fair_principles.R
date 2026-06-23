@@ -33,13 +33,25 @@ fair_principles <- function(category = NULL) {
 
 #' Canonical definition of the FAIR principle a metric maps to.
 #'
-#' @param metric_identifier A metric identifier (e.g. "FsF-F1-01MD").
+#' For data metrics (`FsF-*`) this returns the FAIR Guiding Principle definition;
+#' for software metrics (`FRSM-*`) it returns the corresponding FAIR4RS Principle
+#' statement (see [fair4rs_principles()]).
+#'
+#' @param metric_identifier A metric identifier (e.g. "FsF-F1-01MD" or
+#'   "FRSM-17-R1.2").
 #' @return The principle's definition string, or `NA`.
 #' @export
 #' @examples
 #' principle_definition("FsF-R1.1-01M")
+#' principle_definition("FRSM-17-R1.2")
 principle_definition <- function(metric_identifier) {
-  pc <- principle_of(metric_identifier)
-  p <- ref_data("fair_principles")[[unname(pc["principle"])]]
+  pid <- unname(principle_of(metric_identifier)["principle"])
+  if (is.na(pid)) return(NA_character_)
+  if (grepl("^FRSM-", metric_identifier)) {
+    d <- .fair4rs()
+    hit <- d$statement[d$id == pid]
+    return(if (length(hit)) hit[1] else NA_character_)
+  }
+  p <- ref_data("fair_principles")[[pid]]
   if (is.null(p)) NA_character_ else p$definition
 }

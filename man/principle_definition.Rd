@@ -7,14 +7,18 @@
 principle_definition(metric_identifier)
 }
 \arguments{
-\item{metric_identifier}{A metric identifier (e.g. "FsF-F1-01MD").}
+\item{metric_identifier}{A metric identifier (e.g. "FsF-F1-01MD" or
+"FRSM-17-R1.2").}
 }
 \value{
 The principle's definition string, or \code{NA}.
 }
 \description{
-Canonical definition of the FAIR principle a metric maps to.
+For data metrics (\verb{FsF-*}) this returns the FAIR Guiding Principle definition;
+for software metrics (\verb{FRSM-*}) it returns the corresponding FAIR4RS Principle
+statement (see \code{\link[=fair4rs_principles]{fair4rs_principles()}}).
 }
 \examples{
 principle_definition("FsF-R1.1-01M")
+principle_definition("FRSM-17-R1.2")
 }

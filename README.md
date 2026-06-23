@@ -24,7 +24,8 @@ Accessibility, Interoperability, and Reusability.
 `rfair` began as a fork of [`rfuji`](https://github.com/NFDI4Chem/rfuji), an HTTP
 client for an external F-UJI server; unlike that client it performs the **entire
 assessment in R** — no Python, no server. It also scores **research software**
-against the FRSM (FAIR for Research Software) metrics.
+against the FRSM (FAIR for Research Software) metrics, which operationalize the
+[FAIR4RS Principles](https://doi.org/10.15497/RDA00068) (Chue Hong et al. 2022).
 
 It also goes **beyond F-UJI** with checks that automated FAIR tools usually miss
 (prompted by peer review of a COVID-19 FAIR-assessment study): whether a license
@@ -79,6 +80,9 @@ as_rdf(a)             # DQV + schema.org Rating (JSON-LD)
 # Research software, scored against the FRSM metrics:
 sw <- assess_fair("https://github.com/pangaea-data-publisher/fuji",
                   metric_version = "0.7_software")
+
+fair4rs_principles()         # the FAIR4RS principles the software metrics map to
+fair4rs_principles("R")      # filter to one foundational principle
 ```
 
 ## Metric versions and F-UJI options
@@ -186,9 +190,15 @@ always resolves to the latest version. Cite the version you used, or run
 [rfuji](https://github.com/NFDI4Chem/rfuji) F-UJI API client (Steffen Neumann)
 and reimplements the assessment engine natively in R. It is a native R port of
 [F-UJI](https://github.com/pangaea-data-publisher/fuji)
-(© PANGAEA, MIT), itself based on the FAIRsFAIR metrics. License reusability uses
-the [(Re)usable Data Project](https://reusabledata.org) rubric; FAIR principle
-definitions come from the [FAIR-nanopubs](https://peta-pico.github.io/FAIR-nanopubs/principles/index-en.html)
+(© PANGAEA, MIT), itself based on the FAIRsFAIR metrics. The software metrics
+operationalize the **FAIR Principles for Research Software (FAIR4RS)**: Chue Hong,
+N. P., Katz, D. S., Barker, M., Lamprecht, A.-L., Martinez, C., Psomopoulos, F. E.,
+Harrow, J., Castro, L. J., Gruenpeter, M., Martinez, P. A., Honeyman, T., et al.
+(2022). *FAIR Principles for Research Software (FAIR4RS Principles)* (1.0).
+Research Data Alliance. <https://doi.org/10.15497/RDA00068> (CC BY 4.0). License
+reusability uses the [(Re)usable Data Project](https://reusabledata.org) rubric;
+data FAIR principle definitions come from the
+[FAIR-nanopubs](https://peta-pico.github.io/FAIR-nanopubs/principles/index-en.html)
 vocabulary referenced by [go-fair.org](https://www.go-fair.org/fair-principles/).
 
 ## Use of AI
