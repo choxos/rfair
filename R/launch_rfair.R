@@ -8,8 +8,8 @@
 #' @return Runs the app (called for its side effect); invisibly `NULL`.
 #' @export
 #' @examples
-#' \dontrun{
-#' launch_rfair()
+#' if (interactive()) {
+#'   launch_rfair()
 #' }
 launch_rfair <- function(...) {
   for (pkg in c("shiny", "bslib", "DT")) {

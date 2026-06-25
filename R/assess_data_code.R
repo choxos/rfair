@@ -144,8 +144,6 @@ assess_fair_batch <- function(ids, metric_version = "0.8", quiet = FALSE, ...) {
 #' @export
 #' @examples
 #' \donttest{
-#' # rt <- rtransparent::rt_data_code_pmc(xml)
-#' # assess_data_code(rt, id_col = "pmid")
 #' assess_data_code(list(open_data_links = "https://doi.org/10.5281/zenodo.8347772",
 #'                       open_code_links = "https://github.com/pangaea-data-publisher/fuji"))
 #' }
