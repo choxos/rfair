@@ -18,7 +18,7 @@ explore the per-metric results, license reusability, access/sensitivity, and
 identifier hygiene.
 }
 \examples{
-\dontrun{
-launch_rfair()
+if (interactive()) {
+  launch_rfair()
 }
 }

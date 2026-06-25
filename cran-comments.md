@@ -1,3 +1,16 @@
+## Resubmission
+
+This is a resubmission. In response to the CRAN review I have:
+
+* Written the references in the DESCRIPTION in the `authors (year) <doi:...>`
+  form (Chue Hong et al. (2022) <doi:10.15497/RDA00068>; Devaraju and Huber
+  (2020) <doi:10.5281/zenodo.3775793>).
+* Removed the commented-out example code (which referenced the unexported
+  function `rtransparent::rt_data_code_pmc()`) from the `assess_data_code()`
+  example; the example now calls only exported functions.
+* Replaced `\dontrun{}` with `if (interactive()) {}` in the interactive-only
+  `launch_rfair()` example.
+
 ## R CMD check results
 
 0 errors | 0 warnings | 1 note
