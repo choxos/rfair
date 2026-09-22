@@ -2,7 +2,7 @@
 #
 # Sourced from the FAIR-nanopubs vocabulary (https://w3id.org/fair/principles),
 # the machine-readable encoding of the FAIR Guiding Principles (Wilkinson et al.
-# 2016) referenced by the canonical FAIR website, https://www.go-fair.org. This
+# 2016) referenced by the canonical FAIR website, https://www.gofair.foundation. This
 # grounds rfair's metrics in the authoritative principle definitions.
 
 #' The canonical FAIR (sub)principles.
@@ -27,7 +27,7 @@ fair_principles <- function(category = NULL) {
   attr(df, "source") <- paste(
     "FAIR Guiding Principles (Wilkinson et al. 2016, doi:10.1038/sdata.2016.18);",
     "machine-readable via FAIR-nanopubs (https://w3id.org/fair/principles),",
-    "as referenced by https://www.go-fair.org/fair-principles/.")
+    "as referenced by https://www.gofair.foundation/fair-principles.")
   df
 }
 

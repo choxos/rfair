@@ -40,18 +40,14 @@ Imports:
 Suggests:
     bslib,
     chromote,
-    covr,
     DT,
-    httptest2,
-    jqr,
     knitr,
     plumber,
     rdflib,
     rmarkdown,
     shiny,
     testthat (>= 3.0.0),
-    withr,
-    wand
+    withr
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 Encoding: UTF-8

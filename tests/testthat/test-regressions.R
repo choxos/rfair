@@ -1,4 +1,4 @@
-# Regression tests for defects found in the engine/collector/plot audit.
+# Regression tests for engine, collector, and plot defects fixed before 0.1.0.
 
 test_that("map_access_right matches eu-repo access levels case-insensitively", {
   expect_equal(map_access_right("info:eu-repo/semantics/openAccess"), "public")

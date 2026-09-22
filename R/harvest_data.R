@@ -1,6 +1,6 @@
 # Data-file harvester: probe content (data) links for type and size, improving
-# the data-content and file-format metrics. Uses HTTP HEAD + the 'mime' package;
-# the optional 'wand' package adds libmagic content sniffing.
+# the data-content and file-format metrics. Uses HTTP HEAD, with the 'mime'
+# package guessing the type from the file extension when HEAD gives none.
 
 #' Enrich object_content_identifier entries with MIME type and size.
 #' @noRd

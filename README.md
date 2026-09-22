@@ -122,7 +122,7 @@ classify_access(access_level = "closedAccess",
 # Identifier hygiene (layered / non-persistent PIDs)
 identifier_hygiene("RRID:MGI:5577054")$issues
 
-# Canonical FAIR principle definitions (go-fair.org / FAIR-nanopubs)
+# Canonical FAIR principle definitions (GO FAIR Foundation / FAIR-nanopubs)
 fair_principles("R")
 ```
 
@@ -199,7 +199,7 @@ Research Data Alliance. <https://doi.org/10.15497/RDA00068> (CC BY 4.0). License
 reusability uses the [(Re)usable Data Project](https://reusabledata.org) rubric;
 data FAIR principle definitions come from the
 [FAIR-nanopubs](https://peta-pico.github.io/FAIR-nanopubs/principles/index-en.html)
-vocabulary referenced by [go-fair.org](https://www.go-fair.org/fair-principles/).
+vocabulary referenced by [the GO FAIR Foundation](https://www.gofair.foundation/fair-principles).
 
 ## Use of AI
 
