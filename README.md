@@ -35,7 +35,7 @@ whether identifiers follow best practices.
 ## Installation
 
 ```r
-# From CRAN (when available)
+# From CRAN
 install.packages("rfair")
 
 # Development version from GitHub

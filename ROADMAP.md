@@ -2,13 +2,12 @@
 
 Native, pure-R reimplementation of the F-UJI FAIR assessment engine, plus a
 Shiny app and a static JS/TS web app. This file tracks everything still to do so
-nothing is forgotten. See `~/.claude/plans/i-forked-rfair-r-deep-backus.md` for
-the approved plan and design rationale.
+nothing is forgotten.
 
 Legend: `[x]` done · `[~]` partial · `[ ]` todo
 
 ## Phase 0 — Foundations  `[x]`
-- [x] Package scaffolding (DESCRIPTION v2, roxygen NAMESPACE, `.onLoad`, MIT LICENSE, `.Rbuildignore`); generated OpenAPI client removed
+- [x] Package scaffolding (DESCRIPTION v2, roxygen NAMESPACE, `.onLoad`, LICENSE (MIT at first; GPL-3 since 0.1.0), `.Rbuildignore`); generated OpenAPI client removed
 - [x] Reference-data pipeline `data-raw/01..04` → `R/sysdata.rda` (SPDX, file formats, access rights, protocols, identifiers.org, DOI prefixes) + `inst/extdata/metrics` + `inst/extdata/web/*.json`
 - [x] Engine primitives: `id_parse`, `content_negotiate`/`resolve_landing_page` (httr2), `reference_schema`, `merge_metadata` (+ `levenshtein_ratio`/`token_sort_ratio`), metrics loader, criterium engine, scorer, `fair_assessment` S3 (print/format/as.data.frame/summary), `as_fuji_json`
 

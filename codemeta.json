@@ -1,42 +1,26 @@
 {
   "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
   "@type": "SoftwareSourceCode",
-  "@id": "https://github.com/choxos/rfair",
   "identifier": "https://doi.org/10.5281/zenodo.20775127",
-  "name": "rfair",
-  "description": "Native R implementation of F-UJI and FAIRsFAIR research data object assessment metrics, including legacy metric versions, software FAIR metrics, and reusable JSON/RDF outputs.",
+  "description": "A native R implementation of the F-UJI (FAIRsFAIR Research Data Object Assessment) and FRSM (FAIR for Research Software) metrics for evaluating how well a research data object or piece of research software satisfies the FAIR principles (Findable, Accessible, Interoperable, Reusable). The software metrics operationalize the FAIR Principles for Research Software (FAIR4RS) of Chue Hong et al. (2022) <doi:10.15497/RDA00068>. Given a persistent identifier, URL, or code repository, 'rfair' resolves it, harvests metadata from landing pages and registries, and scores it against the FAIRsFAIR metrics of Devaraju and Huber (2020) <doi:10.5281/zenodo.3775793> entirely in R, without requiring an external assessment server. 'rfair' began as a fork of the 'rfuji' F-UJI API client and reimplements the assessment engine natively.",
+  "name": "rfair: Assess the FAIRness of Research Data Objects and Software",
+  "relatedLink": ["https://choxos.github.io/rfair/", "https://CRAN.R-project.org/package=rfair", "https://doi.org/10.32614/CRAN.package.rfair", "https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/choxos/rfair"],
   "codeRepository": "https://github.com/choxos/rfair",
-  "url": "https://choxos.github.io/rfair/",
   "issueTracker": "https://github.com/choxos/rfair/issues",
-  "license": "https://spdx.org/licenses/GPL-3.0-only.html",
+  "license": "https://spdx.org/licenses/GPL-3.0",
   "version": "0.1.0",
-  "softwareVersion": "0.1.0",
-  "programmingLanguage": "R",
-  "runtimePlatform": "R >= 4.1",
-  "operatingSystem": "OS Independent",
-  "applicationCategory": "FAIR assessment",
-  "developmentStatus": "active",
-  "keywords": [
-    "FAIR",
-    "F-UJI",
-    "FAIRsFAIR",
-    "research data",
-    "research software",
-    "FAIR metrics",
-    "R"
-  ],
-  "softwareRequirements": [
-    "R >= 4.1",
-    "digest",
-    "httr2",
-    "jsonlite",
-    "mime",
-    "plumber",
-    "rvest",
-    "stringdist",
-    "xml2",
-    "yaml"
-  ],
+  "programmingLanguage": {
+    "@type": "ComputerLanguage",
+    "name": "R",
+    "url": "https://r-project.org"
+  },
+  "runtimePlatform": "R version 4.6.0 (2026-04-24)",
+  "provider": {
+    "@id": "https://cran.r-project.org",
+    "@type": "Organization",
+    "name": "Comprehensive R Archive Network (CRAN)",
+    "url": "https://cran.r-project.org"
+  },
   "author": [
     {
       "@type": "Person",
@@ -44,49 +28,308 @@
       "familyName": "Sofi-Mahmudi",
       "email": "a.sofimahmudi@gmail.com",
       "@id": "https://orcid.org/0000-0001-6829-0823"
-    },
-    {
-      "@type": "Person",
-      "givenName": "Steffen",
-      "familyName": "Neumann"
     }
   ],
   "contributor": [
     {
-      "@type": "Role",
-      "roleName": [
-        "Conceptualization",
-        "Data curation",
-        "Formal analysis",
-        "Methodology",
-        "Software",
-        "Validation",
-        "Visualization",
-        "Writing - original draft",
-        "Writing - review & editing",
-        "Project administration"
-      ],
-      "url": "https://credit.niso.org/",
-      "description": "rfair has a single author; all CRediT contributor roles are attributed to Ahmad Sofi-Mahmudi.",
-      "schema:author": {
-        "@id": "https://orcid.org/0000-0001-6829-0823",
-        "name": "Ahmad Sofi-Mahmudi"
-      }
-    },
+      "@type": "Person",
+      "givenName": "Steffen",
+      "familyName": "Neumann",
+      "email": "sneumann@ipb-halle.de"
+    }
+  ],
+  "copyrightHolder": [
     {
       "@type": "Organization",
       "name": "PANGAEA"
     }
   ],
-  "isBasedOn": [
-    "https://github.com/pangaea-data-publisher/fuji",
-    "https://doi.org/10.5281/zenodo.3775793"
+  "maintainer": [
+    {
+      "@type": "Person",
+      "givenName": "Ahmad",
+      "familyName": "Sofi-Mahmudi",
+      "email": "a.sofimahmudi@gmail.com",
+      "@id": "https://orcid.org/0000-0001-6829-0823"
+    }
   ],
-  "relatedLink": [
-    "https://doi.org/10.5281/zenodo.20775127",
-    "https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/choxos/rfair"
+  "softwareSuggestions": [
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "bslib",
+      "name": "bslib",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=bslib"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "chromote",
+      "name": "chromote",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=chromote"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "DT",
+      "name": "DT",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=DT"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "knitr",
+      "name": "knitr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=knitr"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "plumber",
+      "name": "plumber",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=plumber"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "rdflib",
+      "name": "rdflib",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=rdflib"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "rmarkdown",
+      "name": "rmarkdown",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=rmarkdown"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "shiny",
+      "name": "shiny",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=shiny"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "testthat",
+      "name": "testthat",
+      "version": ">= 3.0.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=testthat"
+    },
+    {
+      "@type": "SoftwareApplication",
+      "identifier": "withr",
+      "name": "withr",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=withr"
+    }
   ],
+  "softwareRequirements": {
+    "1": {
+      "@type": "SoftwareApplication",
+      "identifier": "R",
+      "name": "R",
+      "version": ">= 4.1"
+    },
+    "2": {
+      "@type": "SoftwareApplication",
+      "identifier": "digest",
+      "name": "digest",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=digest"
+    },
+    "3": {
+      "@type": "SoftwareApplication",
+      "identifier": "httr2",
+      "name": "httr2",
+      "version": ">= 1.1.0",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=httr2"
+    },
+    "4": {
+      "@type": "SoftwareApplication",
+      "identifier": "jsonlite",
+      "name": "jsonlite",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=jsonlite"
+    },
+    "5": {
+      "@type": "SoftwareApplication",
+      "identifier": "mime",
+      "name": "mime",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=mime"
+    },
+    "6": {
+      "@type": "SoftwareApplication",
+      "identifier": "rvest",
+      "name": "rvest",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=rvest"
+    },
+    "7": {
+      "@type": "SoftwareApplication",
+      "identifier": "stats",
+      "name": "stats"
+    },
+    "8": {
+      "@type": "SoftwareApplication",
+      "identifier": "stringdist",
+      "name": "stringdist",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=stringdist"
+    },
+    "9": {
+      "@type": "SoftwareApplication",
+      "identifier": "utils",
+      "name": "utils"
+    },
+    "10": {
+      "@type": "SoftwareApplication",
+      "identifier": "xml2",
+      "name": "xml2",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=xml2"
+    },
+    "11": {
+      "@type": "SoftwareApplication",
+      "identifier": "yaml",
+      "name": "yaml",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=yaml"
+    },
+    "SystemRequirements": null
+  },
+  "fileSize": "1152.74KB",
+  "citation": [
+    {
+      "@type": "SoftwareSourceCode",
+      "datePublished": "2026",
+      "author": [
+        {
+          "@type": "Person",
+          "givenName": "Ahmad",
+          "familyName": "Sofi-Mahmudi",
+          "email": "a.sofimahmudi@gmail.com",
+          "@id": "https://orcid.org/0000-0001-6829-0823"
+        }
+      ],
+      "name": "{rfair}: Assess the FAIRness of Research Data Objects and Software",
+      "identifier": "10.5281/zenodo.20775127",
+      "url": "https://github.com/choxos/rfair",
+      "description": "R package version 0.1.0",
+      "@id": "https://doi.org/10.5281/zenodo.20775127",
+      "sameAs": "https://doi.org/10.5281/zenodo.20775127"
+    }
+  ],
+  "releaseNotes": "https://github.com/choxos/rfair/blob/main/NEWS.md",
   "readme": "https://github.com/choxos/rfair/blob/main/README.md",
-  "contIntegration": "https://github.com/choxos/rfair/actions",
-  "buildInstructions": "https://github.com/choxos/rfair#installation"
+  "contIntegration": [
+    "https://github.com/choxos/rfair/actions/workflows/R-CMD-check.yaml",
+    "https://app.codecov.io/gh/choxos/rfair"
+  ],
+  "developmentStatus": "https://lifecycle.r-lib.org/articles/stages.html#experimental",
+  "keywords": [
+    "accessibility",
+    "data",
+    "fair",
+    "fair-data",
+    "fair-principles",
+    "findability",
+    "interoperability",
+    "r-package",
+    "reusability"
+  ]
 }

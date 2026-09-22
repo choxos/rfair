@@ -1,6 +1,6 @@
 {
-  "title": "rfair: native R FAIR assessment metrics",
-  "description": "A native R implementation of the F-UJI / FAIRsFAIR research data object assessment metrics and the FRSM research-software metrics, including legacy metric versions and reusable JSON/RDF outputs. rfair began as a fork of the rfuji F-UJI API client and reimplements the assessment engine natively in R.",
+  "title": "rfair: Assess the FAIRness of Research Data Objects and Software",
+  "description": "A native R implementation of the F-UJI (FAIRsFAIR Research Data Object Assessment) and FRSM (FAIR for Research Software) metrics for evaluating how well a research data object or piece of research software satisfies the FAIR principles (Findable, Accessible, Interoperable, Reusable). The software metrics operationalize the FAIR Principles for Research Software (FAIR4RS) of Chue Hong et al. (2022) <doi:10.15497/RDA00068>. Given a persistent identifier, URL, or code repository, 'rfair' resolves it, harvests metadata from landing pages and registries, and scores it against the FAIRsFAIR metrics of Devaraju and Huber (2020) <doi:10.5281/zenodo.3775793> entirely in R, without requiring an external assessment server. 'rfair' began as a fork of the 'rfuji' F-UJI API client and reimplements the assessment engine natively.",
   "upload_type": "software",
   "license": "GPL-3.0-only",
   "creators": [

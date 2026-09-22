@@ -1,15 +1,16 @@
+year <- meta$`Date/Publication`
+if (is.null(year)) year <- meta$Date
+year <- if (is.null(year)) format(Sys.Date(), "%Y") else sub("-.*", "", year)
+
 bibentry(
   bibtype = "Manual",
-  title = "rfair: Native R FAIR Assessment Metrics",
-  author = c(
-    person("Ahmad", "Sofi-Mahmudi",
-           email = "a.sofimahmudi@gmail.com",
-           comment = c(ORCID = "0000-0001-6829-0823")),
-    person("Steffen", "Neumann")
-  ),
-  year = "2026",
-  version = "0.1.0",
+  title = paste0("{rfair}: ", meta$Title),
+  author = person("Ahmad", "Sofi-Mahmudi",
+                  email = "a.sofimahmudi@gmail.com",
+                  comment = c(ORCID = "0000-0001-6829-0823")),
+  year = year,
+  version = meta$Version,
   doi = "10.5281/zenodo.20775127",
   url = "https://github.com/choxos/rfair",
-  note = "R package version 0.1.0"
+  note = paste("R package version", meta$Version)
 )
