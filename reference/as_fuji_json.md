@@ -41,8 +41,8 @@ cat(as_fuji_json(a))
 #>     "metadata_service_type": "",
 #>     "test_debug": false
 #>   },
-#>   "start_timestamp": "2026-06-25T11:45:54+0000",
-#>   "end_timestamp": "2026-06-25T11:45:58+0000",
+#>   "start_timestamp": "2026-09-22T18:25:55+0000",
+#>   "end_timestamp": "2026-09-22T18:26:00+0000",
 #>   "software_version": "0.1.0",
 #>   "metric_version": "0.8",
 #>   "metric_specification": "https://doi.org/10.5281/zenodo.15045911",
@@ -744,7 +744,7 @@ cat(as_fuji_json(a))
 #>           },
 #>           "metric_test_maturity": 3,
 #>           "metric_test_status": "pass",
-#>           "evidence": ["https://opensource.org/licenses/MIT", "info:eu-repo/semantics/openAccess", "MIT License", "Open Access"]
+#>           "evidence": ["https://opensource.org/license/mit/", "https://opensource.org/licenses/MIT", "info:eu-repo/semantics/openAccess", "MIT License", "Open Access"]
 #>         }
 #>       },
 #>       "test_status": "pass",
@@ -755,6 +755,14 @@ cat(as_fuji_json(a))
 #>       },
 #>       "maturity": 3,
 #>       "output": [
+#>         {
+#>           "license": "https://opensource.org/license/mit/",
+#>           "id": null,
+#>           "is_url": true,
+#>           "spdx_uri": null,
+#>           "osi_approved": false,
+#>           "valid": false
+#>         },
 #>         {
 #>           "license": "https://opensource.org/licenses/MIT",
 #>           "id": "MIT",

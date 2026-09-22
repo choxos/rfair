@@ -2,6 +2,8 @@
 
 ## rfair 0.1.0
 
+CRAN release: 2026-07-01
+
 First release. `rfair` is a native R implementation of the F-UJI /
 FAIRsFAIR research data object assessment metrics and the FRSM (FAIR for
 Research Software) metrics. It performs the entire assessment in R, with
