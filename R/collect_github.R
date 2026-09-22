@@ -1,7 +1,8 @@
 # GitHub repository metadata harvester. When the assessed object is a GitHub
 # repository, enriches the metadata record from the GitHub REST API (license,
 # description, topics, dates). Ported in spirit from github_harvester.py.
-# Set GITHUB_TOKEN to raise the API rate limit.
+# Set GITHUB_PAT (or GITHUB_TOKEN) to raise the API rate limit from 60 to 5000
+# requests per hour.
 
 #' Detect an owner/repo pair from candidate URLs.
 #' @noRd
@@ -13,6 +14,25 @@ github_repo_of <- function(urls) {
   NULL
 }
 
+#' GitHub token from GITHUB_PAT (the gh/gitcreds convention) or GITHUB_TOKEN.
+#' @noRd
+github_token <- function() {
+  for (v in c("GITHUB_PAT", "GITHUB_TOKEN")) {
+    tok <- Sys.getenv(v, "")
+    if (nzchar(tok)) return(tok)
+  }
+  ""
+}
+
+#' Record a failed metadata source on the engine state.
+#' @noRd
+add_harvest_error <- function(ctx, source, url, message, status = NA_integer_) {
+  if (is.null(ctx)) return(invisible())
+  ctx$harvest_errors[[length(ctx$harvest_errors) + 1L]] <-
+    list(source = source, url = url, status = as.integer(status), message = message)
+  invisible()
+}
+
 #' Harvest GitHub repository metadata into the engine state.
 #' @noRd
 collect_github <- function(ctx, timeout = 15) {
@@ -20,18 +40,8 @@ collect_github <- function(ctx, timeout = 15) {
   if (is.null(repo)) return(invisible())
 
   api <- sprintf("https://api.github.com/repos/%s/%s", repo$owner, repo$name)
-  req <- httr2::request(api)
-  req <- httr2::req_headers(req, Accept = "application/vnd.github+json",
-                            `X-GitHub-Api-Version` = "2022-11-28")
-  req <- httr2::req_user_agent(req, "rfair R package")
-  req <- httr2::req_timeout(req, timeout)
-  req <- httr2::req_error(req, is_error = function(resp) FALSE)
-  token <- Sys.getenv("GITHUB_TOKEN", "")
-  if (nzchar(token)) req <- httr2::req_auth_bearer_token(req, token)
-
-  resp <- tryCatch(httr2::req_perform(req), error = function(e) NULL)
-  if (is.null(resp) || httr2::resp_status(resp) >= 400) return(invisible())
-  j <- tryCatch(httr2::resp_body_json(resp), error = function(e) NULL)
+  token <- github_token()
+  j <- github_json(api, token, timeout, ctx = ctx)
   if (is.null(j)) return(invisible())
 
   spdx <- jget(j, "license", "spdx_id")
@@ -59,7 +69,7 @@ collect_github <- function(ctx, timeout = 15) {
 
   # deeper software metadata: latest release version + codemeta.json + CITATION.cff
   branch <- j$default_branch %||% "main"
-  ver <- tryCatch(github_json(paste0(api, "/releases/latest"), token, timeout)$tag_name,
+  ver <- tryCatch(github_json(paste0(api, "/releases/latest"), token, timeout, ctx = ctx)$tag_name,
                   error = function(e) NULL)
   cm <- github_software_files(ctx, repo, branch, token, timeout)
   sw <- compact(c(cm, list(version = ver %||% cm$version,
@@ -70,21 +80,22 @@ collect_github <- function(ctx, timeout = 15) {
   }
 
   # software FAIR signals (for the FRSM software metrics) from the repo file tree
-  ctx$software <- harvest_software_signals(api, repo, branch, j, ver, cm, token, timeout)
+  ctx$software <- harvest_software_signals(api, repo, branch, j, ver, cm, token, timeout, ctx = ctx)
   invisible()
 }
 
 #' Detect software FAIR signals from the repository file tree + API.
 #' @noRd
-harvest_software_signals <- function(api, repo, branch, j, ver, cm, token = "", timeout = 15) {
+harvest_software_signals <- function(api, repo, branch, j, ver, cm, token = "", timeout = 15,
+                                     ctx = NULL) {
   tree <- tryCatch(
-    github_json(sprintf("%s/git/trees/%s?recursive=1", api, branch), token, timeout)$tree,
+    github_json(sprintf("%s/git/trees/%s?recursive=1", api, branch), token, timeout, ctx = ctx)$tree,
     error = function(e) NULL)
   paths <- tolower(as_chr(lapply(tree %||% list(), function(t) t$path)))
   any_match <- function(re) any(grepl(re, paths, perl = TRUE))
 
   contributors <- tryCatch(
-    length(github_json(paste0(api, "/contributors?per_page=100"), token, timeout) %||% list()),
+    length(github_json(paste0(api, "/contributors?per_page=100"), token, timeout, ctx = ctx) %||% list()),
     error = function(e) 0L)
   github_license_refs <- software_license_refs(list(
     jget(j, "license", "spdx_id"),
@@ -199,17 +210,42 @@ software_spdx_ids <- function(x) {
 }
 
 #' GET + parse a GitHub API JSON resource.
+#'
+#' A rate-limited response (403 or 429 with `x-ratelimit-remaining: 0`) is
+#' recorded in `ctx$harvest_errors` and raised as an `rfair_rate_limit`
+#' warning, once per assessment; later GitHub calls in the same assessment are
+#' skipped, so a rate limit can no longer lower the scores without a trace.
 #' @noRd
-github_json <- function(url, token = "", timeout = 15) {
+github_json <- function(url, token = "", timeout = 15, ctx = NULL) {
+  if (isTRUE(ctx$github_rate_limited)) return(NULL)
   req <- httr2::request(url)
-  req <- httr2::req_headers(req, Accept = "application/vnd.github+json")
+  req <- httr2::req_headers(req, Accept = "application/vnd.github+json",
+                            `X-GitHub-Api-Version` = "2022-11-28")
   req <- httr2::req_user_agent(req, "rfair R package")
   req <- httr2::req_timeout(req, timeout)
   req <- httr2::req_error(req, is_error = function(resp) FALSE)
   if (nzchar(token)) req <- httr2::req_auth_bearer_token(req, token)
-  resp <- httr2::req_perform(req)
-  if (httr2::resp_status(resp) >= 400) return(NULL)
-  httr2::resp_body_json(resp)
+  resp <- tryCatch(httr2::req_perform(req), error = function(e) {
+    add_harvest_error(ctx, "github", url, conditionMessage(e))
+    NULL
+  })
+  if (is.null(resp)) return(NULL)
+  status <- httr2::resp_status(resp)
+  if (status %in% c(403L, 429L) &&
+      (status == 429L || identical(httr2::resp_header(resp, "x-ratelimit-remaining"), "0"))) {
+    reset <- suppressWarnings(as.numeric(httr2::resp_header(resp, "x-ratelimit-reset")))
+    when <- if (is.na(reset)) "later" else
+      format(as.POSIXct(reset, origin = "1970-01-01"), "%Y-%m-%d %H:%M:%S %Z")
+    msg <- sprintf(paste0("GitHub API rate limit reached; software metrics for this ",
+                          "repository are incomplete. It resets at %s. Set GITHUB_PAT ",
+                          "to raise the limit."), when)
+    add_harvest_error(ctx, "github", url, msg, status)
+    if (!is.null(ctx)) ctx$github_rate_limited <- TRUE
+    warning(warningCondition(msg, class = "rfair_rate_limit"))
+    return(NULL)
+  }
+  if (status >= 400) return(NULL)
+  tryCatch(httr2::resp_body_json(resp), error = function(e) NULL)
 }
 
 #' Harvest codemeta.json / CITATION.cff from a repo's default branch.

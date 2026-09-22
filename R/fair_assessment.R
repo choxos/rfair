@@ -10,7 +10,10 @@
 #'
 #' Useful list elements: `summary` (F/A/I/R scores), `results` (per-metric),
 #' `metadata` (harvested), `reuse` (license reusability), `access`
-#' (access/sensitivity), and `identifier_hygiene`.
+#' (access/sensitivity), `identifier_hygiene`, `resolution` (the identifier's
+#' resolution attempt: `url`, `final_url`, HTTP `status`, `ok`, `error`), and
+#' `harvest_errors` (metadata sources that failed, for example a GitHub rate
+#' limit). `resolved_url` is `NA` when the identifier did not resolve.
 #'
 #' @name fair_assessment
 #' @seealso [assess_fair()]
@@ -22,7 +25,8 @@ new_fair_assessment <- function(id, request, results, summary, resolved_url,
                                 metrics_meta, metadata = list(),
                                 start_time = NULL, end_time = NULL, log = list(),
                                 reuse = NULL, access = NULL,
-                                identifier_hygiene = NULL) {
+                                identifier_hygiene = NULL, resolution = NULL,
+                                harvest_errors = list()) {
   structure(
     list(
       id = id,
@@ -40,6 +44,8 @@ new_fair_assessment <- function(id, request, results, summary, resolved_url,
       reuse = reuse,
       access = access,
       identifier_hygiene = identifier_hygiene,
+      resolution = resolution,
+      harvest_errors = harvest_errors,
       log = log
     ),
     class = "fair_assessment"
@@ -115,6 +121,9 @@ format.fair_assessment <- function(x, ...) {
   lines <- c(
     sprintf("<fair_assessment> %s", x$id),
     if (is_nonempty_string(x$resolved_url)) sprintf("  resolved: %s", x$resolved_url),
+    if (isFALSE(x$resolution$ok)) sprintf("  unresolved: %s (%s)",
+                                          if (is_nonempty_string(x$resolution$url)) x$resolution$url else x$id,
+                                          resolution_reason(x$resolution)),
     sprintf("  metrics: v%s (%d metrics)", x$metric_version %||% "?", x$total_metrics),
     "",
     sprintf("  %-5s %9s %8s %9s", "FAIR", "earned", "percent", "maturity")
@@ -139,11 +148,23 @@ format.fair_assessment <- function(x, ...) {
     lines <- c(lines, sprintf("  access:   %s (%s)  [restricted access may be legitimate; not a FAIR failure]",
                               x$access$access, paste(tags, collapse = ", ")))
   }
+  if (length(x$harvest_errors)) {
+    lines <- c(lines, sprintf("  harvest:  %d source(s) failed (see $harvest_errors)",
+                              length(x$harvest_errors)))
+  }
   if (!is.null(x$identifier_hygiene) && isFALSE(x$identifier_hygiene$hygiene_ok)) {
     lines <- c(lines, sprintf("  id hygiene: %d issue(s) (see $identifier_hygiene)",
                               length(x$identifier_hygiene$issues)))
   }
   paste(lines, collapse = "\n")
+}
+
+#' Short human-readable reason a resolution failed.
+#' @noRd
+resolution_reason <- function(r) {
+  if (!is.null(r$status) && !is.na(r$status)) return(paste("HTTP", r$status))
+  if (is_nonempty_string(r$error)) return(r$error)
+  "no response"
 }
 
 #' @export

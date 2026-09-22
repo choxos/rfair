@@ -7,6 +7,16 @@ url_scheme <- function(u) {
   tolower(tryCatch(httr2::url_parse(u)$scheme, error = function(e) NA_character_) %||% NA_character_)
 }
 
+#' URL schemes of the metadata access URLs (landing page and PID URL).
+#'
+#' F-UJI checks the set {landing_url, origin_url, pid_url}; a PID URL counts
+#' even when it did not resolve.
+#' @noRd
+metadata_url_schemes <- function(ctx) {
+  urls <- as_chr(c(ctx$landing_url, ctx$pid_url))
+  unique(stats::na.omit(vapply(urls, url_scheme, character(1), USE.NAMES = FALSE)))
+}
+
 #' Content (data) URLs harvested into object_content_identifier.
 #' @noRd
 content_urls_of <- function(ctx) {

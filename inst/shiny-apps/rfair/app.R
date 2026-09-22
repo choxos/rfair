@@ -152,7 +152,8 @@ server <- function(input, output, session) {
         value_box("Maturity", if (length(fair_ml) && !is.na(fair_ml)) fair_ml else "n/a",
                   showcase = icon("layer-group"),
                   theme = value_box_theme(bg = fair_col, fg = "#fff")),
-        value_box("Resolved", tags$small(a$resolved_url %||% a$id),
+        value_box(if (isFALSE(a$resolution$ok)) "Unresolved" else "Resolved",
+                  tags$small(if (is.character(a$resolved_url) && !is.na(a$resolved_url)) a$resolved_url else a$id),
                   showcase = icon("link"), theme = "light")
       ),
       do.call(layout_columns, c(

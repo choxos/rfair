@@ -61,7 +61,7 @@ content_negotiate <- function(url, accept = "default", timeout = 15,
 #' @param url Identifier URL (e.g. a doi.org URL).
 #' @param ... Passed to `content_negotiate()`.
 #' @return A list with `landing_url`, `status`, `content`, `content_type`,
-#'   `format`, and `ok`.
+#'   `format`, `headers`, `ok`, and `error` (the transport error, if any).
 #' @noRd
 resolve_landing_page <- function(url, ...) {
   resp <- content_negotiate(url, accept = "default", ...)
@@ -72,6 +72,7 @@ resolve_landing_page <- function(url, ...) {
     content_type = resp$content_type,
     format = resp$format,
     headers = resp$headers,
-    ok = resp$ok
+    ok = resp$ok,
+    error = resp$error %||% NA_character_
   )
 }

@@ -1,0 +1,136 @@
+{
+ "id": "https://doi.org/10.5281/zenodo.8347772",
+ "doi": "10.5281/ZENODO.8347772",
+ "url": "https://zenodo.org/record/8347772",
+ "types": {
+  "ris": "COMP",
+  "bibtex": "misc",
+  "citeproc": "article",
+  "schemaOrg": "SoftwareSourceCode",
+  "resourceTypeGeneral": "Software"
+ },
+ "creators": [
+  {
+   "name": "Devaraju, Anusuriya",
+   "givenName": "Anusuriya",
+   "familyName": "Devaraju",
+   "nameIdentifiers": [
+    {
+     "schemeUri": "https://orcid.org",
+     "nameIdentifier": "https://orcid.org/0000-0003-0870-3192",
+     "nameIdentifierScheme": "ORCID"
+    }
+   ]
+  },
+  {
+   "name": "Huber, Robert",
+   "givenName": "Robert",
+   "familyName": "Huber",
+   "nameIdentifiers": [
+    {
+     "schemeUri": "https://orcid.org",
+     "nameIdentifier": "https://orcid.org/0000-0003-3000-0020",
+     "nameIdentifierScheme": "ORCID"
+    }
+   ]
+  }
+ ],
+ "titles": [
+  {
+   "title": "F-UJI - An Automated FAIR Data Assessment Tool"
+  }
+ ],
+ "publisher": {
+  "name": "Zenodo"
+ },
+ "container": {},
+ "subjects": [
+  {
+   "subject": "PANGAEA"
+  },
+  {
+   "subject": "FAIRsFAIR"
+  },
+  {
+   "subject": "FAIR Principles"
+  },
+  {
+   "subject": "Data Object Assessment"
+  },
+  {
+   "subject": "Swagger"
+  },
+  {
+   "subject": "FAIR"
+  },
+  {
+   "subject": "Research Data"
+  },
+  {
+   "subject": "FAIR data"
+  },
+  {
+   "subject": "Metadata harvesting"
+  }
+ ],
+ "contributors": [],
+ "dates": [
+  {
+   "date": "2023-09-15",
+   "dateType": "Issued"
+  }
+ ],
+ "publicationYear": 2023,
+ "identifiers": [
+  {
+   "identifier": "https://zenodo.org/record/8347772",
+   "identifierType": "URL"
+  }
+ ],
+ "sizes": [],
+ "formats": [],
+ "version": "v2.2.5",
+ "rightsList": [
+  {
+   "rights": "MIT License",
+   "rightsUri": "https://opensource.org/licenses/MIT",
+   "schemeUri": "https://spdx.org/licenses/",
+   "rightsIdentifier": "mit",
+   "rightsIdentifierScheme": "SPDX"
+  },
+  {
+   "rights": "Open Access",
+   "rightsUri": "info:eu-repo/semantics/openAccess"
+  }
+ ],
+ "descriptions": [
+  {
+   "description": "FAIRsFAIR has developed F-UJI, a service based on REST, and is piloting a programmatic assessment of the FAIRness of research datasets in five trustworthy data repositories.",
+   "descriptionType": "Abstract"
+  },
+  {
+   "description": "Please cite this software using these metadata.",
+   "descriptionType": "Other"
+  }
+ ],
+ "geoLocations": [],
+ "fundingReferences": [],
+ "relatedIdentifiers": [
+  {
+   "relationType": "IsSupplementTo",
+   "relatedIdentifier": "https://github.com/pangaea-data-publisher/fuji/tree/v2.2.5",
+   "relatedIdentifierType": "URL"
+  },
+  {
+   "relationType": "IsVersionOf",
+   "relatedIdentifier": "10.5281/zenodo.6361400",
+   "relatedIdentifierType": "DOI"
+  }
+ ],
+ "relatedItems": [],
+ "schemaVersion": "http://datacite.org/schema/kernel-4",
+ "providerId": "cern",
+ "clientId": "cern.zenodo",
+ "agency": "datacite",
+ "state": "findable"
+}

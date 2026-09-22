@@ -37,6 +37,8 @@ new_engine_ctx <- function(id, metrics_meta, use_datacite = TRUE, test_debug = F
   ctx$content_identifier <- list()
   ctx$github_data <- list()
   ctx$log <- list()
+  ctx$resolution <- NULL
+  ctx$harvest_errors <- list()
   ctx
 }
 
@@ -124,14 +126,19 @@ assess_fair <- function(id, metric_version = "0.8", use_datacite = TRUE,
 
   if (isTRUE(resolve)) {
     landing <- tryCatch(resolve_landing_page(ctx$pid_url, timeout = timeout),
-                        error = function(e) NULL)
-    if (!is.null(landing) && isTRUE(landing$ok)) {
+                        error = function(e) list(ok = FALSE, error = conditionMessage(e)))
+    ctx$resolution <- list(url = ctx$pid_url,
+                           final_url = landing$landing_url %||% NA_character_,
+                           status = landing$status %||% NA_integer_,
+                           ok = isTRUE(landing$ok),
+                           error = landing$error %||% NA_character_)
+    # A failed resolution leaves landing_url NA (as F-UJI leaves it None), so an
+    # identifier that does not resolve is never reported or scored as resolved.
+    if (isTRUE(landing$ok)) {
       ctx$landing_url <- landing$landing_url
       ctx$landing_html <- landing$content
       ctx$landing_content_type <- landing$content_type
       ctx$landing_headers <- landing$headers
-    } else {
-      ctx$landing_url <- ctx$pid_url
     }
   }
 
@@ -156,7 +163,7 @@ assess_fair <- function(id, metric_version = "0.8", use_datacite = TRUE,
   content_urls <- as_chr(lapply(ctx$metadata_merged$object_content_identifier %||% list(),
                                 function(x) if (is.list(x)) x$url else x))
   access <- classify_access(access_level = ctx$metadata_merged$access_level,
-                            urls = unique(c(ctx$landing_url, ctx$pid_url, content_urls)))
+                            urls = as_chr(unique(c(ctx$landing_url, ctx$pid_url, content_urls))))
   hygiene <- identifier_hygiene(id)
   end_time <- format(Sys.time(), "%Y-%m-%dT%H:%M:%S%z")
 
@@ -170,6 +177,7 @@ assess_fair <- function(id, metric_version = "0.8", use_datacite = TRUE,
     resolved_url = ctx$landing_url %||% NA_character_, metrics_meta = metrics_meta,
     metadata = as.list(ctx$metadata_merged), start_time = start_time,
     end_time = end_time, log = if (test_debug) ctx$log else list(),
-    reuse = reuse, access = access, identifier_hygiene = hygiene
+    reuse = reuse, access = access, identifier_hygiene = hygiene,
+    resolution = ctx$resolution, harvest_errors = ctx$harvest_errors
   )
 }

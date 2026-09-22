@@ -17,7 +17,9 @@ assess_fair_batch(ids, metric_version = "0.8", quiet = FALSE, ...)
 }
 \value{
 A data frame with one row per unique identifier: \code{identifier},
-\code{metric_version}, \code{scheme}, \code{is_persistent}, \code{resolved_url},
+\code{metric_version}, \code{scheme}, \code{is_persistent}, \code{resolved} (did the
+identifier resolve; \code{NA} when \code{resolve = FALSE}), \code{http_status},
+\code{resolved_url},
 \code{fair_percent}, \code{F}, \code{A}, \code{I}, \code{R}, \code{maturity}, \code{n_pass}, \code{n_metrics},
 \code{error}.
 }

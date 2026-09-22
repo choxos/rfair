@@ -28,8 +28,8 @@ split_identifiers <- function(x, sep = " ; ") {
 .assessment_row <- function(id, version, a) {
   base <- data.frame(
     identifier = id, metric_version = version, scheme = NA_character_,
-    is_persistent = NA, resolved_url = NA_character_,
-    fair_percent = NA_real_, F = NA_real_, A = NA_real_, I = NA_real_,
+    is_persistent = NA, resolved = NA, http_status = NA_integer_,
+    resolved_url = NA_character_, fair_percent = NA_real_, F = NA_real_, A = NA_real_, I = NA_real_,
     R = NA_real_, maturity = NA_real_, n_pass = NA_integer_,
     n_metrics = NA_integer_, error = NA_character_, stringsAsFactors = FALSE
   )
@@ -46,6 +46,10 @@ split_identifiers <- function(x, sep = " ; ") {
   getc <- function(k) { v <- s$percent[s$category == k]; if (length(v)) v[1] else NA_real_ }
   fair <- s[s$category == "FAIR", , drop = FALSE]
   df <- as.data.frame(a)
+  if (!is.null(a$resolution)) {
+    base$resolved <- isTRUE(a$resolution$ok)
+    base$http_status <- as.integer(a$resolution$status %||% NA_integer_)
+  }
   base$resolved_url <- a$resolved_url %||% NA_character_
   base$fair_percent <- if (nrow(fair)) fair$percent[1] else NA_real_
   base$F <- getc("F"); base$A <- getc("A"); base$I <- getc("I"); base$R <- getc("R")
@@ -66,7 +70,9 @@ split_identifiers <- function(x, sep = " ; ") {
 #' @param quiet If `FALSE` (default), print per-identifier progress.
 #' @param ... Passed to [assess_fair()].
 #' @return A data frame with one row per unique identifier: `identifier`,
-#'   `metric_version`, `scheme`, `is_persistent`, `resolved_url`,
+#'   `metric_version`, `scheme`, `is_persistent`, `resolved` (did the
+#'   identifier resolve; `NA` when `resolve = FALSE`), `http_status`,
+#'   `resolved_url`,
 #'   `fair_percent`, `F`, `A`, `I`, `R`, `maturity`, `n_pass`, `n_metrics`,
 #'   `error`.
 #' @seealso [assess_data_code()], [assess_fair()]

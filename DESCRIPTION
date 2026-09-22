@@ -28,7 +28,7 @@ Depends:
     R (>= 4.1)
 Imports:
     digest,
-    httr2,
+    httr2 (>= 1.1.0),
     jsonlite,
     mime,
     rvest,
@@ -50,10 +50,11 @@ Suggests:
     rmarkdown,
     shiny,
     testthat (>= 3.0.0),
+    withr,
     wand
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 Encoding: UTF-8
 Language: en-US
 Roxygen: list(markdown = TRUE)
-Config/roxygen2/version: 8.0.0
+Config/roxygen2/version: 8.1.0
