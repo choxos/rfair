@@ -2,7 +2,7 @@
 % Please edit documentation in R/as_rdf.R
 \name{as_rdf}
 \alias{as_rdf}
-\title{Serialize a FAIR assessment to RDF (DQV + schema.org Rating).}
+\title{Serialize a FAIR assessment to RDF (DQV + schema.org Rating + FTR).}
 \usage{
 as_rdf(x, format = c("jsonld", "turtle"))
 }
@@ -10,14 +10,21 @@ as_rdf(x, format = c("jsonld", "turtle"))
 \item{x}{A \link{fair_assessment} object.}
 
 \item{format}{\code{"jsonld"} (default) or \code{"turtle"} (needs the optional \code{rdflib}
-package).}
+and \code{jsonld} packages).}
 }
 \value{
 A character scalar of serialized RDF.
 }
 \description{
-Emits the assessment as W3C Data Quality Vocabulary quality measurements plus
-a schema.org Rating, the machine-readable form the F-UJI service publishes.
+Emits the assessment as W3C Data Quality Vocabulary quality measurements (one
+per FAIR category and one per metric) plus a schema.org Rating, the
+machine-readable form the F-UJI service publishes, and one FAIR Test Result
+per metric test using the OSTrails FAIR Testing Resource vocabulary
+(\url{https://w3id.org/ftr}, version 1.3.0): \code{prov:value} pass or fail,
+\code{ftr:completion}, the evidence as \code{ftr:log}, and for failed tests the
+\code{\link[=fair_recommendations]{fair_recommendations()}} action as an \code{ftr:suggestion}. Metrics and tests are
+identified within the metric specification (for example
+\verb{https://doi.org/10.5281/zenodo.6461229#FsF-F1-01MD-1}).
 }
 \examples{
 \donttest{

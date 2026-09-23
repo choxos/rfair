@@ -43,6 +43,7 @@ Suggests:
     bslib,
     chromote,
     DT,
+    jsonld,
     knitr,
     plumber,
     rdflib,
