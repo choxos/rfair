@@ -185,3 +185,23 @@ test_that("forge_of recognizes GitHub, nested GitLab groups, and Codeberg", {
   expect_identical(forge_of("https://github.com/o/r/tree/v1")$forge, "github")
   expect_null(forge_of("https://example.org/o/r"))
 })
+
+test_that("data links count as retrievable only when they answer 2xx", {
+  test_status <- function(status) {
+    routes <- zenodo_routes()
+    routes[[3]]$status <- status
+    local_http(routes)
+    a <- assess_fair("https://doi.org/10.5281/zenodo.8347772")
+    r <- a$results[[which(vapply(a$results, `[[`, "", "metric_identifier") == "FsF-A1-02MD")]]
+    r$metric_tests[["FsF-A1-02MD-2"]]$metric_test_status
+  }
+  expect_identical(test_status(200L), "pass")
+  expect_identical(test_status(401L), "fail")
+})
+
+test_that("schema.org isAccessibleForFree is read as an access statement", {
+  md <- map_schemaorg(list(`@type` = "Dataset", name = "x", isAccessibleForFree = TRUE))
+  expect_true(md$access_free)
+  expect_identical(access_statements(md), "https://schema.org/isAccessibleForFree#public")
+  expect_identical(map_access_right(access_statements(md)), "public")
+})

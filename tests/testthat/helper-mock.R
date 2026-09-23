@@ -57,7 +57,7 @@ zenodo_routes <- function() {
           type = "application/vnd.datacite.datacite+json; charset=utf-8",
           final_url = "https://data.crosscite.org/10.5281%2Fzenodo.8347772"),
     route("https://zenodo.org/records/8347772/files/pangaea-data-publisher/fuji-v2.2.5.zip",
-          method = "HEAD", type = "application/zip",
+          type = "application/zip",
           headers = list(`Content-Length` = "2263011"))
   )
 }

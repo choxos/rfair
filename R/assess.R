@@ -166,7 +166,7 @@ assess_fair <- function(id, metric_version = "0.8", use_datacite = TRUE,
   reuse <- reuse_from_metadata(ctx$metadata_merged$license)
   content_urls <- as_chr(lapply(ctx$metadata_merged$object_content_identifier %||% list(),
                                 function(x) if (is.list(x)) x$url else x))
-  access <- classify_access(access_level = ctx$metadata_merged$access_level,
+  access <- classify_access(access_level = access_statements(ctx$metadata_merged),
                             urls = as_chr(unique(c(ctx$landing_url, ctx$pid_url, content_urls))))
   hygiene <- identifier_hygiene(id)
   end_time <- format(Sys.time(), "%Y-%m-%dT%H:%M:%S%z")

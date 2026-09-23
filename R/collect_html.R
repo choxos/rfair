@@ -95,6 +95,10 @@ map_schemaorg <- function(j) {
   out$summary <- j$description %||% j$abstract
   kw <- j$keywords
   if (!is.null(kw)) out$keywords <- if (is.list(kw)) as.list(as_chr(kw)) else kw
+  free <- j$isAccessibleForFree
+  if (length(free) == 1L) {
+    out$access_free <- isTRUE(free) || tolower(as.character(free)) %in% c("true", "free")
+  }
   oid <- j$identifier %||% j$url
   if (is.list(oid)) oid <- oid$value %||% oid[["@id"]]
   if (!is.null(oid)) out$object_identifier <- as_chr(oid)[1]

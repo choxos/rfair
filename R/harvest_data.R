@@ -1,10 +1,13 @@
 # Data-file harvester: probe content (data) links for type and size, improving
-# the data-content and file-format metrics. Uses HTTP HEAD, with the 'mime'
-# package guessing the type from the file extension when HEAD gives none.
+# the data-content and file-format metrics. Reads the response headers of a
+# streamed GET, with the 'mime' package guessing the type from the file
+# extension when the server gives none.
 
-#' Enrich object_content_identifier entries with MIME type and size.
+#' Enrich object_content_identifier entries with MIME type, size, and the HTTP
+#' status of the link (probing at most `limit` links, like F-UJI's
+#' data_files_limit).
 #' @noRd
-harvest_data <- function(ctx, timeout = 10, limit = 3) {
+harvest_data <- function(ctx, timeout = 10, limit = 5) {
   oci <- ctx$metadata_merged$object_content_identifier
   if (is.null(oci)) return(invisible())
   items <- if (is.list(oci) && is.null(names(oci))) oci else list(oci)
@@ -16,8 +19,11 @@ harvest_data <- function(ctx, timeout = 10, limit = 3) {
     entry <- if (is.list(it)) it else list(url = url)
     if (is_nonempty_string(url) && probed < limit) {
       probed <- probed + 1L
-      resp <- rfair_perform(rfair_request(url, timeout = timeout, method = "HEAD"),
-                            ctx = ctx, source = "data")
+      # GET, closed once the headers arrive (as F-UJI reads the status of a
+      # streamed GET); HEAD hangs on repositories that build files on request
+      resp <- rfair_perform(rfair_request(url, timeout = timeout), ctx = ctx,
+                            source = "data", headers_only = TRUE)
+      if (is_response(resp)) entry$status <- httr2::resp_status(resp)
       # an error page's content-type/length is not the data file's
       info <- if (is_response(resp) && httr2::resp_status(resp) < 400L) {
         list(type = tryCatch(httr2::resp_content_type(resp), error = function(e) NA_character_),

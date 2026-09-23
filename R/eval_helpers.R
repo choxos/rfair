@@ -26,6 +26,26 @@ content_urls_of <- function(ctx) {
   as_chr(lapply(items, function(x) if (is.list(x)) x$url else x))
 }
 
+#' Content URLs whose probe returned a 2xx status.
+#' @noRd
+retrievable_content_urls <- function(ctx) {
+  oci <- ctx$metadata_merged$object_content_identifier
+  items <- if (is.list(oci) && is.null(names(oci))) oci else if (!is.null(oci)) list(oci)
+  as_chr(lapply(items, function(x) {
+    if (is.list(x) && is.numeric(x$status) && x$status >= 200 && x$status < 300) x$url
+  }))
+}
+
+#' Access statements from metadata: access_level values plus the schema.org
+#' isAccessibleForFree flag as a term F-UJI recognizes.
+#' @noRd
+access_statements <- function(md) {
+  free <- md$access_free
+  c(as_chr(md$access_level),
+    if (length(free) == 1L && !is.na(free))
+      paste0("https://schema.org/isAccessibleForFree#", if (isTRUE(as.logical(free))) "public" else "restricted"))
+}
+
 #' Is a URL scheme a standardized communication protocol?
 #' @noRd
 is_standard_protocol <- function(scheme) {

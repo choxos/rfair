@@ -48,9 +48,11 @@ rfair_request <- function(url, timeout = 15, accept = NULL, method = NULL,
 #'
 #' Returns the response, or an `rfair_http_failure` (a list with `message`)
 #' when the URL is blocked or the transfer fails. The reason is also recorded
-#' in `ctx$harvest_errors` when `ctx` is given.
+#' in `ctx$harvest_errors` when `ctx` is given. With `headers_only = TRUE` the
+#' request streams and is closed once the headers arrive, so probing a large
+#' or generated file does not download it.
 #' @noRd
-rfair_perform <- function(req, ctx = NULL, source = "http") {
+rfair_perform <- function(req, ctx = NULL, source = "http", headers_only = FALSE) {
   fail <- function(url, msg) {
     add_harvest_error(ctx, source, url, msg)
     structure(list(message = msg), class = "rfair_http_failure")
@@ -63,7 +65,15 @@ rfair_perform <- function(req, ctx = NULL, source = "http") {
       why <- url_block_reason(url)
       if (!is.na(why)) return(fail(url, why))
     }
-    resp <- tryCatch(httr2::req_perform(req), error = function(e) e)
+    resp <- tryCatch({
+      if (headers_only) {
+        r <- httr2::req_perform_connection(req)
+        close(r)
+        r
+      } else {
+        httr2::req_perform(req)
+      }
+    }, error = function(e) e)
     if (inherits(resp, "error")) return(fail(url, conditionMessage(resp)))
     if (!guard) return(resp)
     loc <- httr2::resp_header(resp, "location")
