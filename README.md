@@ -189,10 +189,10 @@ The API and the Shiny app fetch whatever URL a visitor sends, so both set
 hosts that resolve to loopback, private, link-local, or cloud metadata
 addresses, are refused. Each request connects to the address that was checked,
 so DNS rebinding cannot swap it, and every redirect is checked, with credentials
-dropped when a redirect leaves the host. Headless rendering is off in the API
-unless the server sets `RFAIR_API_ALLOW_HEADLESS=true`, and it runs outside
-this guard. Before exposing either publicly, also put it behind a proxy with
-request limits.
+dropped when a redirect changes scheme, host, or port. Headless rendering is off
+in the API unless the server sets `RFAIR_API_ALLOW_HEADLESS=true`, and it runs
+outside this guard. Before exposing either publicly, also put it behind a proxy
+with request limits.
 
 ## How it works
 

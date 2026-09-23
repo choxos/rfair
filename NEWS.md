@@ -119,8 +119,8 @@ comparisons) rose from 91.8% to 97.6%; see `tests/conformance/README.md`.
   hosts that resolve to loopback, private, link-local, or cloud metadata
   addresses. The request connects to the address that was checked (libcurl's
   CURLOPT_RESOLVE), so DNS rebinding cannot swap it, and every redirect hop is
-  checked, with credentials dropped when a redirect leaves the host. The
-  bundled Plumber API and Shiny app turn it on, since both fetch
+  checked, with credentials dropped when a redirect changes scheme, host, or
+  port. The bundled Plumber API and Shiny app turn it on, since both fetch
   visitor-supplied URLs. Headless rendering (`use_headless`) runs in a browser
   outside this guard.
 * The Plumber API refuses headless rendering unless the server sets

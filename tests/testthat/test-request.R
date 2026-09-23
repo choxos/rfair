@@ -80,6 +80,25 @@ test_that("guarded redirects drop credentials when they leave the host", {
   expect_false("Authorization" %in% sent[["https://b.example/final"]])   # other host does not
 })
 
+test_that("guarded redirects drop credentials on a downgrade to plain HTTP", {
+  withr::local_options(rfair.block_private_hosts = TRUE)
+  local_mocked_bindings(resolve_host = function(host) "93.184.215.14")
+  sent <- list()
+  httr2::local_mocked_responses(function(req) {
+    sent[[req$url]] <<- names(httr2::req_get_headers(req, "reveal"))
+    if (startsWith(req$url, "https://")) {
+      return(httr2::response(301L, url = req$url, headers = list(Location = "http://a.example/x")))
+    }
+    httr2::response(200L, url = req$url)
+  })
+  req <- httr2::req_headers(rfair_request("https://a.example/x"), `PRIVATE-TOKEN` = "secret")
+  expect_true(is_response(rfair_perform(req)))
+  expect_true("PRIVATE-TOKEN" %in% sent[["https://a.example/x"]])
+  expect_false("PRIVATE-TOKEN" %in% sent[["http://a.example/x"]])
+  expect_false(identical(url_origin("https://a.example/x"), url_origin("http://a.example/x")))
+  expect_identical(url_origin("https://A.example/x"), url_origin("https://a.example:443/y"))
+})
+
 test_that("body_text survives charsets iconv does not know", {
   resp <- httr2::response(200L, headers = list(`Content-Type` = "text/html; charset=utf8mb4"),
                           body = charToRaw("café"))

@@ -14,7 +14,8 @@
 #   resolves to a loopback, private, or link-local address, connect to the
 #   address that was checked (so DNS rebinding cannot swap it), and follow
 #   redirects manually so every hop is checked, dropping credentials when a
-#   redirect leaves the host. Turn it on when rfair runs as a service that
+#   redirect changes scheme, host, or port (so a token never follows a
+#   downgrade to plain HTTP). Turn it on when rfair runs as a service that
 #   fetches user-supplied URLs (the bundled Plumber API and Shiny app do).
 
 RFAIR_USER_AGENT <- "F-UJI (rfair R package; https://github.com/choxos/rfair)"
@@ -85,8 +86,8 @@ rfair_perform <- function(req, ctx = NULL, source = "http", headers_only = FALSE
       return(resp)
     }
     next_url <- xml2::url_absolute(loc, url)
-    if (!identical(url_host(next_url), url_host(url))) {
-      # libcurl would not send credentials to another host; neither do we
+    if (!identical(url_origin(next_url), url_origin(url))) {
+      # like libcurl, send credentials only to the same scheme, host, and port
       req <- httr2::req_headers(req, Authorization = NULL, `PRIVATE-TOKEN` = NULL)
     }
     url <- next_url
@@ -98,10 +99,14 @@ rfair_perform <- function(req, ctx = NULL, source = "http", headers_only = FALSE
 #' @noRd
 is_response <- function(x) inherits(x, "httr2_response")
 
-#' Lowercased host of a URL ("" if it has none).
+#' Scheme, host, and port of a URL, lowercased ("" if it cannot be parsed).
 #' @noRd
-url_host <- function(url) {
-  tolower(tryCatch(httr2::url_parse(url)$hostname, error = function(e) NULL) %||% "")
+url_origin <- function(url) {
+  p <- tryCatch(httr2::url_parse(url), error = function(e) NULL)
+  if (is.null(p)) return("")
+  scheme <- tolower(p$scheme %||% "")
+  port <- p$port %||% switch(scheme, https = "443", http = "80", "")
+  tolower(paste0(scheme, "://", p$hostname %||% "", ":", port))
 }
 
 #' All addresses a host name resolves to.
