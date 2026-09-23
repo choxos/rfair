@@ -94,6 +94,9 @@ run_evaluators <- function(ctx, metrics_meta) {
 #' @param use_headless If `TRUE` and the optional `chromote` package is
 #'   installed, render JavaScript-heavy landing pages with a headless browser
 #'   before harvesting embedded metadata.
+#' @param max_time Time budget for the whole assessment, in seconds. Metadata
+#'   sources not yet harvested when it runs out are skipped and listed in
+#'   `harvest_errors`. The default, `Inf`, has no limit.
 #' @return A [fair_assessment] object.
 #' @export
 #' @examples
@@ -105,7 +108,7 @@ assess_fair <- function(id, metric_version = "0.8", use_datacite = TRUE,
                         metadata_service_endpoint = NULL,
                         metadata_service_type = metadata_service_types(),
                         test_debug = FALSE, resolve = TRUE, timeout = 15,
-                        use_headless = FALSE) {
+                        use_headless = FALSE, max_time = Inf) {
   if (!is_nonempty_string(id)) stop("`id` must be a non-empty identifier or URL.", call. = FALSE)
   metadata_service_endpoint <- trimws(as.character(metadata_service_endpoint %||% ""))
   if (!nzchar(metadata_service_endpoint)) metadata_service_endpoint <- NULL
@@ -118,6 +121,7 @@ assess_fair <- function(id, metric_version = "0.8", use_datacite = TRUE,
     metadata_service_type = metadata_service_type
   )
 
+  ctx$deadline <- Sys.time() + max_time
   parsed <- id_parse(id)
   ctx$pid <- parsed
   ctx$pid_url <- parsed$identifier_url %||% id

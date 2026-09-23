@@ -32,6 +32,7 @@ Imports:
     httr2 (>= 1.1.0),
     jsonlite,
     mime,
+    parallel,
     rvest,
     stats,
     stringdist,

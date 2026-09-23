@@ -88,6 +88,10 @@ harvest_all_metadata <- function(ctx, timeout = 15) {
   # the whole harvest (later collectors only fill gaps, so a skipped source just
   # means fewer signals, not a failed assessment).
   run <- function(label, expr) {
+    if (!is.null(ctx$deadline) && Sys.time() > ctx$deadline) {
+      add_harvest_error(ctx, label, NA_character_, "skipped: max_time reached")
+      return(invisible())
+    }
     tryCatch(expr, error = function(e)
       ctx_log(ctx, "FsF-F2-01M", "warning",
               sprintf("collector '%s' failed: %s", label, conditionMessage(e))))

@@ -4,7 +4,15 @@
 \alias{assess_fair_batch}
 \title{Assess the FAIRness of a batch of identifiers}
 \usage{
-assess_fair_batch(ids, metric_version = "0.8", quiet = FALSE, ...)
+assess_fair_batch(
+  ids,
+  metric_version = "0.8",
+  quiet = FALSE,
+  workers = 1L,
+  keep = FALSE,
+  previous = NULL,
+  ...
+)
 }
 \arguments{
 \item{ids}{Character vector of DOIs, PIDs, URLs, or identifiers.org codes.}
@@ -13,15 +21,27 @@ assess_fair_batch(ids, metric_version = "0.8", quiet = FALSE, ...)
 
 \item{quiet}{If \code{FALSE} (default), print per-identifier progress.}
 
+\item{workers}{Number of identifiers to assess at once. Values above 1 fork
+worker processes with \code{\link[parallel:mclapply]{parallel::mclapply()}}, which is not available on
+Windows (there the batch runs serially with a warning). HTTP requests to one
+host stay rate limited per process (see \code{options(rfair.rate_per_host)}).}
+
+\item{keep}{If \code{TRUE}, keep the full \link{fair_assessment} objects, named by
+identifier, in the \code{"assessments"} attribute of the result.}
+
+\item{previous}{Optional result of an earlier \code{assess_fair_batch()} call.
+Identifiers it already scored without an error (for the same metric
+version) are reused instead of assessed again, so an interrupted batch can
+be resumed.}
+
 \item{...}{Passed to \code{\link[=assess_fair]{assess_fair()}}.}
 }
 \value{
 A data frame with one row per unique identifier: \code{identifier},
 \code{metric_version}, \code{scheme}, \code{is_persistent}, \code{resolved} (did the
 identifier resolve; \code{NA} when \code{resolve = FALSE}), \code{http_status},
-\code{resolved_url},
-\code{fair_percent}, \code{F}, \code{A}, \code{I}, \code{R}, \code{maturity}, \code{n_pass}, \code{n_metrics},
-\code{error}.
+\code{resolved_url}, \code{fair_percent}, \code{F}, \code{A}, \code{I}, \code{R}, \code{maturity}, \code{n_pass},
+\code{n_metrics}, \code{error}.
 }
 \description{
 Runs \code{\link[=assess_fair]{assess_fair()}} over a vector of identifiers and returns one tidy row per
@@ -30,7 +50,9 @@ than aborting the batch.
 }
 \examples{
 \donttest{
-assess_fair_batch(c("https://doi.org/10.5281/zenodo.8347772", "geo:GSE12345"))
+res <- assess_fair_batch(c("https://doi.org/10.5281/zenodo.8347772", "geo:GSE12345"),
+                         keep = TRUE)
+attr(res, "assessments")[[1]]
 }
 }
 \seealso{

@@ -13,7 +13,8 @@ assess_fair(
   test_debug = FALSE,
   resolve = TRUE,
   timeout = 15,
-  use_headless = FALSE
+  use_headless = FALSE,
+  max_time = Inf
 )
 }
 \arguments{
@@ -43,6 +44,10 @@ metadata document, then RDF.}
 \item{use_headless}{If \code{TRUE} and the optional \code{chromote} package is
 installed, render JavaScript-heavy landing pages with a headless browser
 before harvesting embedded metadata.}
+
+\item{max_time}{Time budget for the whole assessment, in seconds. Metadata
+sources not yet harvested when it runs out are skipped and listed in
+\code{harvest_errors}. The default, \code{Inf}, has no limit.}
 }
 \value{
 A \link{fair_assessment} object.
