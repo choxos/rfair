@@ -5,24 +5,60 @@
 # path is gated behind the optional `rdflib` package (which needs the system
 # `librdf`) and degrades gracefully when it is unavailable.
 
-# SPARQL that pulls reference fields from an arbitrary RDF graph
-# (Mapper.GENERIC_SPARQL, metadata_mapper.py:302).
-.GENERIC_SPARQL <- "
-PREFIX dct: <http://purl.org/dc/terms/>
-PREFIX dc: <http://purl.org/dc/elements/1.1/>
-PREFIX sdo: <http://schema.org/>
-SELECT ?object_identifier ?title ?summary ?publisher ?publication_date ?creator ?object_type ?license ?access_level ?keywords WHERE {
-  OPTIONAL {?s dct:title|dc:title|sdo:name ?title}
-  OPTIONAL {?s dct:identifier|dc:identifier|sdo:identifier ?object_identifier}
-  OPTIONAL {?s dct:description|dc:description|sdo:abstract ?summary}
-  OPTIONAL {?s dct:publisher|dc:publisher|sdo:publisher ?publisher}
-  OPTIONAL {?s dct:created|dct:issued|dct:date|sdo:datePublished ?publication_date}
-  OPTIONAL {?s dct:creator|dc:creator|sdo:author ?creator}
-  OPTIONAL {?s dct:type|dc:type ?object_type}
-  OPTIONAL {?s dct:license|dc:license|sdo:license ?license}
-  OPTIONAL {?s dct:accessRights|dct:rights|dc:rights ?access_level}
-  OPTIONAL {?s dct:subject|dc:subject|sdo:keywords ?keywords}
-} LIMIT 5"
+# RDF predicates mapped to reference fields (Mapper.GENERIC_SPARQL,
+# metadata_mapper.py:302). Mapped in R from a plain triple dump rather than with
+# SPARQL 1.1 property paths, which librdf's query engine rejects.
+.RDF_FIELDS <- local({
+  dct <- c(title = "title", identifier = "object_identifier", description = "summary",
+           abstract = "summary", publisher = "publisher", created = "publication_date",
+           issued = "publication_date", date = "publication_date", creator = "creator",
+           type = "object_type", license = "license", accessRights = "access_level",
+           rights = "access_level", subject = "keywords")
+  dc <- dct[c("title", "identifier", "description", "publisher", "date", "creator",
+              "type", "rights", "subject")]
+  sdo <- c(name = "title", identifier = "object_identifier", abstract = "summary",
+           description = "summary", publisher = "publisher", datePublished = "publication_date",
+           author = "creator", creator = "creator", license = "license", keywords = "keywords")
+  c(stats::setNames(dct, paste0("http://purl.org/dc/terms/", names(dct))),
+    stats::setNames(dc, paste0("http://purl.org/dc/elements/1.1/", names(dc))),
+    stats::setNames(sdo, paste0("http://schema.org/", names(sdo))),
+    stats::setNames(sdo, paste0("https://schema.org/", names(sdo))))
+})
+
+# Predicates giving a human-readable name for a node (e.g. a creator).
+.RDF_NAME_PREDICATES <- c("http://xmlns.com/foaf/0.1/name", "http://schema.org/name",
+                          "https://schema.org/name", "http://www.w3.org/2006/vcard/ns#fn",
+                          "http://www.w3.org/2000/01/rdf-schema#label")
+
+#' Map a triple table (s, p, o) to reference-schema keys.
+#'
+#' The main subject is the one carrying the most mapped predicates; node
+#' objects (for example creator URIs) are replaced by their name when the graph
+#' gives one.
+#' @noRd
+map_rdf_triples <- function(triples) {
+  field <- unname(.RDF_FIELDS[triples$p])
+  mapped <- triples[!is.na(field), , drop = FALSE]
+  if (!nrow(mapped)) return(list())
+  mapped$field <- field[!is.na(field)]
+  main <- names(sort(table(mapped$s), decreasing = TRUE))[1]
+  mapped <- mapped[mapped$s == main, , drop = FALSE]
+  names_tbl <- triples[triples$p %in% .RDF_NAME_PREDICATES, , drop = FALSE]
+  md <- list()
+  for (f in unique(mapped$field)) {
+    vals <- unique(mapped$o[mapped$field == f])
+    named <- names_tbl$o[match(vals, names_tbl$s)]
+    vals <- ifelse(is.na(named), vals, named)
+    md[[f]] <- if (f %in% c("creator", "keywords", "license", "access_level")) as.list(vals) else vals[1]
+  }
+  compact(md)
+}
+
+#' Namespaces of the predicates used in a triple table.
+#' @noRd
+rdf_namespaces <- function(triples) {
+  unique(sub("[^/#]*$", "", triples$p))
+}
 
 #' Harvest content-negotiated JSON-LD (native) into the metadata record.
 #' @noRd
@@ -62,19 +98,18 @@ collect_rdf_graph <- function(ctx, content, content_type, url) {
   fmt <- if (grepl("turtle|n3", content_type)) "turtle"
          else if (grepl("n-triples", content_type)) "ntriples"
          else "rdfxml"
-  res <- tryCatch({
+  triples <- tryCatch({
     rdf <- rdflib::rdf_parse(content, format = fmt, rdf = rdflib::rdf())
-    rdflib::rdf_query(rdf, .GENERIC_SPARQL)
+    rdflib::rdf_query(rdf, "SELECT ?s ?p ?o WHERE { ?s ?p ?o }")
   }, error = function(e) NULL)
-  if (is.null(res) || !nrow(res)) return(invisible(FALSE))
-  row <- as.list(res[1, , drop = FALSE])
-  md <- compact(lapply(row, function(v) if (length(v) && !is.na(v)) as.character(v) else NULL))
-  if (length(md)) {
-    merge_metadata(ctx, md, url = url, method = "rdf", format = "rdf",
-                   mimetype = content_type, schema = "")
-    ctx$metadata_sources[[length(ctx$metadata_sources) + 1L]] <-
-      list(source = "rdf", method = "content_negotiation")
-  }
+  if (is.null(triples) || !nrow(triples)) return(invisible(FALSE))
+  triples <- as.data.frame(lapply(triples, as.character), stringsAsFactors = FALSE)
+  md <- map_rdf_triples(triples)
+  if (!length(md)) return(invisible(FALSE))
+  merge_metadata(ctx, md, url = url, method = "rdf", format = "rdf",
+                 mimetype = content_type, schema = "", namespaces = rdf_namespaces(triples))
+  ctx$metadata_sources[[length(ctx$metadata_sources) + 1L]] <-
+    list(source = "rdf", method = "content_negotiation")
   invisible(TRUE)
 }
 

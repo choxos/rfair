@@ -163,6 +163,7 @@ collect_xml_from_url <- function(ctx, url, timeout = 15) {
 #' Harvest XML metadata via content negotiation (DataCite XML, generic XML).
 #' @noRd
 collect_xml <- function(ctx, timeout = 15) {
+  if (!datacite_possible(ctx)) return(invisible())
   resp <- tryCatch(content_negotiate(ctx$pid_url, accept = "datacite_xml", timeout = timeout),
                    error = function(e) NULL)
   if (!is.null(resp) && isTRUE(resp$ok) && !is.null(resp$content) &&

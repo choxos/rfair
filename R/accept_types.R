@@ -4,6 +4,7 @@
 ACCEPT_TYPES <- list(
   datacite_json = "application/vnd.datacite.datacite+json",
   datacite_xml  = "application/vnd.datacite.datacite+xml",
+  csl_json      = "application/vnd.citationstyles.csl+json",
   schemaorg     = "application/vnd.schemaorg.ld+json, application/ld+json",
   html          = "text/html, application/xhtml+xml",
   html_xml      = "text/html, application/xhtml+xml, application/xml;q=0.5, text/xml;q=0.5, application/rdf+xml;q=0.5",

@@ -1,0 +1,19 @@
+<http://dx.doi.org/10.1038/sdata.2016.18>
+        <http://prismstandard.org/namespaces/basic/2.1/doi> "10.1038/sdata.2016.18" ;
+        <http://purl.org/dc/terms/creator>
+                <https://id.crossref.org/contributor/mark-d-wilkinson-22ytiarjfr4yd> ,
+                <https://id.crossref.org/contributor/michel-dumontier-22ytiarjfr4yd> ;
+        <http://purl.org/dc/terms/date> "2016-03-15"^^<http://www.w3.org/2001/XMLSchema#date> ;
+        <http://purl.org/dc/terms/identifier> "10.1038/sdata.2016.18" ;
+        <http://purl.org/dc/terms/publisher> "Springer Science and Business Media LLC" ;
+        <http://purl.org/dc/terms/title>
+                "The FAIR Guiding Principles for scientific data management and stewardship" ;
+        <http://purl.org/ontology/bibo/doi> "10.1038/sdata.2016.18" .
+
+<https://id.crossref.org/contributor/mark-d-wilkinson-22ytiarjfr4yd>
+        a <http://xmlns.com/foaf/0.1/Person> ;
+        <http://xmlns.com/foaf/0.1/name> "Mark D. Wilkinson" .
+
+<https://id.crossref.org/contributor/michel-dumontier-22ytiarjfr4yd>
+        a <http://xmlns.com/foaf/0.1/Person> ;
+        <http://xmlns.com/foaf/0.1/name> "Michel Dumontier" .

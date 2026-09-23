@@ -3,7 +3,7 @@
 #' Harvest DataCite metadata via content negotiation and merge it.
 #' @noRd
 collect_datacite <- function(ctx, timeout = 15) {
-  if (!isTRUE(ctx$use_datacite)) return(invisible())
+  if (!isTRUE(ctx$use_datacite) || !datacite_possible(ctx)) return(invisible())
   pid_url <- ctx$pid_url
   if (!is_nonempty_string(pid_url)) return(invisible())
 
@@ -29,6 +29,15 @@ collect_datacite <- function(ctx, timeout = 15) {
                   paste(names(md), collapse = ", ")))
   }
   invisible()
+}
+
+#' Could the PID have a DataCite record? FALSE only for DOIs whose
+#' registration agency is known to be another one (Crossref, mEDRA, ...), which
+#' saves the DataCite JSON and XML requests that would get 406 anyway.
+#' @noRd
+datacite_possible <- function(ctx) {
+  ra <- ctx$doi_ra %||% NA_character_
+  is.na(ra) || identical(ra, "DataCite")
 }
 
 #' Harvest a user-supplied metadata service endpoint or metadata document.
@@ -70,8 +79,8 @@ collect_metadata_service <- function(ctx, timeout = 15) {
 #' Run all metadata collectors over the engine state.
 #'
 #' Collectors run in F-UJI's priority order; later collectors only fill gaps via
-#' `merge_metadata()`. Wires DataCite, landing-page HTML, signposting, XML, RDF,
-#' GitHub, and the data-file probe.
+#' `merge_metadata()`. Wires DataCite, CSL JSON (other DOI agencies),
+#' landing-page HTML, signposting, XML, RDF, GitHub, and the data-file probe.
 #' @noRd
 harvest_all_metadata <- function(ctx, timeout = 15) {
   # isolate each collector: a malformed response from one source must not abort
@@ -89,7 +98,10 @@ harvest_all_metadata <- function(ctx, timeout = 15) {
     run("signposting", collect_signposting(ctx))
   }
   run("metadata_service", collect_metadata_service(ctx, timeout = timeout))
+  ctx$doi_ra <- tryCatch(doi_registration_agency(ctx, timeout = timeout),
+                         error = function(e) NA_character_)
   run("datacite", collect_datacite(ctx, timeout = timeout))
+  run("csl", collect_csl(ctx, timeout = timeout))
   run("xml", collect_xml(ctx, timeout = timeout))
   run("rdf", collect_rdf(ctx, timeout = timeout))
   run("github", collect_github(ctx, timeout = timeout))

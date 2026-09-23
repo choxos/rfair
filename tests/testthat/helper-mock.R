@@ -22,10 +22,12 @@ json_route <- function(url, body, ...) {
 local_http <- function(routes, env = parent.frame()) {
   seen <- new.env(parent = emptyenv())
   seen$urls <- character(0)
+  seen$accepts <- character(0)
   httr2::local_mocked_responses(function(req) {
     method <- httr2::req_get_method(req)
     accept <- httr2::req_get_headers(req)$Accept %||% ""
     seen$urls <- c(seen$urls, paste(method, req$url))
+    seen$accepts <- c(seen$accepts, accept)
     for (r in routes) {
       if (identical(r$url, req$url) && identical(r$method, method) &&
           (is.null(r$accept) || grepl(r$accept, accept, fixed = TRUE))) {
@@ -87,5 +89,17 @@ github_routes <- function(owner = "example", name = "tool") {
     route(paste0(raw, "CITATION.cff"), "cff-version: 1.2.0\nversion: 1.2.0\ndoi: 10.5281/zenodo.1234567\n",
           type = "text/plain"),
     route(paste0(raw, "README.md"), "# tool\n", type = "text/plain")
+  )
+}
+
+# Canned responses for the Crossref DOI 10.1038/sdata.2016.18.
+crossref_routes <- function() {
+  doi <- "https://doi.org/10.1038/sdata.2016.18"
+  list(
+    route(doi, "<html><head><title>FAIR principles</title></head></html>",
+          accept = "text/html", final_url = "https://www.nature.com/articles/sdata201618"),
+    route(doi, fixture_text("crossref-csl.json"), accept = "application/vnd.citationstyles.csl+json",
+          type = "application/vnd.citationstyles.csl+json"),
+    json_route("https://doi.org/ra/10.1038", '[{"DOI": "10.1038", "RA": "Crossref"}]')
   )
 }

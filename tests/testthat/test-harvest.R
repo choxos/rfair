@@ -85,3 +85,47 @@ test_that("github_token prefers GITHUB_PAT over GITHUB_TOKEN", {
   withr::local_envvar(GITHUB_PAT = "")
   expect_identical(github_token(), "tok")
 })
+
+test_that("a Crossref DOI is harvested through CSL JSON, without DataCite requests", {
+  seen <- local_http(crossref_routes())
+  a <- assess_fair("https://doi.org/10.1038/sdata.2016.18")
+
+  expect_identical(a$metadata$title,
+                   "The FAIR Guiding Principles for scientific data management and stewardship")
+  expect_true(length(a$metadata$creator) >= 3L)
+  expect_identical(as_chr(a$metadata$license)[1], "https://creativecommons.org/licenses/by/4.0")
+  urls <- vapply(a$metadata$object_content_identifier, function(x) x$url, "")
+  expect_true("https://www.nature.com/articles/sdata201618.pdf" %in% urls)
+  expect_false(any(grepl("datacite", seen$accepts, fixed = TRUE)))
+
+  expect_equal(metric_row(a, "FsF-R1.1-01M")$status, "pass")
+  # FsF-F4-01M-2 is specific to DataCite registration; CSL does not satisfy it
+  f4 <- a$results[[which(vapply(a$results, `[[`, "", "metric_identifier") == "FsF-F4-01M")]]
+  expect_false(any(vapply(f4$metric_tests, function(t)
+    grepl("-2$", t$metric_test_identifier) && identical(t$metric_test_status, "pass"), logical(1))))
+})
+
+test_that("map_csl maps dates, authors, relations, and skips similarity-check links", {
+  md <- map_csl(list(
+    DOI = "10.1/x", title = "T", type = "dataset",
+    author = list(list(given = "Ada", family = "Lovelace"), list(literal = "Consortium")),
+    issued = list(`date-parts` = list(list(2020, 1))),
+    link = list(list(URL = "https://x/sc.pdf", `intended-application` = "similarity-checking")),
+    relation = list(`is-supplement-to` = list(list(`id-type` = "doi", id = "10.2/y")))))
+  expect_identical(md$publication_date, "2020-01")
+  expect_identical(unlist(md$creator), c("Ada Lovelace", "Consortium"))
+  expect_null(md$object_content_identifier)
+  expect_identical(md$related_resources[[1]]$related_resource, "https://doi.org/10.2/y")
+})
+
+test_that("Turtle metadata is mapped from the RDF graph, with creator names", {
+  skip_if_not_installed("rdflib")
+  local_http(list())
+  ctx <- new_engine_ctx("x", load_metrics("0.8"))
+  ok <- collect_rdf_graph(ctx, fixture_text("crossref.ttl"), "text/turtle", "https://doi.org/10.1038/sdata.2016.18")
+  expect_true(ok)
+  md <- ctx$metadata_merged
+  expect_identical(md$title, "The FAIR Guiding Principles for scientific data management and stewardship")
+  expect_setequal(unlist(md$creator), c("Mark D. Wilkinson", "Michel Dumontier"))
+  expect_true("http://purl.org/ontology/bibo/" %in% unlist(ctx$metadata_unmerged[[1]]$namespaces))
+})
