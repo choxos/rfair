@@ -31,21 +31,33 @@ Point at a different reference with `FUJI_ENDPOINT`, and supply
 
 It prints per-metric earned-score agreement and an overall fidelity %.
 
-## Result (historical / manual, not reproduced by CI)
+## Scheduled runs
 
-Measured **manually on 2026-06-16** against a locally-run F-UJI 4.0.0 (metrics
-v0.8). This is *not* reproduced by CI (no reference server runs in CI), so treat
-it as a historical measurement: reproduce it by following steps 1-2 above with a
-live F-UJI at `localhost:1071`.
+`.github/workflows/conformance.yaml` runs this harness monthly (and on demand)
+against the F-UJI Docker image, and uploads the per-metric comparison
+(`conformance-v0.8.csv`) and the image digest as a workflow artifact. Set
+`CONFORMANCE_OUT` to write the same CSV locally.
 
-| identifier | exact per-metric agreement |
+## Results
+
+Measured on 2026-09-22 against a locally run F-UJI 4.0.0 (metrics v0.8), five
+fixture DOIs, 85 metric comparisons (earned-score match):
+
+| rfair | agreement |
 |---|---|
-| Zenodo `10.5281/zenodo.8347772` | **16/17 = 94.1%** |
-| PANGAEA + Dryad (2 DOIs) | 29/34 = 85.3% |
+| 0.1.0 (`main`) | 91.8% |
+| 0.2.0 | 95.3% |
 
-The only consistent divergence is **FsF-R1.3-02D** (data file format), which
-depends on deeper data-file harvesting (F-UJI uses Tika content detection;
-rfair uses HTTP HEAD content-type). This met the ≥85% Phase 1 gate at that time.
+The remaining differences:
+
+* **FsF-R1.3-02D** (data file format; Zenodo, PANGAEA): F-UJI downloads the
+  files and detects their format with Apache Tika; rfair reads the declared
+  and served content types.
+* **FsF-I2-01M** (semantic vocabularies; PANGAEA, Dryad): F-UJI checks the
+  namespaces against its full linked-vocabulary corpus.
+
+An earlier manual run (2026-06-16, F-UJI 4.0.0) measured 94.1% on the Zenodo
+DOI alone and 85.3% over PANGAEA and Dryad.
 
 The R↔TS parity harness (`parity.R`) compares the R engine against the
 TypeScript engine, which lives on the separate **`webapp` branch**. Materialize

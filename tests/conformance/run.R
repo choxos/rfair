@@ -8,6 +8,10 @@
 # Configure the reference server via environment variables:
 #   FUJI_ENDPOINT  (default http://localhost:1071/fuji/api/v1/evaluate)
 #   FUJI_USER, FUJI_PASS  (HTTP basic auth, if the instance requires it)
+#   FUJI_METRIC_VERSION   (default 0.8; sent to F-UJI and used by rfair)
+#   CONFORMANCE_OUT       (optional CSV path for the per-metric comparison)
+# The scheduled workflow .github/workflows/conformance.yaml runs this against
+# the F-UJI Docker image.
 # Start a local, version-matched reference first (see tests/conformance/README.md).
 #
 # Usage:
@@ -18,11 +22,13 @@ suppressMessages(devtools::load_all(quiet = TRUE))
 
 endpoint <- Sys.getenv("FUJI_ENDPOINT", "http://localhost:1071/fuji/api/v1/evaluate")
 user <- Sys.getenv("FUJI_USER", ""); pass <- Sys.getenv("FUJI_PASS", "")
+metric_version <- Sys.getenv("FUJI_METRIC_VERSION", "0.8")
 
 #' Query a reference F-UJI server and return per-metric earned/total/status.
 fuji_reference <- function(id, timeout = 120) {
   body <- list(object_identifier = id, test_debug = FALSE, use_datacite = TRUE,
-               metadata_service_endpoint = "", use_github = FALSE)
+               metadata_service_endpoint = "", use_github = FALSE,
+               metric_version = paste0("metrics_v", metric_version))
   req <- httr2::request(endpoint) |>
     httr2::req_method("POST") |>
     httr2::req_body_json(body) |>
@@ -48,7 +54,7 @@ fuji_reference <- function(id, timeout = 120) {
 #' Compare rfair vs reference for one identifier.
 compare_one <- function(id) {
   message("- ", id)
-  rf <- as.data.frame(assess_fair(id, timeout = 60))[
+  rf <- as.data.frame(assess_fair(id, metric_version = metric_version, timeout = 60))[
     , c("metric_identifier", "earned", "total", "status")]
   ref <- fuji_reference(id)
   if (is.null(ref)) return(NULL)
@@ -70,3 +76,9 @@ cat("\n==== per-metric earned-score agreement ====\n")
 print(by_metric, row.names = FALSE)
 cat(sprintf("\nOverall fidelity (earned-score match): %.1f%% over %d metric comparisons, %d identifiers\n",
             100 * fidelity, nrow(all), length(unique(all$id))))
+out <- Sys.getenv("CONFORMANCE_OUT", "")
+if (nzchar(out)) {
+  all$metric_version <- metric_version
+  all$rfair_version <- as.character(utils::packageVersion("rfair"))
+  utils::write.csv(all, out, row.names = FALSE)
+}
