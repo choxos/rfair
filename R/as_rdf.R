@@ -7,7 +7,11 @@ build_dqv <- function(x) {
   fair <- s[s$category == "FAIR", ]
   principle_uri <- "https://w3id.org/fair/principles/terms/"
   spec <- x$metric_specification %||% "https://doi.org/10.5281/zenodo.6461229"
-  target <- list("@id" = if (is_nonempty_string(x$resolved_url)) x$resolved_url else x$id)
+  # an absolute IRI for the assessed resource: a relative one (a bare DOI) is
+  # dropped by JSON-LD to RDF conversion
+  candidates <- c(x$resolved_url, id_parse(x$id)$identifier_url, x$id)
+  candidates <- candidates[!is.na(candidates) & grepl("^[A-Za-z][A-Za-z0-9+.-]*:", candidates)]
+  target <- if (length(candidates)) list("@id" = candidates[1])
   measurements <- lapply(seq_len(nrow(s)), function(i) {
     list(
       "@type" = "dqv:QualityMeasurement",
@@ -16,27 +20,27 @@ build_dqv <- function(x) {
     )
   })
   # one measurement per metric, identified within the metric specification
-  metric_measurements <- lapply(x$results, function(r) list(
+  metric_measurements <- lapply(x$results, function(r) compact(list(
     "@type" = "dqv:QualityMeasurement",
     "dqv:value" = r$score$percent %||% 0,
     "dqv:computedOn" = target,
     "dqv:isMeasurementOf" = list("@id" = paste0(spec, "#", r$metric_identifier),
                                  "@type" = "dqv:Metric",
-                                 "dc:title" = r$metric_name %||% r$metric_identifier)))
+                                 "dc:title" = r$metric_name %||% r$metric_identifier))))
 
   # one FAIR Test Result (OSTrails FTR vocabulary 1.3.0) per metric test
   advice <- recommendation_table()
   test_results <- unname(unlist(lapply(x$results, function(r) {
     lapply(r$metric_tests %||% list(), function(t) {
       passed <- identical(t$metric_test_status, "pass")
-      out <- list(
+      out <- compact(list(
         "@type" = "ftr:TestResult",
         "dc:identifier" = t$metric_test_identifier,
         "dc:title" = t$metric_test_name %||% t$metric_test_identifier,
         "prov:value" = if (passed) "pass" else "fail",
         "ftr:completion" = if (passed) 1 else 0,
         "ftr:outputFromTest" = list("@id" = paste0(spec, "#", t$metric_test_identifier)),
-        "ftr:assessmentTarget" = target)
+        "ftr:assessmentTarget" = target))
       if (length(t$evidence)) out[["ftr:log"]] <- paste(as_chr(t$evidence), collapse = "; ")
       tip <- advice[[t$metric_test_identifier]]
       if (!passed && is_nonempty_string(tip)) {

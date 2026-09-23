@@ -94,3 +94,10 @@ test_that("as_rdf turtle output parses and carries FTR test results", {
   expect_match(ttl, "https://w3id.org/ftr#TestResult", fixed = TRUE)
   expect_match(ttl, "https://w3id.org/ftr#completion", fixed = TRUE)
 })
+
+test_that("as_rdf uses an absolute IRI for an unresolved bare DOI", {
+  a <- assess_fair("10.5281/zenodo.8347772", resolve = FALSE)
+  o <- jsonlite::fromJSON(as_rdf(a), simplifyVector = FALSE)
+  first <- o[["prov:wasDerivedFrom"]][["prov:hadMember"]][[1]]
+  expect_identical(first[["ftr:assessmentTarget"]][["@id"]], "https://doi.org/10.5281/zenodo.8347772")
+})

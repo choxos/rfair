@@ -59,7 +59,9 @@ comparisons) rose from 91.8% to 97.6%; see `tests/conformance/README.md`.
 * When no data links were found, the file list is read from the repository
   API: Zenodo, figshare, Dataverse, and Dryad.
 * schema.org metadata embedded as microdata or RDFa is harvested, next to
-  JSON-LD, and counts as embedded metadata for FsF-F4-01M and FsF-I1-01M.
+  JSON-LD, and counts as embedded metadata for FsF-F4-01M and FsF-I1-01M. As
+  in F-UJI, only CreativeWork types count (not Organization or
+  BreadcrumbList).
 
 ## Software assessment
 
@@ -86,7 +88,8 @@ comparisons) rose from 91.8% to 97.6%; see `tests/conformance/README.md`.
 ## Guidance
 
 * `fair_recommendations()` lists every failed test with one concrete action,
-  largest score gain first. The Shiny app shows it in a "How to improve" tab.
+  largest score gain first (the gain allows for each metric's cap). The Shiny
+  app shows it in a "How to improve" tab.
 * `fair_compare()` reports per-metric or per-test changes between two
   assessments.
 
@@ -114,10 +117,12 @@ comparisons) rose from 91.8% to 97.6%; see `tests/conformance/README.md`.
 
 * `options(rfair.block_private_hosts = TRUE)` refuses non-http(s) URLs and
   hosts that resolve to loopback, private, link-local, or cloud metadata
-  addresses, and checks every redirect hop. The bundled Plumber API and Shiny
-  app turn it on, since both fetch visitor-supplied URLs. The host is resolved
-  once before connecting, so DNS rebinding between the check and the request
-  is not covered; put a public deployment behind a filtering proxy as well.
+  addresses. The request connects to the address that was checked (libcurl's
+  CURLOPT_RESOLVE), so DNS rebinding cannot swap it, and every redirect hop is
+  checked, with credentials dropped when a redirect leaves the host. The
+  bundled Plumber API and Shiny app turn it on, since both fetch
+  visitor-supplied URLs. Headless rendering (`use_headless`) runs in a browser
+  outside this guard.
 * The Plumber API refuses headless rendering unless the server sets
   `RFAIR_API_ALLOW_HEADLESS=true`.
 

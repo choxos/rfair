@@ -67,7 +67,8 @@ frsm_agreement <- function(assessments, ratings) {
   tests <- unique(m$test_identifier)
   rows <- lapply(tests, function(tid) {
     d <- m[m$test_identifier == tid, , drop = FALSE]
-    r <- ratings[ratings$test_identifier == tid, , drop = FALSE]
+    r <- ratings[ratings$test_identifier == tid & ratings$identifier %in% d$identifier, ,
+                 drop = FALSE]
     raters <- unique(r$rater)
     rater_kappa <- NA_real_
     if (length(raters) >= 2L) {

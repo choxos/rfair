@@ -22,7 +22,7 @@ recommendation_table <- function() {
 #' @param x A [fair_assessment] from [assess_fair()].
 #' @return A data frame, most valuable fixes first, with columns
 #'   `metric_identifier`, `test_identifier`, `test_name`, `points` (the score
-#'   the test would add), and `recommendation`.
+#'   passing the test would add, given the metric's cap), and `recommendation`.
 #' @seealso [fair_compare()] to check the effect of a fix.
 #' @export
 #' @examples
@@ -36,8 +36,13 @@ fair_recommendations <- function(x) {
   rows <- list()
   for (r in x$results) {
     metric_key <- canonical_metric_identifier(r$metric_identifier %||% "")
+    metric_earned <- as.numeric(r$score$earned %||% 0)
+    metric_total <- as.numeric(r$score$total %||% 0)
     for (t in r$metric_tests %||% list()) {
       if (identical(t$metric_test_status, "pass")) next
+      # the metric is capped at its total, so a test can add less than its score
+      test_total <- as.numeric(t$metric_test_score$total %||% 0)
+      gain <- max(0, min(metric_total, metric_earned + test_total) - metric_earned)
       test_key <- t$agnostic_test_identifier %||% t$metric_test_identifier
       advice <- tbl[[t$metric_test_identifier]] %||% tbl[[test_key]] %||%
         tbl[[metric_key %||% ""]] %||% NA_character_
@@ -45,7 +50,7 @@ fair_recommendations <- function(x) {
         metric_identifier = r$metric_identifier,
         test_identifier = t$metric_test_identifier,
         test_name = t$metric_test_name %||% NA_character_,
-        points = as.numeric(t$metric_test_score$total %||% NA_real_),
+        points = gain,
         recommendation = advice,
         stringsAsFactors = FALSE)
     }

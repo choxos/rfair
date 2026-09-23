@@ -162,14 +162,18 @@ html_item <- function(scope, rdfa = FALSE) {
 extract_html_items <- function(doc, rdfa = FALSE) {
   xpath <- if (rdfa) "//*[@typeof and not(@property)]" else "//*[@itemscope and not(@itemprop)]"
   scopes <- xml2::xml_find_all(doc, xpath)
-  items <- lapply(scopes, html_item, rdfa = rdfa)
-  # keep schema.org items; RDFa schema.org pages declare vocab or a schema: prefix
-  Filter(function(it) nzchar(it[["@type"]] %||% "") && length(it) > 1L, items[vapply(scopes, function(s) {
+  # RDFa schema.org pages declare a schema.org vocab or a schema: prefix
+  is_schema_org <- vapply(scopes, function(s) {
     type <- xml2::xml_attr(s, if (rdfa) "typeof" else "itemtype") %||% ""
     vocab <- xml2::xml_attr(xml2::xml_find_first(s, "ancestor-or-self::*[@vocab][1]"), "vocab")
     grepl("schema\\.org", type) || grepl("^schema:", type) ||
       (!is.na(vocab) && grepl("schema\\.org", vocab))
-  }, logical(1))])
+  }, logical(1))
+  items <- lapply(scopes[is_schema_org], html_item, rdfa = rdfa)
+  # keep CreativeWork types only; F-UJI ignores the others (Organization,
+  # BreadcrumbList, ...)
+  creative <- ref_data("schema_org_creativeworks")
+  Filter(function(it) tolower(it[["@type"]] %||% "") %in% creative && length(it) > 1L, items)
 }
 
 #' Parse landing HTML and merge schema.org + Dublin Core + OpenGraph + Highwire.

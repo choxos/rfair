@@ -39,3 +39,15 @@ test_that("fair_compare reports improvements per metric and per test", {
   expect_true(all(c("test_identifier", "status_a", "status_b") %in% names(tests)))
   expect_setequal(unique(fair_compare(a, a)$change), "same")
 })
+
+test_that("fair_recommendations counts only the gain left below the metric cap", {
+  data(fair_example, package = "rfair")
+  x <- fair_example
+  i <- which(vapply(x$results, function(r) length(r$metric_tests) > 1L, logical(1)))[1]
+  r <- x$results[[i]]
+  x$results[[i]]$score$earned <- r$score$total        # metric already at its cap
+  ids <- names(r$metric_tests)
+  x$results[[i]]$metric_tests[[ids[2]]]$metric_test_status <- "fail"
+  rec <- fair_recommendations(x)
+  expect_equal(rec$points[rec$test_identifier == ids[2]], 0)
+})

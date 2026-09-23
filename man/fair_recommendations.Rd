@@ -12,7 +12,7 @@ fair_recommendations(x)
 \value{
 A data frame, most valuable fixes first, with columns
 \code{metric_identifier}, \code{test_identifier}, \code{test_name}, \code{points} (the score
-the test would add), and \code{recommendation}.
+passing the test would add, given the metric's cap), and \code{recommendation}.
 }
 \description{
 Lists every metric test that did not pass, with one concrete action a data

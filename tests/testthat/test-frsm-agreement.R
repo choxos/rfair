@@ -34,3 +34,17 @@ test_that("cohen_kappa handles perfect, chance, and degenerate agreement", {
   expect_equal(cohen_kappa(c(TRUE, TRUE, FALSE, FALSE), c(TRUE, FALSE, TRUE, FALSE)), 0)
   expect_true(is.na(cohen_kappa(c(TRUE, TRUE), c(TRUE, TRUE))))
 })
+
+test_that("rater_kappa uses only ratings of assessed identifiers", {
+  local_http(github_routes())
+  a <- assess_fair("https://github.com/example/tool", metric_version = "0.7_software",
+                   use_datacite = FALSE)
+  ratings <- data.frame(
+    identifier = c(a$id, a$id, "https://github.com/other/repo", "https://github.com/other/repo"),
+    test_identifier = "FRSM-14-R1-1", rater = c("A", "B", "A", "B"),
+    passed = c(TRUE, TRUE, TRUE, FALSE))
+  out <- frsm_agreement(a, ratings)
+  expect_equal(out$n, 1L)
+  # with only the matched identifier, the raters agree and chance agreement is 1
+  expect_true(is.na(out$rater_kappa))
+})

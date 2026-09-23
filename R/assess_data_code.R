@@ -39,7 +39,15 @@ split_identifiers <- function(x, sep = " ; ") {
     base$is_persistent <- p$is_persistent %||% NA
   }
   if (!inherits(a, "fair_assessment")) {
-    if (inherits(a, "condition")) base$error <- conditionMessage(a)
+    # a forked worker that dies returns a "try-error" or NULL, not a condition;
+    # record it so a resumed run (previous =) assesses the identifier again
+    if (inherits(a, "condition")) {
+      base$error <- conditionMessage(a)
+    } else if (inherits(a, "try-error")) {
+      base$error <- trimws(as.character(a)[1])
+    } else if (isTRUE(nzchar(id))) {
+      base$error <- "assessment returned no result (worker failed)"
+    }
     return(base)
   }
   s <- summary(a)

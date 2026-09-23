@@ -50,3 +50,13 @@ test_that("microdata on a landing page counts as embedded, indexable metadata", 
   expect_equal(df$status[df$metric_identifier == "FsF-I1-01M"], "pass")
   expect_identical(a$metadata$title, "Ocean temperatures")
 })
+
+test_that("non-CreativeWork items (Organization, BreadcrumbList) are ignored", {
+  page <- '<html><body>
+  <div itemscope itemtype="https://schema.org/Organization"><span itemprop="name">Big Lab</span></div>
+  <ol itemscope itemtype="https://schema.org/BreadcrumbList"><li itemprop="name">Home</li></ol>
+  </body></html>'
+  expect_length(extract_html_items(xml2::read_html(page)), 0L)
+  items <- extract_html_items(xml2::read_html(microdata_page))
+  expect_identical(items[[1]][["@type"]], "Dataset")
+})

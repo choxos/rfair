@@ -85,3 +85,10 @@ test_that("max_time skips the remaining metadata sources and says so", {
   expect_match(a$harvest_errors[[1]]$message, "max_time")
   expect_null(a$metadata$title)
 })
+
+test_that("crashed parallel workers are recorded as errors, so a resume retries them", {
+  expect_match(.assessment_row("x", "0.8", structure("Error : killed", class = "try-error"))$error,
+               "killed")
+  expect_match(.assessment_row("x", "0.8", NULL)$error, "worker failed")
+  expect_true(is.na(.assessment_row("", "", NULL)$error))   # the column template stays clean
+})
