@@ -44,3 +44,44 @@ test_that("a landing page served as a binary file still counts as resolved", {
   expect_true(a$resolution$ok)
   expect_identical(a$resolved_url, "https://example.org/paper.pdf")
 })
+
+test_that("the guard pins the connection to the address it checked", {
+  withr::local_options(rfair.block_private_hosts = TRUE)
+  local_mocked_bindings(resolve_host = function(host) "93.184.215.14")
+  pinned <- NULL
+  httr2::local_mocked_responses(function(req) {
+    pinned <<- req$options$resolve
+    httr2::response(200L, url = req$url)
+  })
+  resp <- rfair_perform(rfair_request("https://example.org/x"))
+  expect_true(is_response(resp))
+  expect_identical(pinned, "example.org:443:93.184.215.14")
+
+  local_mocked_bindings(resolve_host = function(host) c("93.184.215.14", "127.0.0.1"))
+  expect_match(url_block_reason("https://rebind.example/"), "non-public address \\(127.0.0.1\\)")
+})
+
+test_that("guarded redirects drop credentials when they leave the host", {
+  withr::local_options(rfair.block_private_hosts = TRUE)
+  local_mocked_bindings(resolve_host = function(host) "93.184.215.14")
+  sent <- list()
+  httr2::local_mocked_responses(function(req) {
+    sent[[req$url]] <<- names(httr2::req_get_headers(req, "reveal"))
+    if (grepl("^https://a\\.example", req$url)) {
+      loc <- if (grepl("/first$", req$url)) "/second" else "https://b.example/final"
+      return(httr2::response(302L, url = req$url, headers = list(Location = loc)))
+    }
+    httr2::response(200L, url = req$url)
+  })
+  req <- httr2::req_auth_bearer_token(rfair_request("https://a.example/first"), "secret")
+  resp <- rfair_perform(req)
+  expect_true(is_response(resp))
+  expect_true("Authorization" %in% sent[["https://a.example/second"]])   # same host keeps it
+  expect_false("Authorization" %in% sent[["https://b.example/final"]])   # other host does not
+})
+
+test_that("body_text survives charsets iconv does not know", {
+  resp <- httr2::response(200L, headers = list(`Content-Type` = "text/html; charset=utf8mb4"),
+                          body = charToRaw("café"))
+  expect_identical(body_text(resp), "café")
+})

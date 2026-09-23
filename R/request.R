@@ -11,10 +11,11 @@
 # * `rfair.cache_dir` (default unset): directory for an HTTP cache
 #   (`httr2::req_cache()`); unset means no cache.
 # * `rfair.block_private_hosts` (default FALSE): refuse URLs whose host
-#   resolves to a loopback, private, or link-local address, and follow
-#   redirects manually so every hop is checked. Turn it on when rfair runs as a
-#   service that fetches user-supplied URLs (the bundled Plumber API and Shiny
-#   app do).
+#   resolves to a loopback, private, or link-local address, connect to the
+#   address that was checked (so DNS rebinding cannot swap it), and follow
+#   redirects manually so every hop is checked, dropping credentials when a
+#   redirect leaves the host. Turn it on when rfair runs as a service that
+#   fetches user-supplied URLs (the bundled Plumber API and Shiny app do).
 
 RFAIR_USER_AGENT <- "F-UJI (rfair R package; https://github.com/choxos/rfair)"
 
@@ -62,8 +63,10 @@ rfair_perform <- function(req, ctx = NULL, source = "http", headers_only = FALSE
   if (guard) req <- httr2::req_options(req, followlocation = 0L)
   for (hop in 0:10) {
     if (guard) {
-      why <- url_block_reason(url)
-      if (!is.na(why)) return(fail(url, why))
+      chk <- url_check(url)
+      if (!is.na(chk$reason)) return(fail(url, chk$reason))
+      # connect to the vetted address, not a second DNS answer
+      if (!is.null(chk$pin)) req <- httr2::req_options(req, resolve = chk$pin)
     }
     resp <- tryCatch({
       if (headers_only) {
@@ -81,7 +84,12 @@ rfair_perform <- function(req, ctx = NULL, source = "http", headers_only = FALSE
         !is_nonempty_string(loc)) {
       return(resp)
     }
-    url <- xml2::url_absolute(loc, url)
+    next_url <- xml2::url_absolute(loc, url)
+    if (!identical(url_host(next_url), url_host(url))) {
+      # libcurl would not send credentials to another host; neither do we
+      req <- httr2::req_headers(req, Authorization = NULL, `PRIVATE-TOKEN` = NULL)
+    }
+    url <- next_url
     req <- httr2::req_url(req, url)
   }
   fail(url, "too many redirects")
@@ -90,21 +98,51 @@ rfair_perform <- function(req, ctx = NULL, source = "http", headers_only = FALSE
 #' @noRd
 is_response <- function(x) inherits(x, "httr2_response")
 
-#' Why a URL is refused under `rfair.block_private_hosts`, or NA if allowed.
+#' Lowercased host of a URL ("" if it has none).
 #' @noRd
-url_block_reason <- function(url) {
+url_host <- function(url) {
+  tolower(tryCatch(httr2::url_parse(url)$hostname, error = function(e) NULL) %||% "")
+}
+
+#' All addresses a host name resolves to.
+#' @noRd
+resolve_host <- function(host) {
+  tryCatch(curl::nslookup(host, multiple = TRUE), error = function(e) character(0))
+}
+
+#' Check a URL under `rfair.block_private_hosts`.
+#'
+#' @return A list with `reason` (why the URL is refused, or NA) and `pin` (a
+#'   `host:port:address` entry for libcurl's CURLOPT_RESOLVE, so the request
+#'   connects to the address that was checked; NULL for IP literals).
+#' @noRd
+url_check <- function(url) {
+  refuse <- function(why) list(reason = why, pin = NULL)
   parts <- tryCatch(httr2::url_parse(url), error = function(e) NULL)
-  if (is.null(parts) || !(tolower(parts$scheme %||% "") %in% c("http", "https"))) {
-    return("only http and https URLs are allowed")
+  scheme <- tolower(parts$scheme %||% "")
+  if (is.null(parts) || !(scheme %in% c("http", "https"))) {
+    return(refuse("only http and https URLs are allowed"))
   }
   host <- parts$hostname %||% ""
-  ips <- if (is_ip_literal(host)) host else
-    tryCatch(curl::nslookup(host, multiple = TRUE), error = function(e) character(0))
-  if (!length(ips)) return(sprintf("host '%s' does not resolve", host))
+  literal <- is_ip_literal(host)
+  ips <- if (literal) host else resolve_host(host)
+  if (!length(ips)) return(refuse(sprintf("host '%s' does not resolve", host)))
   bad <- ips[is_private_ip(ips)]
-  if (length(bad)) return(sprintf("host '%s' resolves to a non-public address (%s)", host, bad[1]))
-  NA_character_
+  if (length(bad)) {
+    return(refuse(sprintf("host '%s' resolves to a non-public address (%s)", host, bad[1])))
+  }
+  pin <- NULL
+  if (!literal) {
+    port <- parts$port %||% if (identical(scheme, "https")) 443L else 80L
+    ip <- if (grepl(":", ips[1], fixed = TRUE)) paste0("[", ips[1], "]") else ips[1]
+    pin <- sprintf("%s:%s:%s", host, port, ip)
+  }
+  list(reason = NA_character_, pin = pin)
 }
+
+#' Why a URL is refused under `rfair.block_private_hosts`, or NA if allowed.
+#' @noRd
+url_block_reason <- function(url) url_check(url)$reason
 
 #' @noRd
 is_ip_literal <- function(host) {
@@ -202,7 +240,9 @@ body_text <- function(resp, max_size = 5e6) {
   charset <- tolower(regmatches(ct %||% "", regexpr('(?<=charset=)"?[^;" ]+', ct %||% "", perl = TRUE)))
   charset <- gsub('"', "", charset)
   if (length(charset) && !charset %in% c("utf-8", "utf8")) {
-    conv <- iconv(txt, from = charset, to = "UTF-8", sub = "?")
+    # iconv() errors (not NA) on labels it does not know, such as "utf8mb4"
+    conv <- tryCatch(iconv(txt, from = charset, to = "UTF-8", sub = "?"),
+                     error = function(e) NA_character_)
     if (!is.na(conv)) return(enc2utf8(conv))
   }
   if (!validUTF8(txt)) txt <- iconv(txt, from = "latin1", to = "UTF-8", sub = "?")
