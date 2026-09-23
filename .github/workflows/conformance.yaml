@@ -23,6 +23,7 @@ jobs:
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
       FUJI_ENDPOINT: http://localhost:1071/fuji/api/v1/evaluate
+      # F-UJI's shipped demo account (fuji_server/config/users.py), not a secret
       FUJI_USER: marvel
       FUJI_PASS: wonderwoman
       FUJI_METRIC_VERSION: "0.8"
