@@ -46,15 +46,12 @@ fixture DOIs, 85 metric comparisons (earned-score match):
 | rfair | agreement |
 |---|---|
 | 0.1.0 (`main`) | 91.8% |
-| 0.2.0 | 95.3% |
+| 0.2.0 | 97.6% |
 
-The remaining differences:
-
-* **FsF-R1.3-02D** (data file format; Zenodo, PANGAEA): F-UJI downloads the
-  files and detects their format with Apache Tika; rfair reads the declared
-  and served content types.
-* **FsF-I2-01M** (semantic vocabularies; PANGAEA, Dryad): F-UJI checks the
-  namespaces against its full linked-vocabulary corpus.
+The one remaining difference is **FsF-R1.3-02D** (data file format) for the
+Zenodo and PANGAEA zip archives: F-UJI downloads the files and lists the
+formats inside archives with Apache Tika; rfair reads the declared and served
+content types and does not download data.
 
 An earlier manual run (2026-06-16, F-UJI 4.0.0) measured 94.1% on the Zenodo
 DOI alone and 85.3% over PANGAEA and Dryad.

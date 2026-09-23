@@ -71,6 +71,7 @@ collect_rdf_from_url <- function(ctx, url, jsonld = TRUE, timeout = 15) {
   if (grepl("json", ct)) {
     j <- tryCatch(jsonlite::fromJSON(resp$content, simplifyVector = FALSE), error = function(e) NULL)
     if (is.null(j)) return(invisible())
+    note_linked_uris(ctx, resp$content)
     nodes <- if (!is.null(names(j))) list(j) else j
     for (node in nodes) {
       md <- map_schemaorg(node)
@@ -104,6 +105,7 @@ collect_rdf_graph <- function(ctx, content, content_type, url) {
   }, error = function(e) NULL)
   if (is.null(triples) || !nrow(triples)) return(invisible(FALSE))
   triples <- as.data.frame(lapply(triples, as.character), stringsAsFactors = FALSE)
+  note_linked_uris(ctx, paste(triples$o, collapse = " "))
   md <- map_rdf_triples(triples)
   if (!length(md)) return(invisible(FALSE))
   merge_metadata(ctx, md, url = url, method = "rdf", format = "rdf",

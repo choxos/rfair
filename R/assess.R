@@ -39,6 +39,7 @@ new_engine_ctx <- function(id, metrics_meta, use_datacite = TRUE, test_debug = F
   ctx$log <- list()
   ctx$resolution <- NULL
   ctx$harvest_errors <- list()
+  ctx$linked_uris <- character(0)
   ctx
 }
 

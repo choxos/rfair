@@ -100,6 +100,7 @@ collect_csl <- function(ctx, timeout = 15) {
     return(invisible())
   }
   j <- tryCatch(jsonlite::fromJSON(resp$content, simplifyVector = FALSE), error = function(e) NULL)
+  note_linked_uris(ctx, resp$content)
   md <- map_csl(j)
   if (!length(md)) return(invisible())
   merge_metadata(ctx, md, url = resp$redirect_url, method = "csl", format = "csl_json",

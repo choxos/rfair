@@ -133,6 +133,7 @@ collect_html_meta <- function(ctx) {
     txt <- rvest::html_text(s)
     j <- tryCatch(jsonlite::fromJSON(txt, simplifyVector = FALSE), error = function(e) NULL)
     if (is.null(j)) next
+    note_linked_uris(ctx, txt)
     docs <- if (!is.null(names(j))) list(j) else j  # array of objects or single
     for (node in docs) {
       md <- map_schemaorg(node)

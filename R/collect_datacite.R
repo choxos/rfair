@@ -16,6 +16,7 @@ collect_datacite <- function(ctx, timeout = 15) {
   j <- tryCatch(jsonlite::fromJSON(resp$content, simplifyVector = FALSE),
                 error = function(e) NULL)
   if (is.null(j)) return(invisible())
+  note_linked_uris(ctx, resp$content)
 
   md <- map_datacite(j)
   if (length(md)) {

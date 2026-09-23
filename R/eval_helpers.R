@@ -75,6 +75,15 @@ has_offering_method <- function(ctx, method) {
 #' @noRd
 looks_like_pid <- function(x) is_nonempty_string(x) && !is.na(id_parse(x)$preferred_schema)
 
+#' Remember the URIs that appear in a raw metadata document (for FsF-I2-01M).
+#' @noRd
+note_linked_uris <- function(ctx, text) {
+  if (!is_nonempty_string(text)) return(invisible())
+  uris <- regmatches(text, gregexpr("https?://[^\\s\"'<>\\\\)]+", text, perl = TRUE))[[1]]
+  if (length(uris)) ctx$linked_uris <- unique(c(ctx$linked_uris, uris))
+  invisible()
+}
+
 #' Vocabulary / schema namespace URIs encountered while harvesting.
 #' @noRd
 ctx_namespace_uris <- function(ctx) {

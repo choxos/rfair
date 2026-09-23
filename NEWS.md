@@ -4,7 +4,7 @@ Scores can differ from rfair 0.1.0: several fixes below change what counts as
 evidence, and new metadata sources find evidence that was missed before. Rerun
 assessments before comparing them with 0.1.0 results. Agreement with the
 reference F-UJI 4.0.0 service (metrics v0.8, five fixture DOIs, 85 metric
-comparisons) rose from 91.8% to 95.3%; see `tests/conformance/README.md`.
+comparisons) rose from 91.8% to 97.6%; see `tests/conformance/README.md`.
 
 ## Scoring fixes
 
@@ -39,6 +39,13 @@ comparisons) rose from 91.8% to 95.3%; see `tests/conformance/README.md`.
 * `license_reuse()` recognizes the OGL, Etalab, CDLA, DL-DE, and NLOD open data
   licenses, and classes MPL as copyleft.
 * Link headers split only between links, so URLs containing commas survive.
+* FsF-I2-01M (semantic vocabularies) checks namespaces against F-UJI's full
+  linked-vocabulary index (5,160 registered namespaces from LOV, BioPortal,
+  Bioregistry, SeaDataNet, and others) instead of a curated list of 20, and
+  also counts vocabulary terms used as metadata values (for example an SPDX
+  license URL), as F-UJI does. XML metadata keeps its declared namespaces.
+* Assessments record the version of the bundled reference data in
+  `reference_data`.
 
 ## New metadata sources
 

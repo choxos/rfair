@@ -14,8 +14,9 @@
 #' resolution attempt: `url`, `final_url`, HTTP `status`, `ok`, `error`), and
 #' `harvest_errors` (metadata sources that failed, for example a GitHub rate
 #' limit), and `software` (the repository signals the FRSM software metrics
-#' score, when a code repository was harvested). `resolved_url` is `NA` when the
-#' identifier did not resolve.
+#' score, when a code repository was harvested), and `reference_data` (when and
+#' from which F-UJI release the bundled reference tables were built).
+#' `resolved_url` is `NA` when the identifier did not resolve.
 #'
 #' @name fair_assessment
 #' @seealso [assess_fair()]
@@ -35,6 +36,7 @@ new_fair_assessment <- function(id, request, results, summary, resolved_url,
       resolved_url = resolved_url,
       request = request,
       software_version = as.character(utils::packageVersion("rfair")),
+      reference_data = rfuji_data$reference_data,
       metric_version = metrics_meta$version,
       metric_specification = metrics_meta$metric_specification,
       start_timestamp = start_time,

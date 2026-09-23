@@ -54,3 +54,25 @@ test_that("F4 requires an embedded offering method (not content negotiation)", {
   eval_searchable(ctx, res2)
   expect_equal(finalize_result(res2)$score$earned, 2)
 })
+
+test_that("I2-01M matches declared namespaces and term URIs against the vocabulary index", {
+  expect_identical(lod_namespace_of("http://www.isotc211.org/2005/gmd"), "isotc211.org/2005/gmd")
+  expect_identical(lod_namespace_of("http://www.w3.org/2004/02/skos/core#"), "w3.org/2004/02/skos/core")
+  # a URI used as a value must name a term inside the namespace
+  expect_identical(lod_namespace_of("https://spdx.org/licenses/CC0-1.0.html", term = TRUE), "spdx.org/licenses")
+  expect_true(is.na(lod_namespace_of("https://spdx.org/licenses/", term = TRUE)))
+  expect_true(is.na(lod_namespace_of("https://orcid.org/0000-0001-6829-0823", term = TRUE)))
+
+  ctx <- new_engine_ctx("x", load_metrics("0.8"))
+  note_linked_uris(ctx, '{"license": "https://spdx.org/licenses/CC0-1.0.html"}')
+  res <- new_metric_evaluation(Find(function(m) m$metric_identifier == "FsF-I2-01M",
+                                    load_metrics("0.8")$metrics))
+  eval_semantic_vocabulary(ctx, res)
+  expect_equal(finalize_result(res)$score$earned, 2)
+})
+
+test_that("assessments record the reference data version", {
+  data(fair_example, package = "rfair")
+  a <- assess_fair("https://doi.org/10.5281/zenodo.8347772", resolve = FALSE)
+  expect_true(all(c("core_tables_built", "linked_vocabs_built") %in% names(a$reference_data)))
+})

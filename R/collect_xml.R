@@ -124,6 +124,8 @@ map_iso_xml <- function(root) {
 collect_xml_doc <- function(ctx, content, url, mimetype = "application/xml") {
   doc <- tryCatch(xml2::read_xml(content), error = function(e) NULL)
   if (is.null(doc)) return(invisible(FALSE))
+  note_linked_uris(ctx, content)
+  declared_ns <- unique(unname(as.character(xml2::xml_ns(doc))))
   xml2::xml_ns_strip(doc)
   resource <- xml2::xml_find_first(doc, "//resource")
   found_node <- function(name) xml2::xml_find_first(doc, sprintf("//*[local-name()='%s']", name))
@@ -146,7 +148,7 @@ collect_xml_doc <- function(ctx, content, url, mimetype = "application/xml") {
   }
   if (!length(md)) return(invisible(FALSE))
   merge_metadata(ctx, md, url = url, method = src, format = "xml",
-                 mimetype = mimetype, schema = schema)
+                 mimetype = mimetype, schema = schema, namespaces = declared_ns)
   ctx$metadata_sources[[length(ctx$metadata_sources) + 1L]] <- list(source = src, method = "content_negotiation")
   ctx_log(ctx, "FsF-I1-01M", "info", paste("Harvested", src, "metadata"))
   invisible(TRUE)
