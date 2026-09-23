@@ -175,6 +175,7 @@ server <- function(input, output, session) {
       ),
       navset_card_tab(
         nav_panel("Metrics", DT::DTOutput("metrics")),
+        nav_panel("How to improve", DT::DTOutput("fixes")),
         nav_panel("Reuse & access", uiOutput("reuse")),
         nav_panel("Harvested metadata", DT::DTOutput("harvested")),
         nav_panel("Log", verbatimTextOutput("log"))
@@ -248,6 +249,13 @@ server <- function(input, output, session) {
                        "FAIR+ extension (Haendel et al., doi:10.5281/zenodo.203295)."))
         }))
     )
+  })
+
+  output$fixes <- DT::renderDT({
+    rec <- fair_recommendations(assessment())
+    DT::datatable(rec[c("test_identifier", "points", "recommendation")],
+                  rownames = FALSE, colnames = c("Test", "Points", "What to do"),
+                  options = list(pageLength = 15, dom = "tp"))
   })
 
   output$harvested <- DT::renderDT({
