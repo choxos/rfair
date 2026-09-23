@@ -91,10 +91,10 @@ test_that("guarded redirects drop credentials on a downgrade to plain HTTP", {
     }
     httr2::response(200L, url = req$url)
   })
-  req <- httr2::req_headers(rfair_request("https://a.example/x"), `PRIVATE-TOKEN` = "secret")
+  req <- httr2::req_auth_bearer_token(rfair_request("https://a.example/x"), "secret")
   expect_true(is_response(rfair_perform(req)))
-  expect_true("PRIVATE-TOKEN" %in% sent[["https://a.example/x"]])
-  expect_false("PRIVATE-TOKEN" %in% sent[["http://a.example/x"]])
+  expect_true("Authorization" %in% sent[["https://a.example/x"]])
+  expect_false("Authorization" %in% sent[["http://a.example/x"]])
   expect_false(identical(url_origin("https://a.example/x"), url_origin("http://a.example/x")))
   expect_identical(url_origin("https://A.example/x"), url_origin("https://a.example:443/y"))
 })

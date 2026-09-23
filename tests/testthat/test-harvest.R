@@ -205,3 +205,17 @@ test_that("schema.org isAccessibleForFree is read as an access statement", {
   expect_identical(access_statements(md), "https://schema.org/isAccessibleForFree#public")
   expect_identical(map_access_right(access_statements(md)), "public")
 })
+
+test_that("GitLab tokens travel as a Bearer Authorization header, not PRIVATE-TOKEN", {
+  withr::local_options(rfair.block_private_hosts = FALSE)
+  withr::local_envvar(GITLAB_PAT = "glpat-secret")
+  seen <- NULL
+  httr2::local_mocked_responses(function(req) {
+    seen <<- httr2::req_get_headers(req, "reveal")
+    httr2::response(200L, url = req$url, headers = list(`Content-Type` = "application/json"),
+                    body = charToRaw("{}"))
+  })
+  api_json("https://gitlab.com/api/v4/projects/1", "gitlab")
+  expect_identical(seen$Authorization, "Bearer glpat-secret")
+  expect_null(seen[["PRIVATE-TOKEN"]])
+})

@@ -88,7 +88,7 @@ rfair_perform <- function(req, ctx = NULL, source = "http", headers_only = FALSE
     next_url <- xml2::url_absolute(loc, url)
     if (!identical(url_origin(next_url), url_origin(url))) {
       # like libcurl, send credentials only to the same scheme, host, and port
-      req <- httr2::req_headers(req, Authorization = NULL, `PRIVATE-TOKEN` = NULL)
+      req <- httr2::req_headers(req, Authorization = NULL)
     }
     url <- next_url
     req <- httr2::req_url(req, url)

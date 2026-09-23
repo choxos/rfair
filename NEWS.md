@@ -68,7 +68,8 @@ comparisons) rose from 91.8% to 97.6%; see `tests/conformance/README.md`.
 * Code repositories on GitLab (API v4, nested groups) and Codeberg or any
   Forgejo/Gitea instance (API v1) are harvested, next to GitHub. Tokens are
   read from `GITHUB_PAT` (then `GITHUB_TOKEN`), `GITLAB_PAT`, and
-  `CODEBERG_TOKEN`.
+  `CODEBERG_TOKEN`, and sent as a Bearer `Authorization` header, which libcurl
+  does not forward when a redirect leaves the host.
 * Under the software metrics, a DOI whose metadata links a repository (for
   example Zenodo's `IsSupplementTo` link to GitHub) is bridged to it: the
   repository supplies the software signals and the DOI counts as the registry

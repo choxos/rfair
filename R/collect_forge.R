@@ -85,10 +85,10 @@ api_json <- function(url, forge, ctx = NULL, timeout = 15) {
                        user_agent = "rfair R package", retry = FALSE)
   if (identical(forge, "github")) req <- httr2::req_headers(req, `X-GitHub-Api-Version` = "2022-11-28")
   token <- forge_token(forge)
-  if (nzchar(token)) {
-    req <- if (identical(forge, "gitlab")) httr2::req_headers(req, `PRIVATE-TOKEN` = token)
-           else httr2::req_auth_bearer_token(req, token)
-  }
+  # every forge accepts a Bearer token; libcurl keeps Authorization from
+  # following a redirect to another host, which it does not do for GitLab's
+  # custom PRIVATE-TOKEN header
+  if (nzchar(token)) req <- httr2::req_auth_bearer_token(req, token)
   resp <- rfair_perform(req, ctx = ctx, source = forge)
   if (!is_response(resp)) return(NULL)
   status <- httr2::resp_status(resp)
