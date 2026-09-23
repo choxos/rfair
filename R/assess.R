@@ -67,6 +67,11 @@ run_evaluators <- function(ctx, metrics_meta) {
       })
     }
     results[[i]] <- finalize_result(res)
+    # FRSM scores come from repository signals that are not yet validated
+    # against expert ratings (see frsm_agreement())
+    if (startsWith(results[[i]]$metric_identifier %||% "", "FRSM")) {
+      results[[i]]$evidence_type <- "heuristic"
+    }
   }
   ord <- order(vapply(results, function(r) r$id %||% NA_integer_, integer(1)), na.last = TRUE)
   results[ord]

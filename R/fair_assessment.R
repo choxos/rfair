@@ -153,6 +153,9 @@ format.fair_assessment <- function(x, ...) {
     lines <- c(lines, sprintf("  access:   %s (%s)  [restricted access may be legitimate; not a FAIR failure]",
                               x$access$access, paste(tags, collapse = ", ")))
   }
+  if (any(vapply(x$results, function(r) identical(r$evidence_type, "heuristic"), logical(1)))) {
+    lines <- c(lines, "  note:     FRSM scores are heuristic (repository signals); see ?frsm_agreement")
+  }
   if (length(x$harvest_errors)) {
     lines <- c(lines, sprintf("  harvest:  %d source(s) failed (see $harvest_errors)",
                               length(x$harvest_errors)))

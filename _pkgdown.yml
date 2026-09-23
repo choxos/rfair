@@ -30,6 +30,9 @@ reference:
     contents:
       - fair_recommendations
       - fair_compare
+  - title: Validating the software metrics
+    contents:
+      - frsm_agreement
   - title: Assessment object
     contents:
       - fair_assessment

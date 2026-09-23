@@ -75,6 +75,13 @@ comparisons) rose from 91.8% to 97.6%; see `tests/conformance/README.md`.
   registry (CRAN from `DESCRIPTION`, PyPI from `pyproject.toml` or
   `setup.cfg`), not only against text mentions.
 * The harvested repository signals are returned as `a$software`.
+* FRSM results are labeled `evidence_type = "heuristic"`, and `print()` says
+  so: the scores come from repository signals that have not been validated
+  against expert judgement. `frsm_agreement()` compares them with expert
+  ratings (percent agreement and Cohen's kappa per test, plus agreement
+  between raters), and `inst/extdata/frsm_validation_template.csv` is a
+  rating sheet for all 45 FRSM tests. The validation study itself is still to
+  be done.
 
 ## Guidance
 
