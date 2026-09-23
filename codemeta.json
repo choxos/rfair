@@ -188,14 +188,14 @@
       "sameAs": "https://CRAN.R-project.org/package=withr"
     }
   ],
-  "softwareRequirements": {
-    "1": {
+  "softwareRequirements": [
+    {
       "@type": "SoftwareApplication",
       "identifier": "R",
       "name": "R",
       "version": ">= 4.1"
     },
-    "2": {
+    {
       "@type": "SoftwareApplication",
       "identifier": "curl",
       "name": "curl",
@@ -207,7 +207,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=curl"
     },
-    "3": {
+    {
       "@type": "SoftwareApplication",
       "identifier": "digest",
       "name": "digest",
@@ -219,7 +219,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=digest"
     },
-    "4": {
+    {
       "@type": "SoftwareApplication",
       "identifier": "httr2",
       "name": "httr2",
@@ -232,7 +232,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=httr2"
     },
-    "5": {
+    {
       "@type": "SoftwareApplication",
       "identifier": "jsonlite",
       "name": "jsonlite",
@@ -244,7 +244,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=jsonlite"
     },
-    "6": {
+    {
       "@type": "SoftwareApplication",
       "identifier": "mime",
       "name": "mime",
@@ -256,12 +256,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=mime"
     },
-    "7": {
+    {
       "@type": "SoftwareApplication",
       "identifier": "parallel",
       "name": "parallel"
     },
-    "8": {
+    {
       "@type": "SoftwareApplication",
       "identifier": "rvest",
       "name": "rvest",
@@ -273,12 +273,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=rvest"
     },
-    "9": {
+    {
       "@type": "SoftwareApplication",
       "identifier": "stats",
       "name": "stats"
     },
-    "10": {
+    {
       "@type": "SoftwareApplication",
       "identifier": "stringdist",
       "name": "stringdist",
@@ -290,12 +290,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=stringdist"
     },
-    "11": {
+    {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "12": {
+    {
       "@type": "SoftwareApplication",
       "identifier": "xml2",
       "name": "xml2",
@@ -307,7 +307,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=xml2"
     },
-    "13": {
+    {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",
@@ -318,10 +318,9 @@
         "url": "https://cran.r-project.org"
       },
       "sameAs": "https://CRAN.R-project.org/package=yaml"
-    },
-    "SystemRequirements": null
-  },
-  "fileSize": "1310.179KB",
+    }
+  ],
+  "fileSize": "1318.201KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",

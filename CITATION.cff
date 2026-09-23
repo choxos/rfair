@@ -255,6 +255,26 @@ references:
   year: '2026'
   doi: 10.32614/CRAN.package.bslib
 - type: software
+  title: chromote
+  abstract: 'chromote: Headless Chrome Web Browser Interface'
+  notes: Suggests
+  url: https://rstudio.github.io/chromote/
+  repository: https://CRAN.R-project.org/package=chromote
+  authors:
+  - family-names: Aden-Buie
+    given-names: Garrick
+    email: garrick@posit.co
+    orcid: https://orcid.org/0000-0002-7111-0077
+  - family-names: Chang
+    given-names: Winston
+    email: winston@posit.co
+  - family-names: Schloerke
+    given-names: Barret
+    email: barret@posit.co
+    orcid: https://orcid.org/0000-0001-9986-114X
+  year: '2026'
+  doi: 10.32614/CRAN.package.chromote
+- type: software
   title: DT
   abstract: 'DT: A Wrapper of the JavaScript Library ''DataTables'''
   notes: Suggests

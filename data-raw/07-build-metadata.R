@@ -8,7 +8,9 @@
 #   ro-crate-metadata.json  name and version (set datePublished by hand at release)
 #
 # Run from the package root before each release (needs network for codemetar's
-# GitHub lookups). cffr and codemetar are build tools, not package dependencies:
+# GitHub lookups). cffr lists only installed packages as references, so install
+# every Suggests package first. cffr and codemetar are build tools, not package
+# dependencies:
 #   Rscript data-raw/07-build-metadata.R
 
 concept_doi <- "10.5281/zenodo.20775127"
@@ -32,6 +34,11 @@ cffr::cff_write(cff, outfile = "CITATION.cff", verbose = FALSE)
 # roles; point the identifier at the Zenodo concept DOI.
 codemetar::write_codemeta(".", path = "codemeta.json", verbose = FALSE)
 cm <- jsonlite::read_json("codemeta.json")
+# codemetar writes softwareRequirements as an object keyed "1", "2", ... plus a
+# null SystemRequirements entry; CodeMeta readers need an array
+for (field in c("softwareRequirements", "softwareSuggestions")) {
+  cm[[field]] <- unname(Filter(Negate(is.null), cm[[field]]))
+}
 cm$identifier <- paste0("https://doi.org/", concept_doi)
 cm$description <- description
 cm$relatedLink <- unique(c(
