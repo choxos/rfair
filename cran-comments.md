@@ -7,6 +7,13 @@ Codeberg repositories, repository file APIs, microdata and RDFa), and adds
 `fair_recommendations()`, `fair_compare()`, and `frsm_agreement()`. NEWS.md
 lists the changes.
 
+## Test environments
+
+* local macOS (aarch64-apple-darwin), R 4.6.0, with all Suggests installed
+* GitHub Actions: macOS (R release), Windows (R release), Ubuntu (R release
+  and R devel)
+* win-builder: R-devel (2026-09-21 r90579 ucrt)
+
 ## R CMD check results
 
 0 errors | 0 warnings | 0 notes
