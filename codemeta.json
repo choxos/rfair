@@ -2,13 +2,13 @@
   "@context": "https://doi.org/10.5063/schema/codemeta-2.0",
   "@type": "SoftwareSourceCode",
   "identifier": "https://doi.org/10.5281/zenodo.20775127",
-  "description": "A native R implementation of the F-UJI (FAIRsFAIR Research Data Object Assessment) and FRSM (FAIR for Research Software) metrics for evaluating how well a research data object or piece of research software satisfies the FAIR principles (Findable, Accessible, Interoperable, Reusable). The software metrics operationalize the FAIR Principles for Research Software (FAIR4RS) of Chue Hong et al. (2022) <doi:10.15497/RDA00068>. Given a persistent identifier, URL, or code repository, 'rfair' resolves it, harvests metadata from landing pages and registries, and scores it against the FAIRsFAIR metrics of Devaraju and Huber (2020) <doi:10.5281/zenodo.3775793> entirely in R, without requiring an external assessment server. 'rfair' began as a fork of the 'rfuji' F-UJI API client and reimplements the assessment engine natively.",
+  "description": "A native R implementation of the F-UJI (FAIRsFAIR Research Data Object Assessment) and FRSM (FAIR for Research Software) metrics for evaluating how well a research data object or piece of research software satisfies the FAIR principles (Findable, Accessible, Interoperable, Reusable). The software metrics operationalize the FAIR Principles for Research Software (FAIR4RS) of Chue Hong et al. (2022) https://doi.org/10.15497/RDA00068. Given a persistent identifier, URL, or code repository, 'rfair' resolves it, harvests metadata from landing pages and registries, and scores it against the FAIRsFAIR metrics of Devaraju and Huber (2020) https://doi.org/10.5281/zenodo.3775793 entirely in R, without requiring an external assessment server. 'rfair' began as a fork of the 'rfuji' F-UJI API client and reimplements the assessment engine natively.",
   "name": "rfair: Assess the FAIRness of Research Data Objects and Software",
   "relatedLink": ["https://choxos.github.io/rfair/", "https://CRAN.R-project.org/package=rfair", "https://doi.org/10.32614/CRAN.package.rfair", "https://archive.softwareheritage.org/browse/origin/?origin_url=https://github.com/choxos/rfair"],
   "codeRepository": "https://github.com/choxos/rfair",
   "issueTracker": "https://github.com/choxos/rfair/issues",
   "license": "https://spdx.org/licenses/GPL-3.0",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "programmingLanguage": {
     "@type": "ComputerLanguage",
     "name": "R",
@@ -292,7 +292,7 @@
     },
     "SystemRequirements": null
   },
-  "fileSize": "1152.74KB",
+  "fileSize": "1152.842KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
@@ -309,7 +309,7 @@
       "name": "{rfair}: Assess the FAIRness of Research Data Objects and Software",
       "identifier": "10.5281/zenodo.20775127",
       "url": "https://github.com/choxos/rfair",
-      "description": "R package version 0.1.0",
+      "description": "R package version 0.2.0",
       "@id": "https://doi.org/10.5281/zenodo.20775127",
       "sameAs": "https://doi.org/10.5281/zenodo.20775127"
     }

@@ -8,7 +8,7 @@ message: 'To cite package "rfair" in publications use:'
 type: software
 license: GPL-3.0-only
 title: 'rfair: Assess the FAIRness of Research Data Objects and Software'
-version: 0.1.0
+version: 0.2.0
 doi: 10.5281/zenodo.20775127
 identifiers:
 - type: doi
@@ -37,10 +37,10 @@ preferred-citation:
     email: a.sofimahmudi@gmail.com
     orcid: https://orcid.org/0000-0001-6829-0823
   year: '2026'
-  version: 0.1.0
+  version: 0.2.0
   doi: 10.5281/zenodo.20775127
   url: https://github.com/choxos/rfair
-  notes: R package version 0.1.0
+  notes: R package version 0.2.0
 repository: https://CRAN.R-project.org/package=rfair
 repository-code: https://github.com/choxos/rfair
 url: https://choxos.github.io/rfair/

@@ -1,3 +1,42 @@
+# rfair 0.2.0
+
+Scores can differ from rfair 0.1.0: several fixes below change what counts as
+evidence. Rerun assessments before comparing them with 0.1.0 results.
+
+## Scoring fixes
+
+* `id_parse()` no longer treats a plain URL with a numeric path segment (for
+  example `https://figshare.com/articles/dataset/foo/12345/1`) as a Handle. Such
+  URLs were marked persistent and resolved through `hdl.handle.net` instead of
+  their own page. The Handle pattern is now anchored at the start, as in
+  F-UJI's `verify_handle()`.
+* An identifier that does not resolve is no longer reported or scored as
+  resolved. `resolved_url` is `NA`, the new `resolution` element records the
+  attempt (URL, HTTP status, error), and `print()` shows it as unresolved.
+  FsF-A1-02MD-1 (metadata retrievable) now requires a harvested metadata
+  record, as F-UJI's `testMetadataRetrievable` does; a page that resolves but
+  offers no extractable metadata no longer earns it. A nonexistent DOI dropped
+  from 17.3% to 13.5%; the remaining points (identifier scheme, HTTP protocol)
+  are the ones F-UJI also awards.
+* GitHub API rate limits no longer lower software scores without a trace. They
+  are recorded in the new `harvest_errors` element, raised as an
+  `rfair_rate_limit` warning, and stop further GitHub calls for that
+  assessment. The GitHub token is read from `GITHUB_PAT`, then `GITHUB_TOKEN`.
+* `assess_fair_batch()` and `assess_data_code()` gain `resolved` and
+  `http_status` columns.
+
+## Package metadata
+
+* `CITATION.cff`, `codemeta.json`, `.zenodo.json`, and
+  `ro-crate-metadata.json` are generated from `DESCRIPTION` by
+  `data-raw/07-build-metadata.R`, so title, authors, contributors, and
+  dependencies agree. `citation("rfair")` reads the title and version from the
+  package metadata. The CRAN DOI is recorded.
+* The FAIR principles links point to the GO FAIR Foundation's new address.
+* Removed the unused suggested packages `httptest2`, `jqr`, and `wand`, and
+  `covr`. The documentation no longer mentions libmagic file sniffing, which
+  was never implemented.
+
 # rfair 0.1.0
 
 First release. `rfair` is a native R implementation of the F-UJI / FAIRsFAIR

@@ -5,7 +5,7 @@
 #   CITATION.cff            via cffr
 #   codemeta.json           via codemetar, plus the Zenodo concept DOI
 #   .zenodo.json            title and description
-#   ro-crate-metadata.json  name, version, and release date
+#   ro-crate-metadata.json  name and version (set datePublished by hand at release)
 #
 # Run from the package root before each release (needs network for codemetar's
 # GitHub lookups). cffr and codemetar are build tools, not package dependencies:
@@ -16,8 +16,8 @@ repo <- "https://github.com/choxos/rfair"
 
 d <- as.list(read.dcf("DESCRIPTION")[1, ])
 title <- paste0("rfair: ", d$Title)
-description <- gsub("\\s+", " ", d$Description)
-release_date <- format(Sys.Date(), "%Y-%m-%d")
+# Zenodo renders the description as HTML, where "<doi:...>" would parse as a tag.
+description <- gsub("<doi:([^>]+)>", "https://doi.org/\\1", gsub("\\s+", " ", d$Description))
 
 write_json <- function(x, path) {
   jsonlite::write_json(x, path, auto_unbox = TRUE, pretty = TRUE, null = "null")
@@ -33,6 +33,7 @@ cffr::cff_write(cff, outfile = "CITATION.cff", verbose = FALSE)
 codemetar::write_codemeta(".", path = "codemeta.json", verbose = FALSE)
 cm <- jsonlite::read_json("codemeta.json")
 cm$identifier <- paste0("https://doi.org/", concept_doi)
+cm$description <- description
 cm$relatedLink <- unique(c(
   unlist(cm$relatedLink),
   "https://doi.org/10.32614/CRAN.package.rfair",
@@ -46,10 +47,7 @@ write_json(z, ".zenodo.json")
 
 rc <- jsonlite::read_json("ro-crate-metadata.json")
 rc[["@graph"]] <- lapply(rc[["@graph"]], function(node) {
-  if (identical(node[["@id"]], "./")) {
-    node$name <- title
-    node$datePublished <- release_date
-  }
+  if (identical(node[["@id"]], "./")) node$name <- title
   if (identical(node[["@id"]], "#rfair")) node$version <- d$Version
   node
 })

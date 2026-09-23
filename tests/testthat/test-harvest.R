@@ -13,7 +13,6 @@ test_that("a resolvable DOI harvests landing, signposting, and DataCite metadata
   expect_identical(a$resolved_url, "https://zenodo.org/records/8347772")
   expect_true(all(c("title", "creator", "publisher", "license", "object_identifier") %in%
                     names(a$metadata)))
-  sources <- vapply(a$metadata_sources %||% list(), `[[`, "", "source")
   urls <- vapply(a$metadata$object_content_identifier, function(x) x$url, "")
   expect_true(any(grepl("fuji-v2.2.5.zip", urls, fixed = TRUE)))
 
