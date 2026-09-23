@@ -166,7 +166,7 @@
       "@type": "SoftwareApplication",
       "identifier": "testthat",
       "name": "testthat",
-      "version": ">= 3.0.0",
+      "version": ">= 3.1.7",
       "provider": {
         "@id": "https://cran.r-project.org",
         "@type": "Organization",
@@ -320,7 +320,7 @@
       "sameAs": "https://CRAN.R-project.org/package=yaml"
     }
   ],
-  "fileSize": "1318.201KB",
+  "fileSize": "1320.602KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
