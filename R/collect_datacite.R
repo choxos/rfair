@@ -104,7 +104,7 @@ harvest_all_metadata <- function(ctx, timeout = 15) {
   run("csl", collect_csl(ctx, timeout = timeout))
   run("xml", collect_xml(ctx, timeout = timeout))
   run("rdf", collect_rdf(ctx, timeout = timeout))
-  run("github", collect_github(ctx, timeout = timeout))
+  run("forge", collect_forge(ctx, timeout = timeout))
   run("data", harvest_data(ctx, timeout = timeout))
   invisible()
 }

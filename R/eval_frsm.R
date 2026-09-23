@@ -1,6 +1,6 @@
 # Evaluators for the FRSM (FAIR for Research Software) metrics
 # (metrics_v0.7_software), scoring from the software signals harvested by
-# collect_github() into ctx$software. Scoring is heuristic: a test passes when a
+# collect_forge() into ctx$software. Scoring is heuristic: a test passes when a
 # corresponding signal is detected in the repository (license file, tests, CI,
 # requirements, registry DOI, version, contributors, ...).
 

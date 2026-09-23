@@ -13,7 +13,9 @@
 #' (access/sensitivity), `identifier_hygiene`, `resolution` (the identifier's
 #' resolution attempt: `url`, `final_url`, HTTP `status`, `ok`, `error`), and
 #' `harvest_errors` (metadata sources that failed, for example a GitHub rate
-#' limit). `resolved_url` is `NA` when the identifier did not resolve.
+#' limit), and `software` (the repository signals the FRSM software metrics
+#' score, when a code repository was harvested). `resolved_url` is `NA` when the
+#' identifier did not resolve.
 #'
 #' @name fair_assessment
 #' @seealso [assess_fair()]
@@ -26,7 +28,7 @@ new_fair_assessment <- function(id, request, results, summary, resolved_url,
                                 start_time = NULL, end_time = NULL, log = list(),
                                 reuse = NULL, access = NULL,
                                 identifier_hygiene = NULL, resolution = NULL,
-                                harvest_errors = list()) {
+                                harvest_errors = list(), software = NULL) {
   structure(
     list(
       id = id,
@@ -46,6 +48,7 @@ new_fair_assessment <- function(id, request, results, summary, resolved_url,
       identifier_hygiene = identifier_hygiene,
       resolution = resolution,
       harvest_errors = harvest_errors,
+      software = software,
       log = log
     ),
     class = "fair_assessment"

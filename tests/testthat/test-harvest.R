@@ -129,3 +129,59 @@ test_that("Turtle metadata is mapped from the RDF graph, with creator names", {
   expect_setequal(unlist(md$creator), c("Mark D. Wilkinson", "Michel Dumontier"))
   expect_true("http://purl.org/ontology/bibo/" %in% unlist(ctx$metadata_unmerged[[1]]$namespaces))
 })
+
+test_that("GitLab projects (nested groups) are harvested through API v4", {
+  local_http(gitlab_routes())
+  a <- assess_fair("https://gitlab.com/group/sub/tool", metric_version = "0.7_software",
+                   use_datacite = FALSE)
+  sw <- a$software
+  expect_identical(sw$forge, "gitlab")
+  expect_identical(sw$version, "v2.0.0")
+  expect_identical(sw$language, "Python")
+  expect_true(sw$has_tests && sw$has_ci && sw$has_spdx_license && sw$has_issue_tracker)
+  expect_identical(sw$package_registry, "PyPI")
+  expect_equal(metric_row(a, "FRSM-14-R1")$status, "pass")
+})
+
+test_that("Codeberg repositories are harvested through the Forgejo/Gitea API", {
+  local_http(codeberg_routes())
+  a <- assess_fair("https://codeberg.org/owner/tool", metric_version = "0.7_software",
+                   use_datacite = FALSE)
+  sw <- a$software
+  expect_identical(sw$forge, "gitea")
+  expect_identical(sw$contributors, 2L)
+  expect_true(sw$has_ci && sw$has_license && sw$has_spdx_license)
+  expect_identical(sw$version, "0.3.1")
+})
+
+test_that("a software DOI is bridged to its linked repository under the FRSM metrics", {
+  doi <- "https://doi.org/10.5281/zenodo.1234567"
+  datacite <- jsonlite::toJSON(list(
+    id = doi, doi = "10.5281/zenodo.1234567",
+    types = list(resourceTypeGeneral = "Software"),
+    titles = list(list(title = "tool")), creators = list(list(name = "A")),
+    publisher = "Zenodo", publicationYear = 2026,
+    relatedIdentifiers = list(list(relatedIdentifier = "https://github.com/example/tool/tree/v1.2.0",
+                                   relationType = "IsSupplementTo"))), auto_unbox = TRUE)
+  routes <- c(github_routes(), list(
+    route(doi, "<html><head><title>tool</title></head></html>", accept = "text/html",
+          final_url = "https://zenodo.org/records/1234567"),
+    route(doi, datacite, accept = "application/vnd.datacite.datacite+json",
+          type = "application/vnd.datacite.datacite+json")))
+  local_http(routes)
+  a <- assess_fair(doi, metric_version = "0.7_software")
+  expect_identical(a$software$repository, "https://github.com/example/tool")
+  expect_identical(a$software$registry_doi, "10.5281/zenodo.1234567")
+  expect_equal(metric_row(a, "FRSM-01-F1")$status, "pass")
+  expect_equal(metric_row(a, "FRSM-14-R1")$status, "pass")
+  # the registry record stays the metadata of record
+  expect_identical(a$metadata$title, "tool")
+  expect_null(a$metadata$summary)   # the repository description was not merged in
+})
+
+test_that("forge_of recognizes GitHub, nested GitLab groups, and Codeberg", {
+  expect_identical(forge_of("https://gitlab.com/g/s/p/-/blob/main/x.R")$path, "g/s/p")
+  expect_identical(forge_of("https://codeberg.org/o/r.git")$name, "r")
+  expect_identical(forge_of("https://github.com/o/r/tree/v1")$forge, "github")
+  expect_null(forge_of("https://example.org/o/r"))
+})

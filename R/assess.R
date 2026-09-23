@@ -178,6 +178,7 @@ assess_fair <- function(id, metric_version = "0.8", use_datacite = TRUE,
     metadata = as.list(ctx$metadata_merged), start_time = start_time,
     end_time = end_time, log = if (test_debug) ctx$log else list(),
     reuse = reuse, access = access, identifier_hygiene = hygiene,
-    resolution = ctx$resolution, harvest_errors = ctx$harvest_errors
+    resolution = ctx$resolution, harvest_errors = ctx$harvest_errors,
+    software = ctx$software
   )
 }

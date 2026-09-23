@@ -103,3 +103,49 @@ crossref_routes <- function() {
     json_route("https://doi.org/ra/10.1038", '[{"DOI": "10.1038", "RA": "Crossref"}]')
   )
 }
+
+# Canned GitLab API v4 responses for gitlab.com/group/sub/tool.
+gitlab_routes <- function() {
+  api <- "https://gitlab.com/api/v4/projects/group%2Fsub%2Ftool"
+  web <- "https://gitlab.com/group/sub/tool"
+  project <- jsonlite::toJSON(list(
+    id = 1, web_url = web, name = "tool", description = "A GitLab tool", topics = list("fair"),
+    license = list(key = "apache-2.0", html_url = "https://www.apache.org/licenses/LICENSE-2.0"),
+    namespace = list(path = "group"), created_at = "2024-01-01", last_activity_at = "2026-01-01",
+    default_branch = "main", visibility = "public", `_links` = list(issues = paste0(web, "/issues"))),
+    auto_unbox = TRUE)
+  tree <- jsonlite::toJSON(lapply(c("pyproject.toml", "README.md", "LICENSE", "tests/test_a.py",
+                                    ".gitlab-ci.yml"), function(p) list(path = p)), auto_unbox = TRUE)
+  list(
+    route(web, "<html><head><title>tool</title></head></html>"),
+    json_route(paste0(api, "?license=true"), project),
+    json_route(paste0(api, "/repository/tree?recursive=true&per_page=100&page=1"), tree),
+    json_route(paste0(api, "/languages"), '{"Python": 98.5, "Shell": 1.5}'),
+    json_route(paste0(api, "/releases?per_page=1"), '[{"tag_name": "v2.0.0"}]'),
+    json_route(paste0(api, "/repository/contributors?per_page=100"), '[{"name": "a"}]'),
+    route(paste0(web, "/-/raw/main/pyproject.toml"), '[project]\nname = "gltool"\n', type = "text/plain"),
+    json_route("https://pypi.org/pypi/gltool/json", "{}", method = "HEAD")
+  )
+}
+
+# Canned Forgejo/Gitea API v1 responses for codeberg.org/owner/tool.
+codeberg_routes <- function() {
+  api <- "https://codeberg.org/api/v1/repos/owner/tool"
+  html <- "https://codeberg.org/owner/tool"
+  repo <- jsonlite::toJSON(list(
+    html_url = html, name = "tool", description = "A Codeberg tool", topics = list("fair"),
+    licenses = list("MIT"), owner = list(login = "owner"), created_at = "2024-01-01",
+    updated_at = "2026-01-01", language = "Rust", default_branch = "main", private = FALSE,
+    has_issues = TRUE), auto_unbox = TRUE)
+  tree <- jsonlite::toJSON(list(tree = lapply(c("Cargo.toml", "README.md", "LICENSE",
+                                                  ".forgejo/workflows/ci.yml", "tests/it.rs"),
+                                                function(p) list(path = p))), auto_unbox = TRUE)
+  list(
+    route(html, "<html><head><title>tool</title></head></html>"),
+    json_route(api, repo),
+    json_route(paste0(api, "/git/trees/main?recursive=true&per_page=10000"), tree),
+    json_route(paste0(api, "/commits?limit=50&stat=false&verification=false&files=false"),
+               '[{"commit": {"author": {"email": "a@x"}}}, {"commit": {"author": {"email": "b@x"}}}]'),
+    json_route(paste0(api, "/releases/latest"), '{"tag_name": "0.3.1"}')
+  )
+}
