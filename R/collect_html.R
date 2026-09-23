@@ -1,6 +1,6 @@
-# Landing-page HTML metadata collectors: embedded schema.org JSON-LD, Dublin
-# Core / OpenGraph / Highwire meta tags. Ported from the corresponding
-# metadata_collector_*.py modules. Uses rvest/xml2.
+# Landing-page HTML metadata collectors: embedded schema.org JSON-LD, microdata,
+# and RDFa, and Dublin Core / OpenGraph / Highwire meta tags. Ported from the
+# corresponding metadata_collector_*.py modules. Uses rvest/xml2.
 
 # Dublin Core element -> reference key (reverse of Mapper.DC_MAPPING).
 .DC_MAP <- list(
@@ -120,6 +120,58 @@ map_schemaorg <- function(j) {
   compact(out)
 }
 
+#' Value of a microdata or RDFa property element (HTML microdata algorithm:
+#' attribute by tag, else the text).
+#' @noRd
+html_property_value <- function(n, rdfa = FALSE) {
+  tag <- xml2::xml_name(n)
+  attrs <- if (rdfa) c("content", "href", "src", "resource") else switch(tag,
+    meta = "content", audio = , embed = , iframe = , img = , source = , track = , video = "src",
+    a = , area = , link = "href", object = "data", data = , meter = "value", time = "datetime",
+    character(0))
+  for (a in attrs) {
+    v <- xml2::xml_attr(n, a)
+    if (!is.na(v) && nzchar(v)) return(v)
+  }
+  trimws(gsub("\\s+", " ", xml2::xml_text(n)))
+}
+
+#' One microdata item (itemscope) or RDFa resource (typeof) as a JSON-LD-like
+#' list, recursing into nested items.
+#' @noRd
+html_item <- function(scope, rdfa = FALSE) {
+  scope_attr <- if (rdfa) "typeof" else "itemscope"
+  prop_attr <- if (rdfa) "property" else "itemprop"
+  type <- xml2::xml_attr(scope, if (rdfa) "typeof" else "itemtype")
+  out <- list(`@type` = sub("^.*[/#:]", "", type %||% ""))
+  path <- xml2::xml_path(scope)
+  for (p in xml2::xml_find_all(scope, sprintf(".//*[@%s]", prop_attr))) {
+    owner <- xml2::xml_find_first(p, sprintf("ancestor::*[@%s][1]", scope_attr))
+    if (!identical(xml2::xml_path(owner), path)) next
+    val <- if (!is.na(xml2::xml_attr(p, scope_attr))) html_item(p, rdfa) else html_property_value(p, rdfa)
+    for (name in strsplit(xml2::xml_attr(p, prop_attr), "\\s+")[[1]]) {
+      name <- sub("^.*[/#:]", "", name)
+      out[[name]] <- c(out[[name]], list(val))
+    }
+  }
+  lapply(out, function(v) if (is.list(v) && is.null(names(v)) && length(v) == 1L) v[[1]] else v)
+}
+
+#' schema.org items embedded as microdata or RDFa.
+#' @noRd
+extract_html_items <- function(doc, rdfa = FALSE) {
+  xpath <- if (rdfa) "//*[@typeof and not(@property)]" else "//*[@itemscope and not(@itemprop)]"
+  scopes <- xml2::xml_find_all(doc, xpath)
+  items <- lapply(scopes, html_item, rdfa = rdfa)
+  # keep schema.org items; RDFa schema.org pages declare vocab or a schema: prefix
+  Filter(function(it) nzchar(it[["@type"]] %||% "") && length(it) > 1L, items[vapply(scopes, function(s) {
+    type <- xml2::xml_attr(s, if (rdfa) "typeof" else "itemtype") %||% ""
+    vocab <- xml2::xml_attr(xml2::xml_find_first(s, "ancestor-or-self::*[@vocab][1]"), "vocab")
+    grepl("schema\\.org", type) || grepl("^schema:", type) ||
+      (!is.na(vocab) && grepl("schema\\.org", vocab))
+  }, logical(1))])
+}
+
 #' Parse landing HTML and merge schema.org + Dublin Core + OpenGraph + Highwire.
 #' @noRd
 collect_html_meta <- function(ctx) {
@@ -143,6 +195,19 @@ collect_html_meta <- function(ctx) {
                        schema = "http://schema.org")
         ctx$metadata_sources[[length(ctx$metadata_sources) + 1L]] <-
           list(source = "schema.org", method = "embedded")
+      }
+    }
+  }
+
+  # schema.org as microdata and RDFa (F-UJI reads both through extruct)
+  for (kind in c("microdata", "rdfa")) {
+    for (item in extract_html_items(doc, rdfa = identical(kind, "rdfa"))) {
+      md <- map_schemaorg(item)
+      if (length(md)) {
+        merge_metadata(ctx, md, url = origin_url, method = kind, format = kind,
+                       mimetype = "text/html", schema = "http://schema.org")
+        ctx$metadata_sources[[length(ctx$metadata_sources) + 1L]] <-
+          list(source = kind, method = "embedded")
       }
     }
   }

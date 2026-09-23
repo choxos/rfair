@@ -58,6 +58,8 @@ comparisons) rose from 91.8% to 97.6%; see `tests/conformance/README.md`.
   specific to DataCite.
 * When no data links were found, the file list is read from the repository
   API: Zenodo, figshare, Dataverse, and Dryad.
+* schema.org metadata embedded as microdata or RDFa is harvested, next to
+  JSON-LD, and counts as embedded metadata for FsF-F4-01M and FsF-I1-01M.
 
 ## Software assessment
 
