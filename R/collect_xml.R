@@ -155,7 +155,7 @@ collect_xml_doc <- function(ctx, content, url, mimetype = "application/xml") {
 #' Fetch a URL expected to hold XML metadata and harvest it.
 #' @noRd
 collect_xml_from_url <- function(ctx, url, timeout = 15) {
-  resp <- tryCatch(content_negotiate(url, accept = "xml", timeout = timeout), error = function(e) NULL)
+  resp <- tryCatch(content_negotiate(url, accept = "xml", timeout = timeout, ctx = ctx), error = function(e) NULL)
   if (is.null(resp) || !isTRUE(resp$ok) || is.null(resp$content)) return(invisible())
   collect_xml_doc(ctx, resp$content, url = resp$redirect_url, mimetype = resp$content_type)
 }
@@ -164,7 +164,7 @@ collect_xml_from_url <- function(ctx, url, timeout = 15) {
 #' @noRd
 collect_xml <- function(ctx, timeout = 15) {
   if (!datacite_possible(ctx)) return(invisible())
-  resp <- tryCatch(content_negotiate(ctx$pid_url, accept = "datacite_xml", timeout = timeout),
+  resp <- tryCatch(content_negotiate(ctx$pid_url, accept = "datacite_xml", timeout = timeout, ctx = ctx),
                    error = function(e) NULL)
   if (!is.null(resp) && isTRUE(resp$ok) && !is.null(resp$content) &&
       grepl("xml", resp$content_type %||% "", ignore.case = TRUE)) {

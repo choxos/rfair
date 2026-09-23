@@ -284,7 +284,7 @@ software_signals <- function(info, cm, ctx = NULL, timeout = 15) {
   path_signals <- software_path_signals(paths, private = info$private)
 
   read_raw <- function(path) {
-    r <- content_negotiate(info$raw(path), accept = "default", timeout = timeout)
+    r <- content_negotiate(info$raw(path), accept = "default", timeout = timeout, ctx = ctx)
     if (isTRUE(r$ok)) as_chr(r$content) else ""
   }
   meta_text <- paste(read_raw("codemeta.json"), read_raw("CITATION.cff"),
@@ -420,7 +420,7 @@ software_spdx_ids <- function(x) {
 forge_software_files <- function(ctx, info, timeout = 15, record = TRUE) {
   out <- list()
   cm <- tryCatch({
-    r <- content_negotiate(info$raw("codemeta.json"), accept = "json", timeout = timeout)
+    r <- content_negotiate(info$raw("codemeta.json"), accept = "json", timeout = timeout, ctx = ctx)
     if (isTRUE(r$ok)) jsonlite::fromJSON(r$content, simplifyVector = FALSE) else NULL
   }, error = function(e) NULL)
   if (is.list(cm)) {
@@ -438,7 +438,7 @@ forge_software_files <- function(ctx, info, timeout = 15, record = TRUE) {
     }
   }
   cff <- tryCatch({
-    r <- content_negotiate(info$raw("CITATION.cff"), accept = "default", timeout = timeout)
+    r <- content_negotiate(info$raw("CITATION.cff"), accept = "default", timeout = timeout, ctx = ctx)
     if (isTRUE(r$ok)) yaml::yaml.load(r$content) else NULL
   }, error = function(e) NULL)
   if (is.list(cff)) {

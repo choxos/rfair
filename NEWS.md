@@ -1,7 +1,10 @@
 # rfair 0.2.0
 
 Scores can differ from rfair 0.1.0: several fixes below change what counts as
-evidence. Rerun assessments before comparing them with 0.1.0 results.
+evidence, and new metadata sources find evidence that was missed before. Rerun
+assessments before comparing them with 0.1.0 results. Agreement with the
+reference F-UJI 4.0.0 service (metrics v0.8, five fixture DOIs, 85 metric
+comparisons) rose from 91.8% to 95.3%; see `tests/conformance/README.md`.
 
 ## Scoring fixes
 
@@ -18,14 +21,83 @@ evidence. Rerun assessments before comparing them with 0.1.0 results.
   offers no extractable metadata no longer earns it. A nonexistent DOI dropped
   from 17.3% to 13.5%; the remaining points (identifier scheme, HTTP protocol)
   are the ones F-UJI also awards.
-* GitHub API rate limits no longer lower software scores without a trace. They
-  are recorded in the new `harvest_errors` element, raised as an
-  `rfair_rate_limit` warning, and stop further GitHub calls for that
-  assessment. The GitHub token is read from `GITHUB_PAT`, then `GITHUB_TOKEN`.
-* `assess_fair_batch()` and `assess_data_code()` gain `resolved` and
-  `http_status` columns.
+* FsF-A1-02MD-2 (data retrievable) now requires a data link that answers with
+  a 2xx status, as in F-UJI. Up to five links are probed with a GET that is
+  closed once the headers arrive; HEAD hung on repositories that build files
+  on request.
+* schema.org `isAccessibleForFree` is read as an access statement, as F-UJI
+  does (FsF-A1-01M, `classify_access()`).
+* RDF graph metadata (Turtle, RDF/XML) was never harvested: the query used
+  SPARQL 1.1 property paths, which librdf rejects. Triples are now mapped in R,
+  creator nodes resolve to names, and predicate namespaces feed the semantic
+  vocabulary and community standard metrics. Scores can rise for repositories
+  that serve RDF.
+* Metadata sources that fail are recorded in the new `harvest_errors` element.
+  API rate limits (GitHub, GitLab, Codeberg, repository APIs) are also raised
+  as an `rfair_rate_limit` warning and stop further calls to that API for the
+  assessment, instead of silently lowering software scores.
+* `license_reuse()` recognizes the OGL, Etalab, CDLA, DL-DE, and NLOD open data
+  licenses, and classes MPL as copyleft.
+* Link headers split only between links, so URLs containing commas survive.
 
-## Package metadata
+## New metadata sources
+
+* DOIs registered outside DataCite (Crossref, mEDRA, JaLC, KISTI) are harvested
+  through CSL JSON content negotiation: title, authors, publisher, dates,
+  abstract, subjects, licenses, Crossref text-mining links, and relations. The
+  registration agency is looked up (bundled prefix table, then
+  `https://doi.org/ra/`), and the DataCite requests are skipped for DOIs
+  registered elsewhere. CSL metadata does not satisfy FsF-F4-01M-2, which is
+  specific to DataCite.
+* When no data links were found, the file list is read from the repository
+  API: Zenodo, figshare, Dataverse, and Dryad.
+
+## Software assessment
+
+* Code repositories on GitLab (API v4, nested groups) and Codeberg or any
+  Forgejo/Gitea instance (API v1) are harvested, next to GitHub. Tokens are
+  read from `GITHUB_PAT` (then `GITHUB_TOKEN`), `GITLAB_PAT`, and
+  `CODEBERG_TOKEN`.
+* Under the software metrics, a DOI whose metadata links a repository (for
+  example Zenodo's `IsSupplementTo` link to GitHub) is bridged to it: the
+  repository supplies the software signals and the DOI counts as the registry
+  DOI. rfair's own Zenodo concept DOI rose from 2.2% to 100%.
+* Archiving is checked against Software Heritage and the language package
+  registry (CRAN from `DESCRIPTION`, PyPI from `pyproject.toml` or
+  `setup.cfg`), not only against text mentions.
+* The harvested repository signals are returned as `a$software`.
+
+## Guidance
+
+* `fair_recommendations()` lists every failed test with one concrete action,
+  largest score gain first. The Shiny app shows it in a "How to improve" tab.
+* `fair_compare()` reports per-metric or per-test changes between two
+  assessments.
+
+## Batch runs and HTTP
+
+* `assess_fair()` gains `max_time`, a time budget for the whole assessment.
+* `assess_fair_batch()` and `assess_data_code()` gain `workers` (parallel
+  assessment by forking; serial on Windows), `keep` (the full assessments in
+  the `"assessments"` attribute), and `previous` (resume an interrupted run),
+  plus `resolved` and `http_status` columns.
+* All requests share one policy: retry on 429 and 503 with capped waits, a
+  per-host rate limit (`options(rfair.rate_per_host)`), and an optional HTTP
+  cache (`options(rfair.cache_dir)`). Bodies are decoded from their declared
+  charset to UTF-8.
+
+## Security
+
+* `options(rfair.block_private_hosts = TRUE)` refuses non-http(s) URLs and
+  hosts that resolve to loopback, private, link-local, or cloud metadata
+  addresses, and checks every redirect hop. The bundled Plumber API and Shiny
+  app turn it on, since both fetch visitor-supplied URLs. The host is resolved
+  once before connecting, so DNS rebinding between the check and the request
+  is not covered; put a public deployment behind a filtering proxy as well.
+* The Plumber API refuses headless rendering unless the server sets
+  `RFAIR_API_ALLOW_HEADLESS=true`.
+
+## Package metadata and tests
 
 * `CITATION.cff`, `codemeta.json`, `.zenodo.json`, and
   `ro-crate-metadata.json` are generated from `DESCRIPTION` by
@@ -33,9 +105,12 @@ evidence. Rerun assessments before comparing them with 0.1.0 results.
   dependencies agree. `citation("rfair")` reads the title and version from the
   package metadata. The CRAN DOI is recorded.
 * The FAIR principles links point to the GO FAIR Foundation's new address.
-* Removed the unused suggested packages `httptest2`, `jqr`, and `wand`, and
+* Removed the unused suggested packages `httptest2`, `jqr`, `wand`, and
   `covr`. The documentation no longer mentions libmagic file sniffing, which
   was never implemented.
+* The harvesters are tested end to end offline, with canned responses served
+  through `httr2::local_mocked_responses()`.
+* A scheduled workflow compares rfair with the F-UJI Docker image monthly.
 
 # rfair 0.1.0
 

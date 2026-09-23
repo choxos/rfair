@@ -19,7 +19,7 @@ doi_registration_agency <- function(ctx, timeout = 15) {
   known <- ref_data("doi_prefixes")
   if (prefix %in% names(known)) return(unname(known[[prefix]]))
   if (!is.null(.ra_cache[[prefix]])) return(.ra_cache[[prefix]])
-  resp <- content_negotiate(paste0("https://doi.org/ra/", prefix), accept = "json",
+  resp <- content_negotiate(paste0("https://doi.org/ra/", prefix), accept = "json", ctx = ctx,
                             timeout = timeout)
   ra <- NA_character_
   if (isTRUE(resp$ok) && is_nonempty_string(resp$content)) {

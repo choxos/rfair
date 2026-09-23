@@ -7,7 +7,7 @@ collect_datacite <- function(ctx, timeout = 15) {
   pid_url <- ctx$pid_url
   if (!is_nonempty_string(pid_url)) return(invisible())
 
-  resp <- tryCatch(content_negotiate(pid_url, accept = "datacite_json", timeout = timeout),
+  resp <- tryCatch(content_negotiate(pid_url, accept = "datacite_json", timeout = timeout, ctx = ctx),
                    error = function(e) NULL)
   if (is.null(resp) || !isTRUE(resp$ok) || is.null(resp$content)) return(invisible())
   # content negotiation can fall back to HTML; only accept DataCite JSON

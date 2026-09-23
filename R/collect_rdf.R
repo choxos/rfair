@@ -64,7 +64,7 @@ rdf_namespaces <- function(triples) {
 #' @noRd
 collect_rdf_from_url <- function(ctx, url, jsonld = TRUE, timeout = 15) {
   accept <- if (jsonld) "jsonld" else "rdf"
-  resp <- tryCatch(content_negotiate(url, accept = accept, timeout = timeout), error = function(e) NULL)
+  resp <- tryCatch(content_negotiate(url, accept = accept, timeout = timeout, ctx = ctx), error = function(e) NULL)
   if (is.null(resp) || !isTRUE(resp$ok) || is.null(resp$content)) return(invisible())
   ct <- tolower(resp$content_type %||% "")
 
