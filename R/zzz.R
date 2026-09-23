@@ -3,8 +3,8 @@
 .onAttach <- function(libname, pkgname) {
   version <- utils::packageVersion(pkgname)
   packageStartupMessage(sprintf(
-    paste0("rfair %s: native R FAIR assessment of research data objects ",
-           "(F-UJI metrics).\n  Get started with assess_fair() or launch_rfair().",
+    paste0("rfair %s: native R FAIR assessment of research data and software ",
+           "(F-UJI and FRSM metrics).\n  Get started with assess_fair() or launch_rfair().",
            " GitHub: https://github.com/choxos/rfair"),
     version))
   invisible()

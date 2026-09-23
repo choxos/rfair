@@ -55,7 +55,7 @@ R CMD check --as-cran rfair_*.tar.gz
 ```
 
 Optional features use packages in `Suggests`, including `shiny`, `bslib`, `DT`,
-`plumber`, `rdflib`, and `wand`. If you change optional behavior, verify both
+`plumber`, `rdflib`, and `chromote`. If you change optional behavior, verify both
 the installed-dependency path and the graceful-degradation path where practical.
 
 ## Code and data expectations

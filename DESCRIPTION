@@ -1,6 +1,6 @@
 Package: rfair
 Title: Assess the FAIRness of Research Data Objects and Software
-Version: 0.1.0
+Version: 0.2.0
 Authors@R: c(
     person("Ahmad", "Sofi-Mahmudi", email = "a.sofimahmudi@gmail.com",
            role = c("aut", "cre"), comment = c(ORCID = "0000-0001-6829-0823")),
@@ -27,10 +27,12 @@ BugReports: https://github.com/choxos/rfair/issues
 Depends:
     R (>= 4.1)
 Imports:
+    curl,
     digest,
-    httr2,
+    httr2 (>= 1.1.0),
     jsonlite,
     mime,
+    parallel,
     rvest,
     stats,
     stringdist,
@@ -40,20 +42,18 @@ Imports:
 Suggests:
     bslib,
     chromote,
-    covr,
     DT,
-    httptest2,
-    jqr,
+    jsonld,
     knitr,
     plumber,
     rdflib,
     rmarkdown,
     shiny,
-    testthat (>= 3.0.0),
-    wand
+    testthat (>= 3.1.7),
+    withr
 Config/testthat/edition: 3
 VignetteBuilder: knitr
 Encoding: UTF-8
 Language: en-US
 Roxygen: list(markdown = TRUE)
-Config/roxygen2/version: 8.0.0
+Config/roxygen2/version: 8.1.0

@@ -1,0 +1,109 @@
+# Curator actions for failed metric tests, used by fair_recommendations().
+# Keys are metric test identifiers; metric identifiers (without a test number)
+# are the fallback for tests that have no entry of their own, including the
+# legacy and domain-specific metric versions.
+
+# FsF data metrics (v0.8)
+FsF-F1-01MD-1: Assign the metadata record a globally unique identifier, such as a DOI, Handle, ARK, or at least a stable URL.
+FsF-F1-01MD-2: Give each data file a unique identifier (a stable URL or PID) and list it in the metadata.
+FsF-F1-02MD-1: Register a persistent identifier (DOI, Handle, ARK) for the metadata record instead of relying on a plain URL.
+FsF-F1-02MD-2: Make sure the persistent identifier resolves through its PID authority (for example doi.org) to the landing page.
+FsF-F1-02MD-4: Give the data files persistent identifiers, or link them from a record that has one.
+FsF-F1-02MD-5: Register the data file identifiers with a PID authority so they resolve reliably.
+FsF-F2-01M-2: Provide the core citation metadata; creator, title, identifier, publication date, publisher, and resource type.
+FsF-F2-01M-3: Add the remaining descriptive metadata; a summary or abstract and keywords, next to the citation fields.
+FsF-F3-01M-2: List the download URL or PID of each data file in the metadata (for example DataCite contentUrl, schema.org distribution, or a signposting item link).
+FsF-F4-01M-1: Embed the metadata in the landing page as schema.org JSON-LD (or Dublin Core meta tags) so search engines such as Google Dataset Search can index it.
+FsF-F4-01M-2: Register the metadata with DataCite, for example by minting a DataCite DOI through the repository.
+FsF-A1-01M-1: State the access conditions in the metadata with a controlled term, such as info:eu-repo/semantics/openAccess or a COAR access right.
+FsF-A1-02MD-1: Make the identifier resolve to machine-readable metadata; check that it does not return an error and that the landing page exposes metadata.
+FsF-A1-02MD-2: Make the data files downloadable from the links given in the metadata over HTTP(S).
+FsF-A1.1-01MD-1: Serve the metadata over a standard web protocol such as HTTPS.
+FsF-A1.1-01MD-2: Serve the data files over a standard protocol such as HTTPS or FTP.
+FsF-A1.2-01MD-1: Serve the metadata over a protocol that supports authentication, such as HTTPS.
+FsF-A1.2-01MD-2: Serve the data files over a protocol that supports authentication, such as HTTPS.
+FsF-I1-01M-1: Embed structured metadata (JSON-LD or RDFa) in the landing page HTML.
+FsF-I1-01M-2: Offer the metadata as RDF or JSON-LD through content negotiation, typed links (signposting), or a SPARQL endpoint.
+FsF-I2-01M-1: Describe the data with terms from registered vocabularies or ontologies, identified by their namespace URIs.
+FsF-I2-01M-2: Use terms from registered semantic vocabularies (for example ontologies listed in BioPortal or the LOD cloud) and expose their namespaces in RDF metadata.
+FsF-I3-01M-1: Reference related resources (publications, other datasets, software) in the metadata with a stated relation type.
+FsF-I3-01M-2: Reference related resources by PID (DOI, Handle) with a relation type, for example DataCite relatedIdentifier with relationType IsSupplementTo.
+FsF-R1-01M-1: State the resource type of the data in the metadata (for example DataCite resourceTypeGeneral Dataset).
+FsF-R1-01M-2: Describe how the data is delivered; file format and size for each file, or the API endpoint and protocol for a service.
+FsF-R1-01M-3: List the measured variables or observation types in the metadata (for example schema.org variableMeasured).
+FsF-R1.1-01M-1: Add a license to the metadata as a URL or SPDX identifier, for example https://creativecommons.org/licenses/by/4.0/.
+FsF-R1.1-01M-2: Use a recognized, machine-readable license (an SPDX identifier or a Creative Commons URL).
+FsF-R1.2-01M-1: Record provenance in the metadata; creators, contributors, dates of creation and modification, and related sources.
+FsF-R1.2-01M-2: Express provenance with a formal ontology such as PROV-O or PAV in RDF metadata.
+FsF-R1.3-01M-1: Describe the data with a metadata standard of its research community (for example EML, ISO 19115, DDI, or a domain schema) and expose it.
+FsF-R1.3-01M-3: Use a community-endorsed multidisciplinary metadata standard such as DataCite, Dublin Core, or schema.org, and expose it by namespace.
+FsF-R1.3-02D-1: Publish the data in an open, long-term, or community-recommended file format (for example CSV, NetCDF, HDF5) and declare the format in the metadata.
+
+# Metric-level fallbacks (legacy and domain-specific metric versions)
+FsF-F1-01MD: Give the object a globally unique identifier.
+FsF-F1-02MD: Give the object a persistent identifier that resolves through a PID authority.
+FsF-F2-01M: Provide descriptive core metadata; creator, title, identifier, publication date, publisher, resource type, summary, and keywords.
+FsF-F3-01M: Include the identifiers or download links of the data files in the metadata.
+FsF-F4-01M: Offer the metadata in a form search engines and registries can harvest (embedded schema.org JSON-LD, DataCite).
+FsF-A1-01M: State access restrictions or rights in the metadata with a controlled term.
+FsF-A1-02MD: Make metadata and data retrievable through their identifiers.
+FsF-A1.1-01MD: Use a standard, open web protocol (HTTPS) for metadata and data.
+FsF-A1.2-01MD: Use a protocol that supports authentication where access is restricted.
+FsF-A1-02M: Make the metadata accessible through a standard protocol such as HTTPS.
+FsF-A1-03D: Make the data accessible through a standard protocol such as HTTPS.
+FsF-A2-01M: Keep the metadata available through the persistent identifier, even if the data is removed.
+FsF-I1-01M: Provide machine-readable metadata in a formal knowledge representation language (RDF, JSON-LD).
+FsF-I2-01M: Use registered semantic vocabularies in the metadata.
+FsF-I3-01M: Reference related resources by identifier with a relation type.
+FsF-R1-01M: Describe the data content; resource type, file formats and sizes, and measured variables.
+FsF-R1.1-01M: Add a machine-readable license to the metadata.
+FsF-R1.2-01M: Record provenance information in the metadata.
+FsF-R1.3-01M: Use a community-endorsed metadata standard.
+FsF-R1.3-02D: Publish the data in a community-recommended file format.
+
+# FRSM software metrics (0.7)
+FRSM-01-F1-1: Give the software a unique, resolvable identifier with a machine-readable landing page (for example the repository URL).
+FRSM-01-F1-2: Archive a release in a DOI-issuing repository such as Zenodo and record the DOI in codemeta.json or CITATION.cff.
+FRSM-01-F1-3: Use an identifier scheme common for software, such as a DOI or a Software Heritage identifier (SWHID).
+FRSM-02-F1.1-1: Describe the software components in codemeta.json or CITATION.cff.
+FRSM-02-F1.1-2: Record the relationships between components in the identifier metadata (for example hasPart and isPartOf).
+FRSM-02-F1.1-3: Give each module its own identifier where components are reused separately.
+FRSM-03-F1.2-1: Tag releases with version numbers so each version has its own identifier.
+FRSM-03-F1.2-2: Use semantic version numbers and link versions in the archive metadata (for example Zenodo versioning).
+FRSM-03-F1.2-3: Include the version number in codemeta.json or CITATION.cff.
+FRSM-04-F2-1: Add a README with the software title and a description.
+FRSM-04-F2-2: Add descriptive metadata such as the programming language, keywords (repository topics), domain, and funder.
+FRSM-04-F2-3: Add a codemeta.json or CITATION.cff so the metadata is machine-actionable.
+FRSM-05-R1-1: Say in the README how to get support or contact the maintainers.
+FRSM-05-R1-2: Document the development status and link the documentation; continuous integration helps show the status.
+FRSM-05-R1-3: Declare dependencies and development metadata in a machine-readable file (DESCRIPTION, pyproject.toml, package.json).
+FRSM-06-F2-1: List the contributors in the repository and in the metadata.
+FRSM-06-F2-2: Add a CITATION.cff or codemeta.json that lists all contributors with their roles and ORCIDs.
+FRSM-06-F2-3: Record each contributor's role, for example with CRediT roles in codemeta.json.
+FRSM-07-F3-1: Put the software identifier (for example the DOI) in the README or CITATION.cff.
+FRSM-07-F3-2: Make sure the identifier in the metadata resolves to this software.
+FRSM-08-F4-1: Deposit the software in an infrastructure that guarantees persistence, such as Zenodo or Software Heritage.
+FRSM-08-F4-2: Make the persistent metadata record discoverable by search engines and give it a persistent identifier.
+FRSM-08-F4-3: Archive the software in more than one cross-referenced infrastructure, for example Zenodo plus Software Heritage or a package registry such as CRAN or PyPI.
+FRSM-09-A1-1: Make the repository accessible over HTTPS through its identifier.
+FRSM-09-A1-2: Make the repository public, or document how authenticated access works.
+FRSM-10-I1-1: Document the data formats the software reads and writes.
+FRSM-10-I1-2: Use open data formats (for example CSV, JSON, NetCDF) for input and output.
+FRSM-10-I1-3: Reference the schemas of the data formats (for example a JSON Schema or XSD).
+FRSM-11-I1-1: Document the software's API.
+FRSM-11-I1-2: Make the API openly accessible.
+FRSM-11-I1-3: Publish a machine-readable interface definition, such as OpenAPI, GraphQL, or protobuf.
+FRSM-12-I2-1: Add machine-readable references to related articles and data, for example the references section of CITATION.cff.
+FRSM-13-R1-1: Add build, installation, and usage instructions.
+FRSM-13-R1-2: Declare dependencies in a machine-readable file and automate the build and installation.
+FRSM-14-R1-1: Add tests with test data that check the software works as expected.
+FRSM-14-R1-2: Run the tests automatically in continuous integration.
+FRSM-14-R1-3: Measure and report test coverage (for example with codecov).
+FRSM-15-R1.1-1: Add a LICENSE file to the repository.
+FRSM-15-R1.1-2: Document the licenses of bundled third-party components (for example in a NOTICE or LICENSE.note file).
+FRSM-15-R1.1-3: Use a recognized license and state it with its SPDX identifier.
+FRSM-16-R1.1-1: Include license and copyright information in the software metadata record.
+FRSM-16-R1.1-2: State the license in the metadata as an SPDX identifier or SPDX URL.
+FRSM-17-R1.2-1: Keep the full commit history in the public repository.
+FRSM-17-R1.2-2: Link commits to issues or tickets in the issue tracker.
+FRSM-17-R1.2-3: Capture machine-readable provenance, for example an RO-Crate or build attestations.

@@ -124,6 +124,8 @@ map_iso_xml <- function(root) {
 collect_xml_doc <- function(ctx, content, url, mimetype = "application/xml") {
   doc <- tryCatch(xml2::read_xml(content), error = function(e) NULL)
   if (is.null(doc)) return(invisible(FALSE))
+  note_linked_uris(ctx, content)
+  declared_ns <- unique(unname(as.character(xml2::xml_ns(doc))))
   xml2::xml_ns_strip(doc)
   resource <- xml2::xml_find_first(doc, "//resource")
   found_node <- function(name) xml2::xml_find_first(doc, sprintf("//*[local-name()='%s']", name))
@@ -146,7 +148,7 @@ collect_xml_doc <- function(ctx, content, url, mimetype = "application/xml") {
   }
   if (!length(md)) return(invisible(FALSE))
   merge_metadata(ctx, md, url = url, method = src, format = "xml",
-                 mimetype = mimetype, schema = schema)
+                 mimetype = mimetype, schema = schema, namespaces = declared_ns)
   ctx$metadata_sources[[length(ctx$metadata_sources) + 1L]] <- list(source = src, method = "content_negotiation")
   ctx_log(ctx, "FsF-I1-01M", "info", paste("Harvested", src, "metadata"))
   invisible(TRUE)
@@ -155,7 +157,7 @@ collect_xml_doc <- function(ctx, content, url, mimetype = "application/xml") {
 #' Fetch a URL expected to hold XML metadata and harvest it.
 #' @noRd
 collect_xml_from_url <- function(ctx, url, timeout = 15) {
-  resp <- tryCatch(content_negotiate(url, accept = "xml", timeout = timeout), error = function(e) NULL)
+  resp <- tryCatch(content_negotiate(url, accept = "xml", timeout = timeout, ctx = ctx), error = function(e) NULL)
   if (is.null(resp) || !isTRUE(resp$ok) || is.null(resp$content)) return(invisible())
   collect_xml_doc(ctx, resp$content, url = resp$redirect_url, mimetype = resp$content_type)
 }
@@ -163,7 +165,8 @@ collect_xml_from_url <- function(ctx, url, timeout = 15) {
 #' Harvest XML metadata via content negotiation (DataCite XML, generic XML).
 #' @noRd
 collect_xml <- function(ctx, timeout = 15) {
-  resp <- tryCatch(content_negotiate(ctx$pid_url, accept = "datacite_xml", timeout = timeout),
+  if (!datacite_possible(ctx)) return(invisible())
+  resp <- tryCatch(content_negotiate(ctx$pid_url, accept = "datacite_xml", timeout = timeout, ctx = ctx),
                    error = function(e) NULL)
   if (!is.null(resp) && isTRUE(resp$ok) && !is.null(resp$content) &&
       grepl("xml", resp$content_type %||% "", ignore.case = TRUE)) {

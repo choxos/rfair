@@ -1,8 +1,13 @@
 # Evaluators for the FRSM (FAIR for Research Software) metrics
 # (metrics_v0.7_software), scoring from the software signals harvested by
-# collect_github() into ctx$software. Scoring is heuristic: a test passes when a
+# collect_forge() into ctx$software. Scoring is heuristic: a test passes when a
 # corresponding signal is detected in the repository (license file, tests, CI,
-# requirements, registry DOI, version, contributors, ...).
+# requirements, registry DOI, version, contributors, ...). The heuristics are
+# not yet validated against expert ratings; results carry
+# evidence_type = "heuristic", and frsm_agreement() measures agreement with
+# raters. Several tests pass on weak proxies (for example FRSM-09-A1-2 on a
+# public repository, FRSM-06-F2-3 on any mention of CRediT roles); a
+# validation study should decide whether to tighten them.
 
 .sw <- function(ctx) ctx$software %||% list()
 .p <- function(res, n, ev = NULL) crit_pass_suffix(res, paste0("-", n), evidence = ev)

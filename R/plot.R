@@ -62,7 +62,7 @@ plot.fair_assessment <- function(x, type = c("category", "metric", "sunburst"),
                                  main = NULL, ...) {
   type <- match.arg(type)
   if (is.null(main)) {
-    main <- x$resolved_url %||% x$id %||% "FAIR assessment"
+    main <- if (is_nonempty_string(x$resolved_url)) x$resolved_url else x$id %||% "FAIR assessment"
     if (nchar(main) > 64) main <- paste0(substr(main, 1, 61), "...")
   }
   switch(type,

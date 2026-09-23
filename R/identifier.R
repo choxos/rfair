@@ -27,9 +27,12 @@ extract_doi <- function(x) {
 }
 
 #' Extract a Handle (prefix/suffix) from a string, or NA.
+#'
+#' Anchored at the start, like F-UJI's `verify_handle()` (`re.match`), so a
+#' plain URL with a numeric path segment (`https://host/x/123/y`) is not a Handle.
 #' @noRd
 extract_handle <- function(x) {
-  m <- regmatches(x, regexpr("(?i)(?:hdl:\\s*|(?:https?://)?hdl\\.handle\\.net/)?([0-9]+(?:\\.[0-9]+)*/.+)$",
+  m <- regmatches(x, regexpr("(?i)^(?:hdl:\\s*|(?:https?://)?hdl\\.handle\\.net/)?([0-9]+(?:\\.[0-9]+)*/.+)$",
                              x, perl = TRUE))
   if (length(m) == 0L) return(NA_character_)
   sub("(?i)^(?:hdl:\\s*|(?:https?://)?hdl\\.handle\\.net/)?", "", m, perl = TRUE)

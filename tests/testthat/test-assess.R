@@ -75,6 +75,29 @@ test_that("as_rdf emits valid DQV / schema.org Rating JSON-LD", {
   expect_true(jsonlite::validate(js))
   o <- jsonlite::fromJSON(js, simplifyVector = FALSE)
   expect_true("schema:Rating" %in% o[["@type"]])
-  expect_length(o[["dqv:hasQualityMeasurement"]], 5)
+  expect_length(o[["dqv:hasQualityMeasurement"]], 5 + a$total_metrics)
+  results <- o[["prov:wasDerivedFrom"]][["prov:hadMember"]]
+  n_tests <- sum(vapply(a$results, function(r) length(r$metric_tests), integer(1)))
+  expect_length(results, n_tests)
+  expect_null(names(results))   # a JSON array, not an object keyed by test id
+  expect_true(all(vapply(results, function(r) r[["prov:value"]] %in% c("pass", "fail"), logical(1))))
+  failed <- Filter(function(r) identical(r[["prov:value"]], "fail"), results)
+  expect_true(all(vapply(failed, function(r) !is.null(r[["ftr:suggestion"]]), logical(1))))
   expect_error(as_rdf(list()), "fair_assessment")
+})
+
+test_that("as_rdf turtle output parses and carries FTR test results", {
+  skip_if_not_installed("rdflib")
+  skip_if_not_installed("jsonld")
+  data(fair_example, package = "rfair")
+  ttl <- as_rdf(fair_example, "turtle")
+  expect_match(ttl, "https://w3id.org/ftr#TestResult", fixed = TRUE)
+  expect_match(ttl, "https://w3id.org/ftr#completion", fixed = TRUE)
+})
+
+test_that("as_rdf uses an absolute IRI for an unresolved bare DOI", {
+  a <- assess_fair("10.5281/zenodo.8347772", resolve = FALSE)
+  o <- jsonlite::fromJSON(as_rdf(a), simplifyVector = FALSE)
+  first <- o[["prov:wasDerivedFrom"]][["prov:hadMember"]][[1]]
+  expect_identical(first[["ftr:assessmentTarget"]][["@id"]], "https://doi.org/10.5281/zenodo.8347772")
 })

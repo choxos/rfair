@@ -17,7 +17,8 @@ SIGNPOSTING_RELS <- c("describedby", "item", "license", "type", "collection",
 parse_link_header <- function(link_str) {
   if (!is_nonempty_string(link_str)) return(list())
   out <- list()
-  for (part in strsplit(link_str, ",", fixed = TRUE)[[1]]) {
+  # split only on commas that start a new <link>; a URL may contain commas
+  for (part in strsplit(link_str, ",(?=\\s*<)", perl = TRUE)[[1]]) {
     seg <- trimws(strsplit(part, ";", fixed = TRUE)[[1]])
     url <- sub("^<(.*)>$", "\\1", seg[1])
     if (!nzchar(url)) next

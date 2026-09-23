@@ -6,6 +6,12 @@ library(shiny)
 library(bslib)
 library(rfair)
 
+# The app fetches whatever URL a visitor types. Refuse loopback, private, and
+# link-local hosts (cloud metadata endpoints included) so a hosted copy cannot
+# be used to reach internal services. Set the option to FALSE before
+# launch_rfair() to assess intranet resources from a local session.
+if (is.null(getOption("rfair.block_private_hosts"))) options(rfair.block_private_hosts = TRUE)
+
 `%||%` <- function(x, y) if (is.null(x) || length(x) == 0L) y else x
 
 CAT_COLORS <- c(F = "#118AB2", A = "#06D6A0", I = "#FFD166", R = "#EF476F", FAIR = "#073B4C")
@@ -152,7 +158,8 @@ server <- function(input, output, session) {
         value_box("Maturity", if (length(fair_ml) && !is.na(fair_ml)) fair_ml else "n/a",
                   showcase = icon("layer-group"),
                   theme = value_box_theme(bg = fair_col, fg = "#fff")),
-        value_box("Resolved", tags$small(a$resolved_url %||% a$id),
+        value_box(if (isFALSE(a$resolution$ok)) "Unresolved" else "Resolved",
+                  tags$small(if (is.character(a$resolved_url) && !is.na(a$resolved_url)) a$resolved_url else a$id),
                   showcase = icon("link"), theme = "light")
       ),
       do.call(layout_columns, c(
@@ -168,6 +175,7 @@ server <- function(input, output, session) {
       ),
       navset_card_tab(
         nav_panel("Metrics", DT::DTOutput("metrics")),
+        nav_panel("How to improve", DT::DTOutput("fixes")),
         nav_panel("Reuse & access", uiOutput("reuse")),
         nav_panel("Harvested metadata", DT::DTOutput("harvested")),
         nav_panel("Log", verbatimTextOutput("log"))
@@ -241,6 +249,13 @@ server <- function(input, output, session) {
                        "FAIR+ extension (Haendel et al., doi:10.5281/zenodo.203295)."))
         }))
     )
+  })
+
+  output$fixes <- DT::renderDT({
+    rec <- fair_recommendations(assessment())
+    DT::datatable(rec[c("test_identifier", "points", "recommendation")],
+                  rownames = FALSE, colnames = c("Test", "Points", "What to do"),
+                  options = list(pageLength = 15, dom = "tp"))
   })
 
   output$harvested <- DT::renderDT({

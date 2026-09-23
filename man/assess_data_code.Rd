@@ -13,6 +13,9 @@ assess_data_code(
   code_col = "open_code_links",
   sep = " ; ",
   quiet = FALSE,
+  workers = 1L,
+  keep = FALSE,
+  previous = NULL,
   ...
 )
 }
@@ -37,6 +40,12 @@ strings.}
 \item{sep}{Separator rtransparent uses to join identifiers (default \code{" ; "}).}
 
 \item{quiet}{If \code{FALSE} (default), print per-identifier progress.}
+
+\item{workers, keep}{See \code{\link[=assess_fair_batch]{assess_fair_batch()}}. With \code{keep = TRUE} the
+\code{"assessments"} attribute holds the objects for data and code together.}
+
+\item{previous}{Optional result of an earlier \code{assess_data_code()} call, to
+resume an interrupted run (see \code{\link[=assess_fair_batch]{assess_fair_batch()}}).}
 
 \item{...}{Passed to \code{\link[=assess_fair]{assess_fair()}}.}
 }

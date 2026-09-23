@@ -51,3 +51,44 @@ test_that("assess_fair_batch captures failures in the error column", {
   expect_equal(nrow(out), 1L)
   expect_equal(out$scheme, "geo")
 })
+
+test_that("assess_fair_batch keeps assessments and resumes from a previous run", {
+  ids <- c("https://doi.org/10.5281/zenodo.8347772", "geo:GSE12345")
+  first <- assess_fair_batch(ids[1], quiet = TRUE, resolve = FALSE, keep = TRUE)
+  expect_s3_class(attr(first, "assessments")[[ids[1]]], "fair_assessment")
+
+  calls <- 0L
+  local_mocked_bindings(assess_fair = function(id, ...) { calls <<- calls + 1L; stop("offline") })
+  res <- assess_fair_batch(ids, quiet = TRUE, previous = first, keep = TRUE)
+  expect_equal(calls, 1L)                         # only the new identifier was assessed
+  expect_identical(res$identifier, ids)           # input order kept
+  expect_true(is.na(res$error[1]))                # reused row
+  expect_match(res$error[2], "offline")
+  expect_named(attr(res, "assessments"), ids[1])
+})
+
+test_that("assess_data_code passes resume and keep through to the batches", {
+  x <- list(open_data_links = "https://doi.org/10.5281/zenodo.8347772",
+            open_code_links = "https://github.com/pangaea-data-publisher/fuji")
+  out <- assess_data_code(x, quiet = TRUE, resolve = FALSE, keep = TRUE)
+  expect_equal(nrow(out), 2L)
+  expect_length(attr(out, "assessments"), 2L)
+  local_mocked_bindings(assess_fair = function(id, ...) stop("should not be called"))
+  again <- assess_data_code(x, quiet = TRUE, previous = out)
+  expect_true(all(is.na(again$error)))
+})
+
+test_that("max_time skips the remaining metadata sources and says so", {
+  local_http(zenodo_routes())
+  a <- assess_fair("https://doi.org/10.5281/zenodo.8347772", max_time = -1)
+  expect_true(length(a$harvest_errors) > 0L)
+  expect_match(a$harvest_errors[[1]]$message, "max_time")
+  expect_null(a$metadata$title)
+})
+
+test_that("crashed parallel workers are recorded as errors, so a resume retries them", {
+  expect_match(.assessment_row("x", "0.8", structure("Error : killed", class = "try-error"))$error,
+               "killed")
+  expect_match(.assessment_row("x", "0.8", NULL)$error, "worker failed")
+  expect_true(is.na(.assessment_row("", "", NULL)$error))   # the column template stays clean
+})

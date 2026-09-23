@@ -113,7 +113,27 @@ license_reuse <- function(license) {
     out[c("is_open", "permits_redistribution", "permits_commercial",
           "permits_derivatives")] <- TRUE
     out$category <- "open (attribution)"; out$note <- "Open data license (attribution)."
-  } else if (grepl("^(MIT|BSD|APACHE|ISC|ZLIB|UNLICENSE|MPL|WTFPL)", u)) {
+  } else if (grepl("^(OGL|ETALAB|CDLA-PERMISSIVE|DL-DE-BY|NLOD|APL-1)", u)) {
+    # government and community open-data licenses (attribution only)
+    out$family <- "open-data"; out$requires_attribution <- TRUE
+    out$requires_share_alike <- FALSE
+    out[c("is_open", "permits_redistribution", "permits_commercial",
+          "permits_derivatives")] <- TRUE
+    out$category <- "open (attribution)"; out$note <- "Open data license (attribution)."
+  } else if (grepl("^(DL-DE-ZERO)", u)) {
+    out$family <- "public-domain"
+    out[c("is_open", "permits_redistribution", "permits_commercial",
+          "permits_derivatives")] <- TRUE
+    out$requires_attribution <- FALSE; out$requires_share_alike <- FALSE
+    out$category <- "open (public domain)"
+    out$note <- "Public-domain style license: open for any reuse."
+  } else if (grepl("^CDLA-SHARING", u)) {
+    out$family <- "open-data"; out$requires_attribution <- TRUE
+    out$requires_share_alike <- TRUE
+    out[c("is_open", "permits_redistribution", "permits_commercial",
+          "permits_derivatives")] <- TRUE
+    out$category <- "open (share-alike)"; out$note <- "Open data license (share-alike)."
+  } else if (grepl("^(MIT|BSD|APACHE|ISC|ZLIB|UNLICENSE|WTFPL|0BSD)", u)) {
     out$family <- "software-permissive"
     out[c("is_open", "permits_redistribution", "permits_commercial",
           "permits_derivatives")] <- TRUE
@@ -121,7 +141,7 @@ license_reuse <- function(license) {
     out$requires_share_alike <- FALSE
     out$category <- "open (software, permissive)"
     out$note <- "Permissive software license; note this is a software, not a data, license."
-  } else if (grepl("^(GPL|LGPL|AGPL|EPL|EUPL)", u)) {
+  } else if (grepl("^(GPL|LGPL|AGPL|EPL|EUPL|MPL)", u)) {
     out$family <- "software-copyleft"
     out[c("is_open", "permits_redistribution", "permits_commercial",
           "permits_derivatives", "requires_share_alike")] <- TRUE

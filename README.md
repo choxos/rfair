@@ -16,14 +16,16 @@
 `rfair` is a native R implementation of the
 [F-UJI](https://github.com/pangaea-data-publisher/fuji) (FAIRsFAIR Research Data
 Object Assessment) metrics. Given a persistent identifier or URL it resolves the
-object, harvests metadata from its landing page and from registries (DataCite,
-Crossref, GitHub), and scores it against the FAIRsFAIR metrics
+object, harvests metadata from its landing page, from DOI registries (DataCite,
+Crossref, and other agencies), from code forges (GitHub, GitLab, Codeberg), and
+from repository APIs (Zenodo, figshare, Dataverse, Dryad), and scores it against
+the FAIRsFAIR metrics
 ([v0.8](https://doi.org/10.5281/zenodo.15045911) by default) for Findability,
 Accessibility, Interoperability, and Reusability.
 
 `rfair` began as a fork of [`rfuji`](https://github.com/NFDI4Chem/rfuji), an HTTP
 client for an external F-UJI server; unlike that client it performs the **entire
-assessment in R** — no Python, no server. It also scores **research software**
+assessment in R**: no Python, no server. It also scores **research software**
 against the FRSM (FAIR for Research Software) metrics, which operationalize the
 [FAIR4RS Principles](https://doi.org/10.15497/RDA00068) (Chue Hong et al. 2022).
 
@@ -35,7 +37,7 @@ whether identifiers follow best practices.
 ## Installation
 
 ```r
-# From CRAN (when available)
+# From CRAN
 install.packages("rfair")
 
 # Development version from GitHub
@@ -75,11 +77,16 @@ summary(a)            # F/A/I/R score table
 as.data.frame(a)      # one row per metric
 plot(a, type = "sunburst")   # concentric FAIR sunburst (also "category" / "metric")
 as_fuji_json(a)       # F-UJI-compatible JSON
-as_rdf(a)             # DQV + schema.org Rating (JSON-LD)
+as_rdf(a)             # DQV + schema.org Rating + FAIR Test Results (JSON-LD)
 
-# Research software, scored against the FRSM metrics:
+fair_recommendations(a)   # what to fix, largest score gain first
+fair_compare(a, a2)       # a2: the same record after a metadata fix
+
+# Research software, scored against the FRSM metrics (GitHub, GitLab,
+# Codeberg, or a software DOI that links its repository):
 sw <- assess_fair("https://github.com/pangaea-data-publisher/fuji",
                   metric_version = "0.7_software")
+sw$software                  # the repository signals the FRSM tests use
 
 fair4rs_principles()         # the FAIR4RS principles the software metrics map to
 fair4rs_principles("R")      # filter to one foundational principle
@@ -122,7 +129,7 @@ classify_access(access_level = "closedAccess",
 # Identifier hygiene (layered / non-persistent PIDs)
 identifier_hygiene("RRID:MGI:5577054")$issues
 
-# Canonical FAIR principle definitions (go-fair.org / FAIR-nanopubs)
+# Canonical FAIR principle definitions (GO FAIR Foundation / FAIR-nanopubs)
 fair_principles("R")
 ```
 
@@ -146,6 +153,20 @@ scores <- assess_data_code(rt, id_col = "pmid")    # one row per (article, data/
 
 `split_identifiers()` parses the `" ; "`-joined link strings on their own.
 
+Long runs can go faster and survive interruptions:
+
+```r
+res <- assess_fair_batch(ids, workers = 4, keep = TRUE)   # parallel; keep full results
+res2 <- assess_fair_batch(ids, previous = res)            # resume: skip rows already scored
+attr(res, "assessments")                                   # the fair_assessment objects
+```
+
+The batch output has `resolved` and `http_status` columns, so dead links are
+counted rather than scored. Set `GITHUB_PAT` for software assessments: without
+a token GitHub allows 60 API requests an hour (about 15 repositories).
+`options(rfair.cache_dir = "path")` caches HTTP responses between runs, and
+`assess_fair(max_time = 60)` caps the time spent on one identifier.
+
 ## HTTP API scaffold
 
 `rfair` also ships a Plumber scaffold and OpenAPI contract for teams that want
@@ -163,13 +184,34 @@ The machine-readable API contract is installed at:
 system.file("openapi", "rfair-openapi.yaml", package = "rfair")
 ```
 
+The API and the Shiny app fetch whatever URL a visitor sends, so both set
+`options(rfair.block_private_hosts = TRUE)`: URLs that are not http(s), and
+hosts that resolve to loopback, private, link-local, or cloud metadata
+addresses, are refused. Each request connects to the address that was checked,
+so DNS rebinding cannot swap it, and every redirect is checked, with credentials
+dropped when a redirect changes scheme, host, or port. Headless rendering is off
+in the API unless the server sets `RFAIR_API_ALLOW_HEADLESS=true`, and it runs
+outside this guard. Before exposing either publicly, also put it behind a proxy
+with request limits.
+
 ## How it works
 
 ```
-id_parse() → resolve → harvest (DataCite JSON · landing-page JSON-LD/Dublin Core/
-OpenGraph · signposting typed links · XML · RDF · GitHub) → merge → 17 metric
-evaluators → F/A/I/R score → fair_assessment
+id_parse()  ->  resolve  ->  harvest  ->  merge  ->  17 metric evaluators
+            ->  F/A/I/R score  ->  fair_assessment
+
+harvest: landing page (schema.org JSON-LD, microdata, RDFa; Dublin Core,
+OpenGraph, Highwire meta tags) · signposting typed links · DataCite JSON ·
+CSL JSON (Crossref and other DOI agencies) · XML (DataCite, MODS, EML,
+ISO 19139) · RDF · code forges (GitHub, GitLab, Codeberg) · repository file
+APIs (Zenodo, figshare, Dataverse, Dryad) · data link probes
 ```
+
+rfair is checked against the reference F-UJI service with
+`tests/conformance/run.R`, monthly in CI: on 2026-09-22 it matched F-UJI 4.0.0
+on 97.6% of 85 metric comparisons (see `tests/conformance/README.md`). The FRSM
+software scores are heuristic and not yet validated against expert ratings;
+`frsm_agreement()` supports that study.
 
 Reference data (SPDX licenses, file formats, access rights, protocols, metadata
 standards, FAIR principles, reusabledata.org curations) is baked in from the
@@ -199,7 +241,7 @@ Research Data Alliance. <https://doi.org/10.15497/RDA00068> (CC BY 4.0). License
 reusability uses the [(Re)usable Data Project](https://reusabledata.org) rubric;
 data FAIR principle definitions come from the
 [FAIR-nanopubs](https://peta-pico.github.io/FAIR-nanopubs/principles/index-en.html)
-vocabulary referenced by [go-fair.org](https://www.go-fair.org/fair-principles/).
+vocabulary referenced by [the GO FAIR Foundation](https://www.gofair.foundation/fair-principles).
 
 ## Use of AI
 

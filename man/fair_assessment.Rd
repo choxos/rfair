@@ -12,7 +12,13 @@ with \code{\link[=as_fuji_json]{as_fuji_json()}} and \code{\link[=as_rdf]{as_rdf
 \details{
 Useful list elements: \code{summary} (F/A/I/R scores), \code{results} (per-metric),
 \code{metadata} (harvested), \code{reuse} (license reusability), \code{access}
-(access/sensitivity), and \code{identifier_hygiene}.
+(access/sensitivity), \code{identifier_hygiene}, \code{resolution} (the identifier's
+resolution attempt: \code{url}, \code{final_url}, HTTP \code{status}, \code{ok}, \code{error}), and
+\code{harvest_errors} (metadata sources that failed, for example a GitHub rate
+limit), and \code{software} (the repository signals the FRSM software metrics
+score, when a code repository was harvested), and \code{reference_data} (when and
+from which F-UJI release the bundled reference tables were built).
+\code{resolved_url} is \code{NA} when the identifier did not resolve.
 }
 \seealso{
 \code{\link[=assess_fair]{assess_fair()}}

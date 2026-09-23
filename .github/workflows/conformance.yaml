@@ -1,0 +1,64 @@
+# Scheduled comparison of rfair against the reference F-UJI service.
+# Starts the F-UJI Docker image, scores tests/conformance/identifiers.yaml with
+# both engines, and uploads the per-metric agreement table as an artifact.
+# It reports; it does not fail on low agreement.
+name: F-UJI conformance
+
+on:
+  schedule:
+    - cron: "0 6 1 * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  conformance:
+    runs-on: ubuntu-latest
+    services:
+      fuji:
+        image: ghcr.io/pangaea-data-publisher/fuji:latest
+        ports:
+          - 1071:1071
+    env:
+      GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      FUJI_ENDPOINT: http://localhost:1071/fuji/api/v1/evaluate
+      # F-UJI's shipped demo account (fuji_server/config/users.py), not a secret
+      FUJI_USER: marvel
+      FUJI_PASS: wonderwoman
+      FUJI_METRIC_VERSION: "0.8"
+      CONFORMANCE_OUT: conformance-v0.8.csv
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: r-lib/actions/setup-r@v2
+        with:
+          use-public-rspm: true
+
+      - uses: r-lib/actions/setup-r-dependencies@v2
+        with:
+          extra-packages: any::devtools
+          needs: check
+
+      - name: Wait for F-UJI
+        run: |
+          for i in $(seq 1 60); do
+            code=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:1071/fuji/api/v1/ui/ || true)
+            if [ "$code" != "000" ]; then echo "F-UJI is up (HTTP $code)"; exit 0; fi
+            sleep 5
+          done
+          echo "F-UJI did not start"; exit 1
+
+      - name: Record the F-UJI image
+        run: docker image inspect --format '{{index .RepoDigests 0}}' ghcr.io/pangaea-data-publisher/fuji:latest | tee fuji-image.txt
+
+      - name: Run the conformance harness
+        run: Rscript tests/conformance/run.R
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: fuji-conformance
+          path: |
+            conformance-*.csv
+            fuji-image.txt

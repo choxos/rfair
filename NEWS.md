@@ -1,3 +1,147 @@
+# rfair 0.2.0
+
+Scores can differ from rfair 0.1.0: several fixes below change what counts as
+evidence, and new metadata sources find evidence that was missed before. Rerun
+assessments before comparing them with 0.1.0 results. Agreement with the
+reference F-UJI 4.0.0 service (metrics v0.8, five fixture DOIs, 85 metric
+comparisons) rose from 91.8% to 97.6%; see `tests/conformance/README.md`.
+
+## Scoring fixes
+
+* `id_parse()` no longer treats a plain URL with a numeric path segment (for
+  example `https://figshare.com/articles/dataset/foo/12345/1`) as a Handle. Such
+  URLs were marked persistent and resolved through `hdl.handle.net` instead of
+  their own page. The Handle pattern is now anchored at the start, as in
+  F-UJI's `verify_handle()`.
+* An identifier that does not resolve is no longer reported or scored as
+  resolved. `resolved_url` is `NA`, the new `resolution` element records the
+  attempt (URL, HTTP status, error), and `print()` shows it as unresolved.
+  FsF-A1-02MD-1 (metadata retrievable) now requires a harvested metadata
+  record, as F-UJI's `testMetadataRetrievable` does; a page that resolves but
+  offers no extractable metadata no longer earns it. A nonexistent DOI dropped
+  from 17.3% to 13.5%; the remaining points (identifier scheme, HTTP protocol)
+  are the ones F-UJI also awards.
+* FsF-A1-02MD-2 (data retrievable) now requires a data link that answers with
+  a 2xx status, as in F-UJI. Up to five links are probed with a GET that is
+  closed once the headers arrive; HEAD hung on repositories that build files
+  on request.
+* schema.org `isAccessibleForFree` is read as an access statement, as F-UJI
+  does (FsF-A1-01M, `classify_access()`).
+* RDF graph metadata (Turtle, RDF/XML) was never harvested: the query used
+  SPARQL 1.1 property paths, which librdf rejects. Triples are now mapped in R,
+  creator nodes resolve to names, and predicate namespaces feed the semantic
+  vocabulary and community standard metrics. Scores can rise for repositories
+  that serve RDF.
+* Metadata sources that fail are recorded in the new `harvest_errors` element.
+  API rate limits (GitHub, GitLab, Codeberg, repository APIs) are also raised
+  as an `rfair_rate_limit` warning and stop further calls to that API for the
+  assessment, instead of silently lowering software scores.
+* `license_reuse()` recognizes the OGL, Etalab, CDLA, DL-DE, and NLOD open data
+  licenses, and classes MPL as copyleft.
+* Link headers split only between links, so URLs containing commas survive.
+* FsF-I2-01M (semantic vocabularies) checks namespaces against F-UJI's full
+  linked-vocabulary index (5,160 registered namespaces from LOV, BioPortal,
+  Bioregistry, SeaDataNet, and others) instead of a curated list of 20, and
+  also counts vocabulary terms used as metadata values (for example an SPDX
+  license URL), as F-UJI does. XML metadata keeps its declared namespaces.
+* Assessments record the version of the bundled reference data in
+  `reference_data`.
+
+## New metadata sources
+
+* DOIs registered outside DataCite (Crossref, mEDRA, JaLC, KISTI) are harvested
+  through CSL JSON content negotiation: title, authors, publisher, dates,
+  abstract, subjects, licenses, Crossref text-mining links, and relations. The
+  registration agency is looked up (bundled prefix table, then
+  `https://doi.org/ra/`), and the DataCite requests are skipped for DOIs
+  registered elsewhere. CSL metadata does not satisfy FsF-F4-01M-2, which is
+  specific to DataCite.
+* When no data links were found, the file list is read from the repository
+  API: Zenodo, figshare, Dataverse, and Dryad.
+* schema.org metadata embedded as microdata or RDFa is harvested, next to
+  JSON-LD, and counts as embedded metadata for FsF-F4-01M and FsF-I1-01M. As
+  in F-UJI, only CreativeWork types count (not Organization or
+  BreadcrumbList).
+
+## Software assessment
+
+* Code repositories on GitLab (API v4, nested groups) and Codeberg or any
+  Forgejo/Gitea instance (API v1) are harvested, next to GitHub. Tokens are
+  read from `GITHUB_PAT` (then `GITHUB_TOKEN`), `GITLAB_PAT`, and
+  `CODEBERG_TOKEN`, and sent as a Bearer `Authorization` header, which libcurl
+  does not forward when a redirect leaves the host.
+* Under the software metrics, a DOI whose metadata links a repository (for
+  example Zenodo's `IsSupplementTo` link to GitHub) is bridged to it: the
+  repository supplies the software signals and the DOI counts as the registry
+  DOI. rfair's own Zenodo concept DOI rose from 2.2% to 100%.
+* Archiving is checked against Software Heritage and the language package
+  registry (CRAN from `DESCRIPTION`, PyPI from `pyproject.toml` or
+  `setup.cfg`), not only against text mentions.
+* The harvested repository signals are returned as `a$software`.
+* FRSM results are labeled `evidence_type = "heuristic"`, and `print()` says
+  so: the scores come from repository signals that have not been validated
+  against expert judgement. `frsm_agreement()` compares them with expert
+  ratings (percent agreement and Cohen's kappa per test, plus agreement
+  between raters), and `inst/extdata/frsm_validation_template.csv` is a
+  rating sheet for all 45 FRSM tests. The validation study itself is still to
+  be done.
+
+## Guidance
+
+* `fair_recommendations()` lists every failed test with one concrete action,
+  largest score gain first (the gain allows for each metric's cap). The Shiny
+  app shows it in a "How to improve" tab.
+* `fair_compare()` reports per-metric or per-test changes between two
+  assessments.
+
+## Machine-readable results
+
+* `as_rdf()` adds one DQV quality measurement per metric and one FAIR Test
+  Result per metric test in the OSTrails FAIR Testing Resource vocabulary
+  (<https://w3id.org/ftr/>, version 1.3.0): pass or fail, completion, the
+  evidence as a log, and for failed tests the `fair_recommendations()` action
+  as a suggestion. Turtle output now checks for the `jsonld` package it needs.
+
+## Batch runs and HTTP
+
+* `assess_fair()` gains `max_time`, a time budget for the whole assessment.
+* `assess_fair_batch()` and `assess_data_code()` gain `workers` (parallel
+  assessment by forking; serial on Windows), `keep` (the full assessments in
+  the `"assessments"` attribute), and `previous` (resume an interrupted run),
+  plus `resolved` and `http_status` columns.
+* All requests share one policy: retry on 429 and 503 with capped waits, a
+  per-host rate limit (`options(rfair.rate_per_host)`), and an optional HTTP
+  cache (`options(rfair.cache_dir)`). Bodies are decoded from their declared
+  charset to UTF-8.
+
+## Security
+
+* `options(rfair.block_private_hosts = TRUE)` refuses non-http(s) URLs and
+  hosts that resolve to loopback, private, link-local, or cloud metadata
+  addresses. The request connects to the address that was checked (libcurl's
+  CURLOPT_RESOLVE), so DNS rebinding cannot swap it, and every redirect hop is
+  checked, with credentials dropped when a redirect changes scheme, host, or
+  port. The bundled Plumber API and Shiny app turn it on, since both fetch
+  visitor-supplied URLs. Headless rendering (`use_headless`) runs in a browser
+  outside this guard.
+* The Plumber API refuses headless rendering unless the server sets
+  `RFAIR_API_ALLOW_HEADLESS=true`.
+
+## Package metadata and tests
+
+* `CITATION.cff`, `codemeta.json`, `.zenodo.json`, and
+  `ro-crate-metadata.json` are generated from `DESCRIPTION` by
+  `data-raw/07-build-metadata.R`, so title, authors, contributors, and
+  dependencies agree. `citation("rfair")` reads the title and version from the
+  package metadata. The CRAN DOI is recorded.
+* The FAIR principles links point to the GO FAIR Foundation's new address.
+* Removed the unused suggested packages `httptest2`, `jqr`, `wand`, and
+  `covr`. The documentation no longer mentions libmagic file sniffing, which
+  was never implemented.
+* The harvesters are tested end to end offline, with canned responses served
+  through `httr2::local_mocked_responses()`.
+* A scheduled workflow compares rfair with the F-UJI Docker image monthly.
+
 # rfair 0.1.0
 
 First release. `rfair` is a native R implementation of the F-UJI / FAIRsFAIR

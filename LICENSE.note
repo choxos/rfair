@@ -36,11 +36,24 @@ generated from the upstream sources by the scripts in data-raw/.
 --------------------------------------------------------------------------------
 4. FAIR principle definitions
    Source:  https://peta-pico.github.io/FAIR-nanopubs/principles/
-            referenced by https://www.go-fair.org/fair-principles/
+            referenced by https://www.gofair.foundation/fair-principles
    Holder:  GO FAIR / FAIR-nanopubs contributors
    License: CC-BY-4.0
    Use:     the canonical FAIR principle text returned by fair_principles()
             and principle_definition().
+
+--------------------------------------------------------------------------------
+5. Linked-vocabulary index
+   Source:  F-UJI fuji_server/data/linked_vocab.yaml and linked_vocabs/*.json
+            (F-UJI commit dcd20f1), which compile vocabulary namespaces from
+            LOV, BioPortal, Bioregistry, SeaDataNet, MMI, SWEET, ISO/TC 211,
+            CESSDA, and other registries
+   Holder:  PANGAEA / FAIRsFAIR (compilation); the registries for their entries
+   License: MIT (F-UJI compilation); upstream registries include CC0-1.0
+            (Bioregistry) and CC-BY-4.0 (LOV)
+   Use:     the vocabulary namespace prefixes (URI strings only) that
+            FsF-I2-01M checks metadata against; built by
+            data-raw/08-build-linked-vocabs.R.
 
 --------------------------------------------------------------------------------
 The full text of the MIT, CC0-1.0, and CC-BY-4.0 licenses is available from the

@@ -7,6 +7,16 @@ url_scheme <- function(u) {
   tolower(tryCatch(httr2::url_parse(u)$scheme, error = function(e) NA_character_) %||% NA_character_)
 }
 
+#' URL schemes of the metadata access URLs (landing page and PID URL).
+#'
+#' F-UJI checks the set {landing_url, origin_url, pid_url}; a PID URL counts
+#' even when it did not resolve.
+#' @noRd
+metadata_url_schemes <- function(ctx) {
+  urls <- as_chr(c(ctx$landing_url, ctx$pid_url))
+  unique(stats::na.omit(vapply(urls, url_scheme, character(1), USE.NAMES = FALSE)))
+}
+
 #' Content (data) URLs harvested into object_content_identifier.
 #' @noRd
 content_urls_of <- function(ctx) {
@@ -14,6 +24,26 @@ content_urls_of <- function(ctx) {
   if (is.null(oci)) return(character(0))
   items <- if (is.list(oci) && is.null(names(oci))) oci else list(oci)
   as_chr(lapply(items, function(x) if (is.list(x)) x$url else x))
+}
+
+#' Content URLs whose probe returned a 2xx status.
+#' @noRd
+retrievable_content_urls <- function(ctx) {
+  oci <- ctx$metadata_merged$object_content_identifier
+  items <- if (is.list(oci) && is.null(names(oci))) oci else if (!is.null(oci)) list(oci)
+  as_chr(lapply(items, function(x) {
+    if (is.list(x) && is.numeric(x$status) && x$status >= 200 && x$status < 300) x$url
+  }))
+}
+
+#' Access statements from metadata: access_level values plus the schema.org
+#' isAccessibleForFree flag as a term F-UJI recognizes.
+#' @noRd
+access_statements <- function(md) {
+  free <- md$access_free
+  c(as_chr(md$access_level),
+    if (length(free) == 1L && !is.na(free))
+      paste0("https://schema.org/isAccessibleForFree#", if (isTRUE(as.logical(free))) "public" else "restricted"))
 }
 
 #' Is a URL scheme a standardized communication protocol?
@@ -44,6 +74,15 @@ has_offering_method <- function(ctx, method) {
 #' Does a value look like a resolvable PID/URL?
 #' @noRd
 looks_like_pid <- function(x) is_nonempty_string(x) && !is.na(id_parse(x)$preferred_schema)
+
+#' Remember the URIs that appear in a raw metadata document (for FsF-I2-01M).
+#' @noRd
+note_linked_uris <- function(ctx, text) {
+  if (!is_nonempty_string(text)) return(invisible())
+  uris <- regmatches(text, gregexpr("https?://[^\\s\"'<>\\\\)]+", text, perl = TRUE))[[1]]
+  if (length(uris)) ctx$linked_uris <- unique(c(ctx$linked_uris, uris))
+  invisible()
+}
 
 #' Vocabulary / schema namespace URIs encountered while harvesting.
 #' @noRd

@@ -1,6 +1,14 @@
 #* @apiTitle rfair FAIR assessment API
 #* @apiDescription HTTP API scaffold for running rfair FAIR assessments.
 
+# The API fetches caller-supplied URLs (`id`, `metadata_service_endpoint`).
+# Refuse loopback, private, and link-local hosts, including cloud metadata
+# endpoints, and check every redirect hop. Headless rendering starts a browser
+# per request, so it is off unless RFAIR_API_ALLOW_HEADLESS=true. Put the API
+# behind a reverse proxy with request limits before exposing it publicly.
+options(rfair.block_private_hosts = TRUE)
+allow_headless <- identical(tolower(Sys.getenv("RFAIR_API_ALLOW_HEADLESS")), "true")
+
 parse_bool <- function(x, default = FALSE) {
   value <- parse_string(x, "")
   if (!nzchar(value)) return(default)
@@ -127,6 +135,13 @@ function(id,
       "Query parameter `use_headless` must be boolean.",
       "use_headless",
       c("true", "false", "1", "0", "yes", "no", "y", "n", "t", "f")
+    ))
+  }
+  if (use_headless && !allow_headless) {
+    return(bad_request(
+      res,
+      "Headless rendering is disabled on this server (set RFAIR_API_ALLOW_HEADLESS=true).",
+      "use_headless"
     ))
   }
 

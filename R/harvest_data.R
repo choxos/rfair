@@ -1,10 +1,13 @@
 # Data-file harvester: probe content (data) links for type and size, improving
-# the data-content and file-format metrics. Uses HTTP HEAD + the 'mime' package;
-# the optional 'wand' package adds libmagic content sniffing.
+# the data-content and file-format metrics. Reads the response headers of a
+# streamed GET, with the 'mime' package guessing the type from the file
+# extension when the server gives none.
 
-#' Enrich object_content_identifier entries with MIME type and size.
+#' Enrich object_content_identifier entries with MIME type, size, and the HTTP
+#' status of the link (probing at most `limit` links, like F-UJI's
+#' data_files_limit).
 #' @noRd
-harvest_data <- function(ctx, timeout = 10, limit = 3) {
+harvest_data <- function(ctx, timeout = 10, limit = 5) {
   oci <- ctx$metadata_merged$object_content_identifier
   if (is.null(oci)) return(invisible())
   items <- if (is.list(oci) && is.null(names(oci))) oci else list(oci)
@@ -16,20 +19,16 @@ harvest_data <- function(ctx, timeout = 10, limit = 3) {
     entry <- if (is.list(it)) it else list(url = url)
     if (is_nonempty_string(url) && probed < limit) {
       probed <- probed + 1L
-      info <- tryCatch({
-        req <- httr2::request(url)
-        req <- httr2::req_method(req, "HEAD")
-        req <- httr2::req_timeout(req, timeout)
-        req <- httr2::req_error(req, is_error = function(resp) FALSE)
-        req <- httr2::req_user_agent(req, "F-UJI (rfair R package)")
-        resp <- httr2::req_perform(req)
-        if (httr2::resp_status(resp) >= 400L) {
-          NULL  # an error page's content-type/length is not the data file's
-        } else {
-          list(type = tryCatch(httr2::resp_content_type(resp), error = function(e) NA_character_),
-               size = httr2::resp_header(resp, "content-length"))
-        }
-      }, error = function(e) NULL)
+      # GET, closed once the headers arrive (as F-UJI reads the status of a
+      # streamed GET); HEAD hangs on repositories that build files on request
+      resp <- rfair_perform(rfair_request(url, timeout = timeout), ctx = ctx,
+                            source = "data", headers_only = TRUE)
+      if (is_response(resp)) entry$status <- httr2::resp_status(resp)
+      # an error page's content-type/length is not the data file's
+      info <- if (is_response(resp) && httr2::resp_status(resp) < 400L) {
+        list(type = tryCatch(httr2::resp_content_type(resp), error = function(e) NA_character_),
+             size = httr2::resp_header(resp, "content-length"))
+      }
       if (!is.null(info)) {
         if (is.null(entry$type) && is_nonempty_string(info$type)) entry$type <- info$type
         if (is.null(entry$size) && is_nonempty_string(info$size)) entry$size <- info$size

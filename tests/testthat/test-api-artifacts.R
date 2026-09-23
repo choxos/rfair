@@ -38,6 +38,8 @@ test_that("machine-readable API artifacts are packaged", {
 
 test_that("Plumber scaffold validates request enum parameters as 400s", {
   testthat::skip_if_not_installed("plumber")
+  # plumbing the API turns on the private-host guard; keep it local to this test
+  withr::local_options(rfair.block_private_hosts = FALSE)
   plumber_file <- api_artifact("plumber", "rfair-api.R")
   route <- plumber::plumb(plumber_file)$routes[["assess"]]
   assess <- route$getFunc()
@@ -73,6 +75,8 @@ test_that("Plumber scaffold validates request enum parameters as 400s", {
 
 test_that("Plumber scaffold validates boolean query parameters as 400s", {
   testthat::skip_if_not_installed("plumber")
+  # plumbing the API turns on the private-host guard; keep it local to this test
+  withr::local_options(rfair.block_private_hosts = FALSE)
   plumber_file <- api_artifact("plumber", "rfair-api.R")
   route <- plumber::plumb(plumber_file)$routes[["assess"]]
   assess <- route$getFunc()
@@ -100,4 +104,17 @@ test_that("Plumber scaffold validates boolean query parameters as 400s", {
   expect_true(parse_bool("1", FALSE))
   expect_true(parse_bool("true", FALSE))
   expect_true(parse_bool("yes", FALSE))
+})
+
+test_that("Plumber scaffold refuses headless rendering unless the server allows it", {
+  testthat::skip_if_not_installed("plumber")
+  withr::local_options(rfair.block_private_hosts = FALSE)
+  withr::local_envvar(RFAIR_API_ALLOW_HEADLESS = "")
+  assess <- plumber::plumb(api_artifact("plumber", "rfair-api.R"))$routes[["assess"]]$getFunc()
+  res <- new.env(parent = emptyenv())
+  out <- assess(id = "https://doi.org/10.5281/zenodo.8347772", use_headless = "true",
+                resolve = "false", res = res)
+  expect_equal(res$status, 400)
+  expect_equal(out$parameter, "use_headless")
+  expect_true(getOption("rfair.block_private_hosts"))
 })

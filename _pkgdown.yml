@@ -26,6 +26,13 @@ reference:
       - assess_data_code
       - assess_fair_batch
       - split_identifiers
+  - title: Improving a record
+    contents:
+      - fair_recommendations
+      - fair_compare
+  - title: Validating the software metrics
+    contents:
+      - frsm_agreement
   - title: Assessment object
     contents:
       - fair_assessment

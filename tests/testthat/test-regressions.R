@@ -1,4 +1,4 @@
-# Regression tests for defects found in the engine/collector/plot audit.
+# Regression tests for engine, collector, and plot defects fixed before 0.1.0.
 
 test_that("map_access_right matches eu-repo access levels case-insensitively", {
   expect_equal(map_access_right("info:eu-repo/semantics/openAccess"), "public")
@@ -64,4 +64,12 @@ test_that("collect_metadata_service is a no-op without an endpoint", {
   ctx$log <- list()
   expect_silent(collect_metadata_service(ctx))
   expect_length(ctx$metadata_sources, 0L)
+})
+
+test_that("parse_link_header keeps URLs that contain commas intact", {
+  h <- '<https://ex.org/a,b.csv>; rel="item"; type="text/csv", <https://ex.org/meta>; rel="describedby"'
+  links <- parse_link_header(h)
+  expect_length(links, 2L)
+  expect_equal(links[[1]]$url, "https://ex.org/a,b.csv")
+  expect_equal(links[[2]]$rel, "describedby")
 })
