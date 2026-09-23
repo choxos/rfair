@@ -70,15 +70,15 @@ add_harvest_error <- function(ctx, source, url, message, status = NA_integer_) {
   invisible()
 }
 
-#' GET + parse a forge (or registry) API JSON resource.
+#' GET + parse a JSON API resource (code forges, registries, repositories).
 #'
 #' A rate-limited response (429, or 403 with a zero remaining quota) is recorded
 #' in `ctx$harvest_errors` and raised as an `rfair_rate_limit` warning, once per
-#' forge and assessment; later calls to that forge are skipped, so a rate limit
+#' API and assessment; later calls to that API are skipped, so a rate limit
 #' cannot lower the scores without a trace. GitLab's next-page number is kept
 #' in the `next_page` attribute.
 #' @noRd
-forge_json <- function(url, forge, ctx = NULL, timeout = 15) {
+api_json <- function(url, forge, ctx = NULL, timeout = 15) {
   if (isTRUE(ctx$forge_rate_limited[[forge]])) return(NULL)
   accept <- if (identical(forge, "github")) "application/vnd.github+json" else "application/json"
   req <- rfair_request(url, timeout = timeout, accept = accept,
@@ -99,8 +99,8 @@ forge_json <- function(url, forge, ctx = NULL, timeout = 15) {
                                            httr2::resp_header(resp, "ratelimit-reset")))
     when <- if (is.na(reset)) "later" else
       format(as.POSIXct(reset, origin = "1970-01-01"), "%Y-%m-%d %H:%M:%S %Z")
-    msg <- sprintf(paste0("%s API rate limit reached; software metrics for this ",
-                          "repository are incomplete. It resets at %s.%s"),
+    msg <- sprintf(paste0("%s API rate limit reached; this assessment is incomplete. ",
+                          "It resets at %s.%s"),
                    forge, when, if (identical(forge, "github"))
                      " Set GITHUB_PAT to raise the limit." else "")
     add_harvest_error(ctx, forge, url, msg, status)
@@ -118,10 +118,10 @@ forge_json <- function(url, forge, ctx = NULL, timeout = 15) {
 #' @noRd
 forge_info_github <- function(r, ctx, timeout) {
   api <- sprintf("https://api.github.com/repos/%s/%s", r$owner, r$name)
-  j <- forge_json(api, "github", ctx, timeout)
+  j <- api_json(api, "github", ctx, timeout)
   if (is.null(j)) return(NULL)
   branch <- j$default_branch %||% "main"
-  tree <- forge_json(sprintf("%s/git/trees/%s?recursive=1", api, branch), "github", ctx, timeout)
+  tree <- api_json(sprintf("%s/git/trees/%s?recursive=1", api, branch), "github", ctx, timeout)
   list(
     forge = "github", html_url = j$html_url, name = j$name, description = j$description,
     topics = as_chr(j$topics),
@@ -129,9 +129,9 @@ forge_info_github <- function(r, ctx, timeout) {
     owner = jget(j, "owner", "login"), created = j$created_at, updated = j$updated_at,
     language = j$language, private = isTRUE(j$private), archived = isTRUE(j$archived),
     has_issues = isTRUE(j$has_issues),
-    release = forge_json(paste0(api, "/releases/latest"), "github", ctx, timeout)$tag_name,
+    release = api_json(paste0(api, "/releases/latest"), "github", ctx, timeout)$tag_name,
     paths = as_chr(lapply(tree$tree %||% list(), function(t) t$path)),
-    contributors = length(forge_json(paste0(api, "/contributors?per_page=100"),
+    contributors = length(api_json(paste0(api, "/contributors?per_page=100"),
                                      "github", ctx, timeout) %||% list()),
     raw = function(p) sprintf("https://raw.githubusercontent.com/%s/%s/%s/%s",
                               r$owner, r$name, branch, p))
@@ -141,20 +141,20 @@ forge_info_github <- function(r, ctx, timeout) {
 #' @noRd
 forge_info_gitlab <- function(r, ctx, timeout) {
   api <- sprintf("https://%s/api/v4/projects/%s", r$host, utils::URLencode(r$path, reserved = TRUE))
-  j <- forge_json(paste0(api, "?license=true"), "gitlab", ctx, timeout)
+  j <- api_json(paste0(api, "?license=true"), "gitlab", ctx, timeout)
   if (is.null(j)) return(NULL)
   branch <- j$default_branch %||% "main"
   paths <- character(0)
   page <- "1"
   for (i in seq_len(20)) {   # ponytail: 2000 paths; enough for signal detection
-    t <- forge_json(sprintf("%s/repository/tree?recursive=true&per_page=100&page=%s", api, page),
+    t <- api_json(sprintf("%s/repository/tree?recursive=true&per_page=100&page=%s", api, page),
                     "gitlab", ctx, timeout)
     paths <- c(paths, as_chr(lapply(t %||% list(), function(x) x$path)))
     page <- attr(t, "next_page")
     if (!is_nonempty_string(page)) break
   }
-  langs <- unlist(forge_json(paste0(api, "/languages"), "gitlab", ctx, timeout))
-  releases <- forge_json(paste0(api, "/releases?per_page=1"), "gitlab", ctx, timeout)
+  langs <- unlist(api_json(paste0(api, "/languages"), "gitlab", ctx, timeout))
+  releases <- api_json(paste0(api, "/releases?per_page=1"), "gitlab", ctx, timeout)
   list(
     forge = "gitlab", html_url = j$web_url, name = j$name, description = j$description,
     topics = as_chr(j$topics %||% j$tag_list),
@@ -165,7 +165,7 @@ forge_info_gitlab <- function(r, ctx, timeout) {
     has_issues = isTRUE(j$issues_enabled) || !is.null(jget(j, "_links", "issues")),
     release = if (length(releases)) releases[[1]]$tag_name,
     paths = paths,
-    contributors = length(forge_json(paste0(api, "/repository/contributors?per_page=100"),
+    contributors = length(api_json(paste0(api, "/repository/contributors?per_page=100"),
                                      "gitlab", ctx, timeout) %||% list()),
     raw = function(p) sprintf("%s/-/raw/%s/%s", j$web_url, branch, p))
 }
@@ -174,13 +174,13 @@ forge_info_gitlab <- function(r, ctx, timeout) {
 #' @noRd
 forge_info_gitea <- function(r, ctx, timeout) {
   api <- sprintf("https://%s/api/v1/repos/%s/%s", r$host, r$owner, r$name)
-  j <- forge_json(api, "gitea", ctx, timeout)
+  j <- api_json(api, "gitea", ctx, timeout)
   if (is.null(j)) return(NULL)
   branch <- j$default_branch %||% "main"
-  tree <- forge_json(sprintf("%s/git/trees/%s?recursive=true&per_page=10000", api, branch),
+  tree <- api_json(sprintf("%s/git/trees/%s?recursive=true&per_page=10000", api, branch),
                      "gitea", ctx, timeout)
   # Gitea has no public contributors endpoint; count recent commit authors
-  commits <- forge_json(sprintf("%s/commits?limit=50&stat=false&verification=false&files=false", api),
+  commits <- api_json(sprintf("%s/commits?limit=50&stat=false&verification=false&files=false", api),
                         "gitea", ctx, timeout)
   authors <- unique(as_chr(lapply(commits %||% list(), function(c) jget(c, "commit", "author", "email"))))
   list(
@@ -189,7 +189,7 @@ forge_info_gitea <- function(r, ctx, timeout) {
     owner = jget(j, "owner", "login"), created = j$created_at, updated = j$updated_at,
     language = j$language, private = isTRUE(j$private), archived = isTRUE(j$archived),
     has_issues = isTRUE(j$has_issues),
-    release = forge_json(paste0(api, "/releases/latest"), "gitea", ctx, timeout)$tag_name,
+    release = api_json(paste0(api, "/releases/latest"), "gitea", ctx, timeout)$tag_name,
     paths = as_chr(lapply(tree$tree %||% list(), function(t) t$path)),
     contributors = length(authors),
     raw = function(p) sprintf("https://%s/%s/%s/raw/branch/%s/%s", r$host, r$owner, r$name, branch, p))
@@ -293,7 +293,7 @@ software_signals <- function(info, cm, ctx = NULL, timeout = 15) {
 
   # archiving infrastructures beyond the DOI registry: Software Heritage and a
   # language package registry (CRAN, PyPI)
-  in_swh <- !info$private && !is.null(forge_json(
+  in_swh <- !info$private && !is.null(api_json(
     sprintf("https://archive.softwareheritage.org/api/1/origin/%s/get/", info$html_url),
     "swh", ctx, timeout))
   registry <- package_registry(info, read_raw, ctx, timeout)

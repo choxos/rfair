@@ -80,7 +80,8 @@ collect_metadata_service <- function(ctx, timeout = 15) {
 #'
 #' Collectors run in F-UJI's priority order; later collectors only fill gaps via
 #' `merge_metadata()`. Wires DataCite, CSL JSON (other DOI agencies),
-#' landing-page HTML, signposting, XML, RDF, GitHub, and the data-file probe.
+#' landing-page HTML, signposting, XML, RDF, code forges, repository file APIs,
+#' and the data-file probe.
 #' @noRd
 harvest_all_metadata <- function(ctx, timeout = 15) {
   # isolate each collector: a malformed response from one source must not abort
@@ -105,6 +106,7 @@ harvest_all_metadata <- function(ctx, timeout = 15) {
   run("xml", collect_xml(ctx, timeout = timeout))
   run("rdf", collect_rdf(ctx, timeout = timeout))
   run("forge", collect_forge(ctx, timeout = timeout))
+  run("repository_files", collect_repository_files(ctx, timeout = timeout))
   run("data", harvest_data(ctx, timeout = timeout))
   invisible()
 }
