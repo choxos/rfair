@@ -41,9 +41,9 @@ cat(as_fuji_json(a))
 #>     "metadata_service_type": "",
 #>     "test_debug": false
 #>   },
-#>   "start_timestamp": "2026-09-22T18:25:55+0000",
-#>   "end_timestamp": "2026-09-22T18:26:00+0000",
-#>   "software_version": "0.1.0",
+#>   "start_timestamp": "2026-09-23T13:53:37+0000",
+#>   "end_timestamp": "2026-09-23T13:53:43+0000",
+#>   "software_version": "0.2.0",
 #>   "metric_version": "0.8",
 #>   "metric_specification": "https://doi.org/10.5281/zenodo.15045911",
 #>   "total_metrics": 17,
@@ -462,7 +462,7 @@ cat(as_fuji_json(a))
 #>           },
 #>           "metric_test_maturity": 3,
 #>           "metric_test_status": "pass",
-#>           "evidence": "https://zenodo.org/records/8347772"
+#>           "evidence": ["https://zenodo.org/records/8347772", "https://zenodo.org/api/records/8347772", "https://data.crosscite.org/10.5281%2Fzenodo.8347772"]
 #>         },
 #>         "FsF-A1-02MD-2": {
 #>           "metric_test_identifier": "FsF-A1-02MD-2",

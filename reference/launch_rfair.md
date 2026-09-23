@@ -14,7 +14,8 @@ launch_rfair(...)
 
 - ...:
 
-  Passed to `shiny::runApp()`.
+  Passed to
+  [`shiny::runApp()`](https://rdrr.io/pkg/shiny/man/runApp.html).
 
 ## Value
 

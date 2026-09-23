@@ -101,7 +101,7 @@ fair_tlc(a)
 ## The canonical FAIR principles
 
 For reference, the authoritative principle definitions (from the
-FAIR-nanopubs vocabulary used by go-fair.org):
+FAIR-nanopubs vocabulary used by the GO FAIR Foundation):
 
 ``` r
 

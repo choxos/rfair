@@ -15,7 +15,7 @@ the FRSM software metrics."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">rfair</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -66,6 +66,9 @@ the FRSM software metrics.</p>
 <span>  code_col <span class="op">=</span> <span class="st">"open_code_links"</span>,</span>
 <span>  sep <span class="op">=</span> <span class="st">" ; "</span>,</span>
 <span>  quiet <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  workers <span class="op">=</span> <span class="fl">1L</span>,</span>
+<span>  keep <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  previous <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -109,6 +112,16 @@ strings.</p></dd>
 <dd><p>If <code>FALSE</code> (default), print per-identifier progress.</p></dd>
 
 
+<dt id="arg-workers-keep">workers, keep<a class="anchor" aria-label="anchor" href="#arg-workers-keep"></a></dt>
+<dd><p>See <code><a href="assess_fair_batch.html">assess_fair_batch()</a></code>. With <code>keep = TRUE</code> the
+<code>"assessments"</code> attribute holds the objects for data and code together.</p></dd>
+
+
+<dt id="arg-previous">previous<a class="anchor" aria-label="anchor" href="#arg-previous"></a></dt>
+<dd><p>Optional result of an earlier <code>assess_data_code()</code> call, to
+resume an interrupted run (see <code><a href="assess_fair_batch.html">assess_fair_batch()</a></code>).</p></dd>
+
+
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
 <dd><p>Passed to <code><a href="assess_fair.html">assess_fair()</a></code>.</p></dd>
 
@@ -129,17 +142,20 @@ strings.</p></dd>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="co"># \donttest{</span></span></span>
 <span class="r-in"><span><span class="fu">assess_data_code</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span>open_data_links <span class="op">=</span> <span class="st">"https://doi.org/10.5281/zenodo.8347772"</span>,</span></span>
 <span class="r-in"><span>                      open_code_links <span class="op">=</span> <span class="st">"https://github.com/pangaea-data-publisher/fuji"</span><span class="op">)</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [1/2] assessing https://doi.org/10.5281/zenodo.8347772 (v0.8)</span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> [2/2] assessing https://github.com/pangaea-data-publisher/fuji (v0.7_software)</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [1/1] assessing https://doi.org/10.5281/zenodo.8347772</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> [1/1] assessing https://github.com/pangaea-data-publisher/fuji</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>   source kind                                     identifier metric_version</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1   &lt;NA&gt; data         https://doi.org/10.5281/zenodo.8347772            0.8</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2   &lt;NA&gt; code https://github.com/pangaea-data-publisher/fuji   0.7_software</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   scheme is_persistent                                   resolved_url</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1    doi          TRUE             https://zenodo.org/records/8347772</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2    url         FALSE https://github.com/pangaea-data-publisher/fuji</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   fair_percent   F   A      I     R maturity n_pass n_metrics error</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1        88.46 100 100  66.67 83.33     2.50     15        17  &lt;NA&gt;</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2        73.33  55 100 100.00 81.25     2.25     16        17  &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   scheme is_persistent resolved http_status</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1    doi          TRUE     TRUE         200</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2    url         FALSE     TRUE         200</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>                                     resolved_url fair_percent   F   A      I</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1             https://zenodo.org/records/8347772        88.46 100 100  66.67</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 https://github.com/pangaea-data-publisher/fuji        91.11  95 100 100.00</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>       R maturity n_pass n_metrics error</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1 83.33      2.5     15        17  &lt;NA&gt;</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2 81.25      2.5     17        17  &lt;NA&gt;</span>
 <span class="r-in"><span><span class="co"># }</span></span></span>
 </code></pre></div>
     </div>

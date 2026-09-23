@@ -15,7 +15,14 @@ and [`as_rdf()`](https://choxos.github.io/rfair/reference/as_rdf.md).
 
 Useful list elements: `summary` (F/A/I/R scores), `results`
 (per-metric), `metadata` (harvested), `reuse` (license reusability),
-`access` (access/sensitivity), and `identifier_hygiene`.
+`access` (access/sensitivity), `identifier_hygiene`, `resolution` (the
+identifier's resolution attempt: `url`, `final_url`, HTTP `status`,
+`ok`, `error`), and `harvest_errors` (metadata sources that failed, for
+example a GitHub rate limit), and `software` (the repository signals the
+FRSM software metrics score, when a code repository was harvested), and
+`reference_data` (when and from which F-UJI release the bundled
+reference tables were built). `resolved_url` is `NA` when the identifier
+did not resolve.
 
 ## See also
 

@@ -22,7 +22,7 @@
 
     <a class="navbar-brand me-2" href="index.html">rfair</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,14 +62,14 @@
 <blockquote>
 <p>Assess the FAIRness of research data objects and software, natively in R.</p>
 </blockquote>
-<p><code>rfair</code> is a native R implementation of the <a href="https://github.com/pangaea-data-publisher/fuji" class="external-link">F-UJI</a> (FAIRsFAIR Research Data Object Assessment) metrics. Given a persistent identifier or URL it resolves the object, harvests metadata from its landing page and from registries (DataCite, Crossref, GitHub), and scores it against the FAIRsFAIR metrics (<a href="https://doi.org/10.5281/zenodo.15045911" class="external-link">v0.8</a> by default) for Findability, Accessibility, Interoperability, and Reusability.</p>
-<p><code>rfair</code> began as a fork of <a href="https://github.com/NFDI4Chem/rfuji" class="external-link"><code>rfuji</code></a>, an HTTP client for an external F-UJI server; unlike that client it performs the <strong>entire assessment in R</strong> — no Python, no server. It also scores <strong>research software</strong> against the FRSM (FAIR for Research Software) metrics, which operationalize the <a href="https://doi.org/10.15497/RDA00068" class="external-link">FAIR4RS Principles</a> (Chue Hong et al. 2022).</p>
+<p><code>rfair</code> is a native R implementation of the <a href="https://github.com/pangaea-data-publisher/fuji" class="external-link">F-UJI</a> (FAIRsFAIR Research Data Object Assessment) metrics. Given a persistent identifier or URL it resolves the object, harvests metadata from its landing page, from DOI registries (DataCite, Crossref, and other agencies), from code forges (GitHub, GitLab, Codeberg), and from repository APIs (Zenodo, figshare, Dataverse, Dryad), and scores it against the FAIRsFAIR metrics (<a href="https://doi.org/10.5281/zenodo.15045911" class="external-link">v0.8</a> by default) for Findability, Accessibility, Interoperability, and Reusability.</p>
+<p><code>rfair</code> began as a fork of <a href="https://github.com/NFDI4Chem/rfuji" class="external-link"><code>rfuji</code></a>, an HTTP client for an external F-UJI server; unlike that client it performs the <strong>entire assessment in R</strong>: no Python, no server. It also scores <strong>research software</strong> against the FRSM (FAIR for Research Software) metrics, which operationalize the <a href="https://doi.org/10.15497/RDA00068" class="external-link">FAIR4RS Principles</a> (Chue Hong et al. 2022).</p>
 <p>It also goes <strong>beyond F-UJI</strong> with checks that automated FAIR tools usually miss (prompted by peer review of a COVID-19 FAIR-assessment study): whether a license actually permits reuse, whether data is controlled-access / sensitive, and whether identifiers follow best practices.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># From CRAN (when available)</span></span>
+<code class="sourceCode R"><span><span class="co"># From CRAN</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"rfair"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Development version from GitHub</span></span>
@@ -106,11 +106,16 @@
 <span><span class="fu"><a href="https://rdrr.io/r/base/as.data.frame.html" class="external-link">as.data.frame</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span>      <span class="co"># one row per metric</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">a</span>, type <span class="op">=</span> <span class="st">"sunburst"</span><span class="op">)</span>   <span class="co"># concentric FAIR sunburst (also "category" / "metric")</span></span>
 <span><span class="fu"><a href="reference/as_fuji_json.html">as_fuji_json</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span>       <span class="co"># F-UJI-compatible JSON</span></span>
-<span><span class="fu"><a href="reference/as_rdf.html">as_rdf</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span>             <span class="co"># DQV + schema.org Rating (JSON-LD)</span></span>
+<span><span class="fu"><a href="reference/as_rdf.html">as_rdf</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span>             <span class="co"># DQV + schema.org Rating + FAIR Test Results (JSON-LD)</span></span>
 <span></span>
-<span><span class="co"># Research software, scored against the FRSM metrics:</span></span>
+<span><span class="fu"><a href="reference/fair_recommendations.html">fair_recommendations</a></span><span class="op">(</span><span class="va">a</span><span class="op">)</span>   <span class="co"># what to fix, largest score gain first</span></span>
+<span><span class="fu"><a href="reference/fair_compare.html">fair_compare</a></span><span class="op">(</span><span class="va">a</span>, <span class="va">a2</span><span class="op">)</span>       <span class="co"># a2: the same record after a metadata fix</span></span>
+<span></span>
+<span><span class="co"># Research software, scored against the FRSM metrics (GitHub, GitLab,</span></span>
+<span><span class="co"># Codeberg, or a software DOI that links its repository):</span></span>
 <span><span class="va">sw</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/assess_fair.html">assess_fair</a></span><span class="op">(</span><span class="st">"https://github.com/pangaea-data-publisher/fuji"</span>,</span>
 <span>                  metric_version <span class="op">=</span> <span class="st">"0.7_software"</span><span class="op">)</span></span>
+<span><span class="va">sw</span><span class="op">$</span><span class="va">software</span>                  <span class="co"># the repository signals the FRSM tests use</span></span>
 <span></span>
 <span><span class="fu"><a href="reference/fair4rs_principles.html">fair4rs_principles</a></span><span class="op">(</span><span class="op">)</span>         <span class="co"># the FAIR4RS principles the software metrics map to</span></span>
 <span><span class="fu"><a href="reference/fair4rs_principles.html">fair4rs_principles</a></span><span class="op">(</span><span class="st">"R"</span><span class="op">)</span>      <span class="co"># filter to one foundational principle</span></span></code></pre></div>
@@ -148,7 +153,7 @@
 <span><span class="co"># Identifier hygiene (layered / non-persistent PIDs)</span></span>
 <span><span class="fu"><a href="reference/identifier_hygiene.html">identifier_hygiene</a></span><span class="op">(</span><span class="st">"RRID:MGI:5577054"</span><span class="op">)</span><span class="op">$</span><span class="va">issues</span></span>
 <span></span>
-<span><span class="co"># Canonical FAIR principle definitions (go-fair.org / FAIR-nanopubs)</span></span>
+<span><span class="co"># Canonical FAIR principle definitions (GO FAIR Foundation / FAIR-nanopubs)</span></span>
 <span><span class="fu"><a href="reference/fair_principles.html">fair_principles</a></span><span class="op">(</span><span class="st">"R"</span><span class="op">)</span></span></code></pre></div>
 <p>These results are attached to every assessment (<code>a$reuse</code>, <code>a$access</code>, <code>a$identifier_hygiene</code>) and shown in the app.</p>
 </div>
@@ -160,25 +165,38 @@
 <code class="sourceCode R"><span><span class="va">rt</span> <span class="op">&lt;-</span> <span class="fu">rtransparent</span><span class="fu">::</span><span class="fu">rt_data_code_pmc</span><span class="op">(</span><span class="va">xml</span><span class="op">)</span>          <span class="co"># is_open_data, open_data_links, ...</span></span>
 <span><span class="va">scores</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/assess_data_code.html">assess_data_code</a></span><span class="op">(</span><span class="va">rt</span>, id_col <span class="op">=</span> <span class="st">"pmid"</span><span class="op">)</span>    <span class="co"># one row per (article, data/code link)</span></span></code></pre></div>
 <p><code><a href="reference/split_identifiers.html">split_identifiers()</a></code> parses the <code>" ; "</code>-joined link strings on their own.</p>
+<p>Long runs can go faster and survive interruptions:</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">res</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/assess_fair_batch.html">assess_fair_batch</a></span><span class="op">(</span><span class="va">ids</span>, workers <span class="op">=</span> <span class="fl">4</span>, keep <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>   <span class="co"># parallel; keep full results</span></span>
+<span><span class="va">res2</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/assess_fair_batch.html">assess_fair_batch</a></span><span class="op">(</span><span class="va">ids</span>, previous <span class="op">=</span> <span class="va">res</span><span class="op">)</span>            <span class="co"># resume: skip rows already scored</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/attr.html" class="external-link">attr</a></span><span class="op">(</span><span class="va">res</span>, <span class="st">"assessments"</span><span class="op">)</span>                                   <span class="co"># the fair_assessment objects</span></span></code></pre></div>
+<p>The batch output has <code>resolved</code> and <code>http_status</code> columns, so dead links are counted rather than scored. Set <code>GITHUB_PAT</code> for software assessments: without a token GitHub allows 60 API requests an hour (about 15 repositories). <code>options(rfair.cache_dir = "path")</code> caches HTTP responses between runs, and <code>assess_fair(max_time = 60)</code> caps the time spent on one identifier.</p>
 </div>
 <div class="section level2">
 <h2 id="http-api-scaffold">HTTP API scaffold<a class="anchor" aria-label="anchor" href="#http-api-scaffold"></a>
 </h2>
 <p><code>rfair</code> also ships a Plumber scaffold and OpenAPI contract for teams that want to expose the same assessment engine over HTTP:</p>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">api</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"plumber"</span>, <span class="st">"rfair-api.R"</span>, package <span class="op">=</span> <span class="st">"rfair"</span><span class="op">)</span></span>
-<span><span class="va">pr</span> <span class="op">&lt;-</span> <span class="fu">plumber</span><span class="fu">::</span><span class="fu">pr</span><span class="op">(</span><span class="va">api</span><span class="op">)</span></span>
+<span><span class="va">pr</span> <span class="op">&lt;-</span> <span class="fu">plumber</span><span class="fu">::</span><span class="fu"><a href="https://www.rplumber.io/reference/pr.html" class="external-link">pr</a></span><span class="op">(</span><span class="va">api</span><span class="op">)</span></span>
 <span><span class="va">pr</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span>port <span class="op">=</span> <span class="fl">8000</span><span class="op">)</span></span></code></pre></div>
 <p>The machine-readable API contract is installed at:</p>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/system.file.html" class="external-link">system.file</a></span><span class="op">(</span><span class="st">"openapi"</span>, <span class="st">"rfair-openapi.yaml"</span>, package <span class="op">=</span> <span class="st">"rfair"</span><span class="op">)</span></span></code></pre></div>
+<p>The API and the Shiny app fetch whatever URL a visitor sends, so both set <code>options(rfair.block_private_hosts = TRUE)</code>: URLs that are not http(s), and hosts that resolve to loopback, private, link-local, or cloud metadata addresses, are refused. Each request connects to the address that was checked, so DNS rebinding cannot swap it, and every redirect is checked, with credentials dropped when a redirect changes scheme, host, or port. Headless rendering is off in the API unless the server sets <code>RFAIR_API_ALLOW_HEADLESS=true</code>, and it runs outside this guard. Before exposing either publicly, also put it behind a proxy with request limits.</p>
 </div>
 <div class="section level2">
 <h2 id="how-it-works">How it works<a class="anchor" aria-label="anchor" href="#how-it-works"></a>
 </h2>
-<pre><code>id_parse() → resolve → harvest (DataCite JSON · landing-page JSON-LD/Dublin Core/
-OpenGraph · signposting typed links · XML · RDF · GitHub) → merge → 17 metric
-evaluators → F/A/I/R score → fair_assessment</code></pre>
+<pre><code>id_parse()  -&gt;  resolve  -&gt;  harvest  -&gt;  merge  -&gt;  17 metric evaluators
+            -&gt;  F/A/I/R score  -&gt;  fair_assessment
+
+harvest: landing page (schema.org JSON-LD, microdata, RDFa; Dublin Core,
+OpenGraph, Highwire meta tags) · signposting typed links · DataCite JSON ·
+CSL JSON (Crossref and other DOI agencies) · XML (DataCite, MODS, EML,
+ISO 19139) · RDF · code forges (GitHub, GitLab, Codeberg) · repository file
+APIs (Zenodo, figshare, Dataverse, Dryad) · data link probes</code></pre>
+<p>rfair is checked against the reference F-UJI service with <code>tests/conformance/run.R</code>, monthly in CI: on 2026-09-22 it matched F-UJI 4.0.0 on 97.6% of 85 metric comparisons (see <code>tests/conformance/README.md</code>). The FRSM software scores are heuristic and not yet validated against expert ratings; <code><a href="reference/frsm_agreement.html">frsm_agreement()</a></code> supports that study.</p>
 <p>Reference data (SPDX licenses, file formats, access rights, protocols, metadata standards, FAIR principles, reusabledata.org curations) is baked in from the F-UJI sources by the scripts in <code>data-raw/</code>.</p>
 </div>
 <div class="section level2">
@@ -189,7 +207,7 @@ evaluators → F/A/I/R score → fair_assessment</code></pre>
 <div class="section level2">
 <h2 id="acknowledgements">Acknowledgements<a class="anchor" aria-label="anchor" href="#acknowledgements"></a>
 </h2>
-<p><code>rfair</code> began as a fork of the <a href="https://github.com/NFDI4Chem/rfuji" class="external-link">rfuji</a> F-UJI API client (Steffen Neumann) and reimplements the assessment engine natively in R. It is a native R port of <a href="https://github.com/pangaea-data-publisher/fuji" class="external-link">F-UJI</a> (© PANGAEA, MIT), itself based on the FAIRsFAIR metrics. The software metrics operationalize the <strong>FAIR Principles for Research Software (FAIR4RS)</strong>: Chue Hong, N. P., Katz, D. S., Barker, M., Lamprecht, A.-L., Martinez, C., Psomopoulos, F. E., Harrow, J., Castro, L. J., Gruenpeter, M., Martinez, P. A., Honeyman, T., et al. (2022). <em>FAIR Principles for Research Software (FAIR4RS Principles)</em> (1.0). Research Data Alliance. <a href="https://doi.org/10.15497/RDA00068" class="external-link uri">https://doi.org/10.15497/RDA00068</a> (CC BY 4.0). License reusability uses the <a href="https://reusabledata.org" class="external-link">(Re)usable Data Project</a> rubric; data FAIR principle definitions come from the <a href="https://peta-pico.github.io/FAIR-nanopubs/principles/index-en.html" class="external-link">FAIR-nanopubs</a> vocabulary referenced by <a href="https://www.go-fair.org/fair-principles/" class="external-link">go-fair.org</a>.</p>
+<p><code>rfair</code> began as a fork of the <a href="https://github.com/NFDI4Chem/rfuji" class="external-link">rfuji</a> F-UJI API client (Steffen Neumann) and reimplements the assessment engine natively in R. It is a native R port of <a href="https://github.com/pangaea-data-publisher/fuji" class="external-link">F-UJI</a> (© PANGAEA, MIT), itself based on the FAIRsFAIR metrics. The software metrics operationalize the <strong>FAIR Principles for Research Software (FAIR4RS)</strong>: Chue Hong, N. P., Katz, D. S., Barker, M., Lamprecht, A.-L., Martinez, C., Psomopoulos, F. E., Harrow, J., Castro, L. J., Gruenpeter, M., Martinez, P. A., Honeyman, T., et al. (2022). <em>FAIR Principles for Research Software (FAIR4RS Principles)</em> (1.0). Research Data Alliance. <a href="https://doi.org/10.15497/RDA00068" class="external-link uri">https://doi.org/10.15497/RDA00068</a> (CC BY 4.0). License reusability uses the <a href="https://reusabledata.org" class="external-link">(Re)usable Data Project</a> rubric; data FAIR principle definitions come from the <a href="https://peta-pico.github.io/FAIR-nanopubs/principles/index-en.html" class="external-link">FAIR-nanopubs</a> vocabulary referenced by <a href="https://www.gofair.foundation/fair-principles" class="external-link">the GO FAIR Foundation</a>.</p>
 </div>
 <div class="section level2">
 <h2 id="use-of-ai">Use of AI<a class="anchor" aria-label="anchor" href="#use-of-ai"></a>

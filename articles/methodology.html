@@ -20,7 +20,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rfair</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -99,17 +99,23 @@ the engine itself.</p>
    │  id_parse()            scheme detection + normalization + resolver URL
    ▼
 resolution                  content-negotiated GET, follow redirects -&gt; landing page
-   │  resolve_landing_page()
+   │  resolve_landing_page()   (a failure is recorded in $resolution, not scored)
    ▼
 harvesting                  a sequence of collectors, in priority order:
-   │   collect_html_meta()      embedded JSON-LD (schema.org), Dublin Core,
-   │                            OpenGraph, Highwire meta tags
+   │   collect_html_meta()      embedded schema.org (JSON-LD, microdata, RDFa),
+   │                            Dublin Core, OpenGraph, Highwire meta tags
    │   collect_signposting()    HTTP Link header + &lt;link rel&gt; typed links
    │   collect_datacite()       DataCite JSON via content negotiation
+   │   collect_csl()            CSL JSON for Crossref and other DOI agencies
    │   collect_xml()            DataCite XML, Dublin Core, MODS, EML, ISO19139
    │   collect_rdf()            JSON-LD (native) and Turtle/RDF-XML (via rdflib)
-   │   collect_github()         GitHub repository + codemeta.json + CITATION.cff
-   │   harvest_data()           HEAD on data links for MIME type and size
+   │   collect_forge()          GitHub, GitLab, or Codeberg repository +
+   │                            codemeta.json + CITATION.cff; software DOIs
+   │                            are bridged to their linked repository
+   │   collect_repository_files() file lists from Zenodo, figshare, Dataverse,
+   │                            or Dryad APIs when no data links were found
+   │   harvest_data()           headers of a streamed GET on up to five data
+   │                            links: HTTP status, MIME type, and size
    ▼
 mapping + merging           each source is mapped to one reference schema and
    │  merge_metadata()         merged (first-non-empty for scalars; union for
@@ -173,13 +179,13 @@ hard-coded R logic.</p>
 <span><span class="co">#&gt; [1] 17</span></span></code></pre></div>
 <p>Each metric has one or more <strong>tests</strong>. A test
 contributes a <em>score</em> and a <em>maturity</em> level (a CMMI level
-0–3: incomplete, initial, moderate, advanced) when it passes. Metrics
-use one of two scoring mechanisms:</p>
+from 0 to 3: incomplete, initial, moderate, advanced) when it passes.
+Metrics use one of two scoring mechanisms:</p>
 <ul>
 <li>
-<strong>cumulative</strong> — passed tests’ scores add up;</li>
+<strong>cumulative</strong>: passed tests’ scores add up;</li>
 <li>
-<strong>alternative</strong> — tests are alternative routes to the
+<strong>alternative</strong>: tests are alternative routes to the
 same points (the earned score is capped at the metric total).</li>
 </ul>
 <p>The criterium engine (<code>criterium_engine.R</code>) builds each
@@ -315,25 +321,35 @@ maturity is the (clamped) mean of the per-category maturities.</p>
 </h2>
 <p>For software objects, rfair also bundles the FRSM (FAIR for Research
 Software) metric set; select it with
-<code>metric_version = "0.7_software"</code>. The GitHub harvester
-inspects the repository file tree for signals (a license file, tests, CI
+<code>metric_version = "0.7_software"</code>. The forge harvester
+(GitHub, GitLab, Codeberg and other Forgejo/Gitea instances) inspects
+the repository file tree for signals (a license file, tests, CI
 workflows, dependency manifests, a registry DOI, a release version,
-contributors) and the 17 FRSM evaluators score from them. FRSM scoring
-is heuristic and not yet validated against an upstream software-FAIR
-reference.</p>
+contributors, Software Heritage and package registry archiving) and the
+17 FRSM evaluators score from them. A software DOI whose metadata links
+a repository (such as Zenodo’s <code>IsSupplementTo</code> link to
+GitHub) is scored from that repository.</p>
+<p>FRSM scoring is heuristic and not yet validated against expert
+judgement; the results carry <code>evidence_type = "heuristic"</code>.
+<code><a href="../reference/frsm_agreement.html">frsm_agreement()</a></code> supports a validation study: raters judge
+each FRSM test for a sample of repositories (template in
+<code>system.file("extdata", "frsm_validation_template.csv", package = "rfair")</code>),
+and the function reports per-test agreement and Cohen’s kappa between
+rfair and the raters’ majority, and between raters.</p>
 </div>
 <div class="section level2">
 <h2 id="fidelity-to-f-uji">5. Fidelity to F-UJI<a class="anchor" aria-label="anchor" href="#fidelity-to-f-uji"></a>
 </h2>
 <p>Because rfair reimplements an existing scoring engine, it includes a
 non-CRAN conformance harness. <code>tests/conformance/run.R</code> runs
-identifiers through both rfair and a locally run, version-matched F-UJI
-server and compares per-metric earned scores. A manual run on 2026-06-16
-against F-UJI 4.0.0 (metrics v0.8) measured <strong>94.1% on a Zenodo
-DOI (16/17 metrics exact)</strong> and <strong>85.3%</strong> across
-PANGAEA and Dryad; the consistent divergence was the data file-format
-metric (F-UJI uses Tika content detection where rfair uses an HTTP
-HEAD). This reference-server comparison is not reproduced by CI yet. A
+identifiers through both rfair and a version-matched F-UJI server and
+compares per-metric earned scores; a scheduled workflow runs it monthly
+against the F-UJI Docker image. On 2026-09-22, against F-UJI 4.0.0
+(metrics v0.8), rfair 0.2.0 matched <strong>97.6% of 85 metric
+comparisons</strong> over five fixture DOIs (rfair 0.1.0: 91.8%). The
+one remaining divergence is the data file-format metric for zip
+archives: F-UJI downloads the files and lists the formats inside with
+Apache Tika, while rfair reads the declared and served content types. A
 separate harness (<code>tests/conformance/parity.R</code>) compares the
 R engine with the browser TypeScript engine on registry-derivable
 metrics after the <code>webapp</code> branch is checked out alongside
@@ -356,13 +372,16 @@ See <code><a href="../articles/beyond-fuji.html">vignette("beyond-fuji")</a></co
 <li>The browser app is registry-only (CORS): it cannot harvest landing
 pages, so some metrics score lower than the R engine.</li>
 <li>I2-01M (semantic vocabularies) scores 0 for objects whose metadata
-uses only default namespaces (dc/schema.org/DataCite) — this matches
-F-UJI.</li>
-<li>RDF Turtle/RDF-XML harvesting and <code><a href="../reference/as_rdf.html">as_rdf()</a></code> Turtle
-output need the optional <code>rdflib</code> package (system
-<code>librdf</code>); without it those paths are skipped.</li>
+uses only default namespaces (dc/schema.org/DataCite) and no terms from
+registered vocabularies; this matches F-UJI.</li>
+<li>RDF Turtle/RDF-XML harvesting needs the optional <code>rdflib</code>
+package (system <code>librdf</code>), and <code><a href="../reference/as_rdf.html">as_rdf()</a></code> Turtle
+output also needs <code>jsonld</code>; without them those paths are
+skipped.</li>
 <li>Live scores depend on the object’s current metadata and on
-third-party services (DataCite, Crossref, GitHub) being reachable.</li>
+third-party services (DataCite, doi.org, code forges, repository APIs)
+being reachable. Failed sources are listed in
+<code>$harvest_errors</code>.</li>
 </ul>
 </div>
 <div class="section level2">

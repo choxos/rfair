@@ -18,6 +18,9 @@ assess_data_code(
   code_col = "open_code_links",
   sep = " ; ",
   quiet = FALSE,
+  workers = 1L,
+  keep = FALSE,
+  previous = NULL,
   ...
 )
 ```
@@ -57,6 +60,19 @@ assess_data_code(
 
   If `FALSE` (default), print per-identifier progress.
 
+- workers, keep:
+
+  See
+  [`assess_fair_batch()`](https://choxos.github.io/rfair/reference/assess_fair_batch.md).
+  With `keep = TRUE` the `"assessments"` attribute holds the objects for
+  data and code together.
+
+- previous:
+
+  Optional result of an earlier `assess_data_code()` call, to resume an
+  interrupted run (see
+  [`assess_fair_batch()`](https://choxos.github.io/rfair/reference/assess_fair_batch.md)).
+
 - ...:
 
   Passed to
@@ -81,16 +97,19 @@ Each unique identifier is assessed once.
 # \donttest{
 assess_data_code(list(open_data_links = "https://doi.org/10.5281/zenodo.8347772",
                       open_code_links = "https://github.com/pangaea-data-publisher/fuji"))
-#> [1/2] assessing https://doi.org/10.5281/zenodo.8347772 (v0.8)
-#> [2/2] assessing https://github.com/pangaea-data-publisher/fuji (v0.7_software)
+#> [1/1] assessing https://doi.org/10.5281/zenodo.8347772
+#> [1/1] assessing https://github.com/pangaea-data-publisher/fuji
 #>   source kind                                     identifier metric_version
 #> 1   <NA> data         https://doi.org/10.5281/zenodo.8347772            0.8
 #> 2   <NA> code https://github.com/pangaea-data-publisher/fuji   0.7_software
-#>   scheme is_persistent                                   resolved_url
-#> 1    doi          TRUE             https://zenodo.org/records/8347772
-#> 2    url         FALSE https://github.com/pangaea-data-publisher/fuji
-#>   fair_percent   F   A      I     R maturity n_pass n_metrics error
-#> 1        88.46 100 100  66.67 83.33     2.50     15        17  <NA>
-#> 2        73.33  55 100 100.00 81.25     2.25     16        17  <NA>
+#>   scheme is_persistent resolved http_status
+#> 1    doi          TRUE     TRUE         200
+#> 2    url         FALSE     TRUE         200
+#>                                     resolved_url fair_percent   F   A      I
+#> 1             https://zenodo.org/records/8347772        88.46 100 100  66.67
+#> 2 https://github.com/pangaea-data-publisher/fuji        91.11  95 100 100.00
+#>       R maturity n_pass n_metrics error
+#> 1 83.33      2.5     15        17  <NA>
+#> 2 81.25      2.5     17        17  <NA>
 # }
 ```

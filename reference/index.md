@@ -21,6 +21,18 @@
 - [`split_identifiers()`](https://choxos.github.io/rfair/reference/split_identifiers.md)
   : Split a joined identifier string into individual identifiers.
 
+## Improving a record
+
+- [`fair_recommendations()`](https://choxos.github.io/rfair/reference/fair_recommendations.md)
+  : Recommend how to fix the failed tests of a FAIR assessment
+- [`fair_compare()`](https://choxos.github.io/rfair/reference/fair_compare.md)
+  : Compare two FAIR assessments
+
+## Validating the software metrics
+
+- [`frsm_agreement()`](https://choxos.github.io/rfair/reference/frsm_agreement.md)
+  : Agreement between rfair's FRSM scores and expert ratings
+
 ## Assessment object
 
 - [`fair_assessment`](https://choxos.github.io/rfair/reference/fair_assessment.md)
@@ -61,7 +73,7 @@
 - [`fair_tlc()`](https://choxos.github.io/rfair/reference/fair_tlc.md) :
   FAIR-TLC indicators (Traceable, Licensed, Connected)
 - [`as_rdf()`](https://choxos.github.io/rfair/reference/as_rdf.md) :
-  Serialize a FAIR assessment to RDF (DQV + schema.org Rating).
+  Serialize a FAIR assessment to RDF (DQV + schema.org Rating + FTR).
 
 ## App
 

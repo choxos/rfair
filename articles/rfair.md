@@ -33,7 +33,7 @@ as.data.frame(a)
 ```
 
 `summary(a)` gives the per-principle score table, and the *maturity*
-column reports a 0–3 CMMI level (incomplete → advanced).
+column reports a CMMI level from 0 (incomplete) to 3 (advanced).
 
 ``` r
 

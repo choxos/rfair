@@ -2,16 +2,15 @@
 
 Native, pure-R reimplementation of the F-UJI FAIR assessment engine,
 plus a Shiny app and a static JS/TS web app. This file tracks everything
-still to do so nothing is forgotten. See
-`~/.claude/plans/i-forked-rfair-r-deep-backus.md` for the approved plan
-and design rationale.
+still to do so nothing is forgotten.
 
 Legend: `[x]` done · `[~]` partial · `[ ]` todo
 
 ## Phase 0 — Foundations `[x]`
 
-Package scaffolding (DESCRIPTION v2, roxygen NAMESPACE, `.onLoad`, MIT
-LICENSE, `.Rbuildignore`); generated OpenAPI client removed
+Package scaffolding (DESCRIPTION v2, roxygen NAMESPACE, `.onLoad`,
+LICENSE (MIT at first; GPL-3 since 0.1.0), `.Rbuildignore`); generated
+OpenAPI client removed
 
 Reference-data pipeline `data-raw/01..04` → `R/sysdata.rda` (SPDX, file
 formats, access rights, protocols, identifiers.org, DOI prefixes) +
@@ -32,27 +31,28 @@ schema.org JSON-LD, Dublin Core, OpenGraph, Highwire (`collect_html`) -
 `object_content_identifier` - \[x\] Signposting (HTTP `Link` headers +
 typed `<link rel>`) harvester — implemented in Phase 2
 (`signposting.R`) - \[x\] Data harvester: HEAD content links for
-size/type (`mime`) — implemented in Phase 4 (`harvest_data.R`) - \[ \]
-Improve data-link discovery for repos that expose files via API
-(e.g. Zenodo files endpoint) — currently some records yield no
-`object_content_identifier`
+size/type (`mime`) — implemented in Phase 4 (`harvest_data.R`) - \[x\]
+Data-link discovery through repository APIs (Zenodo, figshare,
+Dataverse, Dryad) when no links were harvested (0.2.0,
+`collect_files.R`)
 
 Evaluators (15 / 17 implemented) - \[x\] F1-01MD unique id · F1-02MD
 persistent id · F2-01M core metadata · F3-01M data-id-included · F4-01M
 searchable - \[x\] A1-01M access info · A1-02MD retrievable · A1.1-01MD
 standard protocol · A1.2-01MD protocol auth - \[x\] I1-01M formal
 metadata · I3-01M related resources - \[x\] R1-01M data content ·
-R1.1-01M license · R1.2-01M provenance · R1.3-02D file format - \[ \]
-I2-01M semantic vocabularies — needs linked-vocab corpus → Phase 3 - \[
-\] R1.3-01M community metadata standard — needs standards corpus → Phase
-3
+R1.1-01M license · R1.2-01M provenance · R1.3-02D file format - \[x\]
+I2-01M semantic vocabularies (Phase 3; full linked-vocab index in
+0.2.0) - \[x\] R1.3-01M community metadata standard (Phase 3)
 
-Fidelity gate (blocks “Phase 1 done”) - \[ \] Stand up a local pinned
-F-UJI (metrics_v0.8) as reference - \[ \] Conformance harness over ~15
-DataCite DOIs; per-metric diff; target ≥85% agreement - \[ \]
-`httptest2` cassettes so unit + replay tests run offline / CRAN-safe -
-\[ \] Reconcile divergences (mapping/merge subtleties, protocol/auth
-edge cases)
+Fidelity gate (blocks “Phase 1 done”) - \[x\] Stand up a local pinned
+F-UJI (metrics_v0.8) as reference - \[x\] Conformance harness with
+per-metric diff; 97.6% agreement over five fixture DOIs (2026-09-22) -
+\[x\] Offline replay tests: canned responses through
+[`httr2::local_mocked_responses()`](https://httr2.r-lib.org/reference/with_mocked_responses.html)
+(0.2.0, `helper-mock.R`) - \[~\] Reconcile divergences: only
+FsF-R1.3-02D on zip archives remains (F-UJI inspects archive contents
+with Tika)
 
 ## Phase 2 — RDF + XML harvesting `[~]`
 
@@ -73,13 +73,13 @@ RDF
 Result: data-content links now harvested → Zenodo/PANGAEA reach ~85%
 (was 65–69%)
 
-`rdflib`/librdf Turtle path is implemented but UNTESTED (install
-librdf + add a fixture)
+`rdflib`/librdf Turtle path fixed (the SPARQL query used property paths
+librdf rejects) and tested with a fixture (0.2.0)
 
 More XML schemas: ISO19139, MODS, EML, METS (mappings exist in fuji);
 explicit OAI-PMH endpoint input
 
-Microdata + RDFa extraction from landing HTML
+Microdata + RDFa extraction from landing HTML (0.2.0)
 
 ## Phase 3 — Community / semantic / software `[~]`
 
@@ -113,8 +113,8 @@ yet validated against an upstream FRSM reference
 re3data/OAI-PMH/SPARQL/CSW metadata-service endpoints for richer
 R1.3-01M (disciplinary standards via repository services)
 
-linked-vocab (LOD) corpus for fuller I2-01M (currently a curated vocab
-subset)
+Linked-vocab (LOD) index for I2-01M: 5,160 namespaces from F-UJI (0.2.0,
+`data-raw/08`)
 
 ## Phase 4 — Optional fidelity tail `[~]`
 
@@ -129,8 +129,8 @@ gated, no-op if absent) wired into
 Data-file harvester (`harvest_data`): HTTP HEAD content links for MIME
 type + size (improves R1-01M-2, R1.3-02D); `mime` fallback
 
-Deeper libmagic content sniffing via `wand` (currently HEAD
-content-type + extension only)
+File format detection inside archives (F-UJI uses Tika); rfair reads
+declared and served content types from a header-only GET
 
 ## Phase 5 — Shiny app `[~]`
 
@@ -208,24 +208,20 @@ README; vignettes (`rfair`, `methodology`, `beyond-fuji`,
 `R CMD build` succeeds
 
 **Historical / manual evidence (not reproduced by CI; needs a reference
-server):** - \[~\] **Conformance vs upstream F-UJI 4.0.0 (metrics
-v0.8)**, measured manually on 2026-06-16 against a locally run F-UJI:
-94.1% on a Zenodo DOI (16/17 metrics exact), 85.3% over PANGAEA+Dryad;
-only FsF-R1.3-02D (data file format) diverged (Tika vs HEAD). Reproduce
-with `tests/conformance/run.R` after starting a local F-UJI at
-`localhost:1071`. CI does **not** start a reference server, so treat
-this as historical until automated. - \[~\] R↔︎TS parity previously
-measured 100% on the registry-core fixture set; the harness is runnable
-(above) but is not yet a CI gate.
+server):** - \[x\] **Conformance vs upstream F-UJI 4.0.0 (metrics
+v0.8)**: 97.6% of 85 metric comparisons over five fixture DOIs on
+2026-09-22 (0.1.0: 91.8%). `.github/workflows/conformance.yaml` reruns
+it monthly against the F-UJI Docker image. - \[~\] R↔︎TS parity
+previously measured 100% on the registry-core fixture set; the harness
+is runnable (above) but is not yet a CI gate.
 
-**Still open:** - \[ \] `httptest2` cassettes for full-pipeline replay
-(unit tests already offline via `resolve = FALSE`) - \[ \] Automate
-F-UJI conformance (containerized reference server) or archive a
-version-pinned conformance artifact, then promote the claim back to
-verified - \[ \] CRAN readiness: full strict `R CMD check` clean in an
-environment with all `Suggests` + system libs (`librdf`, `libmagic`)
-installed (the fallback check with `_R_CHECK_FORCE_SUGGESTS_=false` is
-clean); installed-size check
+**Still open:** - \[x\] Full-pipeline replay tests with httr2 mocked
+responses (0.2.0) - \[x\] Automate F-UJI conformance: scheduled workflow
+with the F-UJI Docker image, comparison CSV and image digest as an
+artifact - \[ \] CRAN readiness: full strict `R CMD check` clean in an
+environment with all `Suggests` + system libs (`librdf`) installed (the
+fallback check with `_R_CHECK_FORCE_SUGGESTS_=false` is clean);
+installed-size check. `wand`/`libmagic` were dropped in 0.2.0.
 
 ## Reviewer-driven extensions (Haendel review + comments/ folder) `[x]`
 
@@ -276,3 +272,17 @@ remaining comments content is manuscript-discussion prose, not code.
   R1.3-01M (community standard) implemented (Phase 3)
 - RDF-only repositories under-score until Phase 2
 - JS-rendered landing pages under-score until Phase 4 (headless)
+
+## Next (after 0.2.0)
+
+FRSM validation study: expert ratings of a repository sample with
+`inst/extdata/frsm_validation_template.csv`, agreement with
+[`frsm_agreement()`](https://choxos.github.io/rfair/reference/frsm_agreement.md);
+tighten or drop heuristics that disagree (FRSM-09-A1-2 and FRSM-06-F2-3
+are the weakest proxies)
+
+`webapp` TS engine: port the 0.2.0 scoring changes (CSL JSON, unresolved
+identifiers, data-link status) or document the divergence in `parity.R`
+
+Bitbucket support in the forge harvester (its API has no recursive tree
+or releases, so it needs its own adapter)

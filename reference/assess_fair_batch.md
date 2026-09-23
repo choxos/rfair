@@ -9,7 +9,15 @@ aborting the batch.
 ## Usage
 
 ``` r
-assess_fair_batch(ids, metric_version = "0.8", quiet = FALSE, ...)
+assess_fair_batch(
+  ids,
+  metric_version = "0.8",
+  quiet = FALSE,
+  workers = 1L,
+  keep = FALSE,
+  previous = NULL,
+  ...
+)
 ```
 
 ## Arguments
@@ -27,6 +35,29 @@ assess_fair_batch(ids, metric_version = "0.8", quiet = FALSE, ...)
 
   If `FALSE` (default), print per-identifier progress.
 
+- workers:
+
+  Number of identifiers to assess at once. Values above 1 fork worker
+  processes with
+  [`parallel::mclapply()`](https://rdrr.io/r/parallel/mclapply.html),
+  which is not available on Windows (there the batch runs serially with
+  a warning). HTTP requests to one host stay rate limited per process
+  (see `options(rfair.rate_per_host)`).
+
+- keep:
+
+  If `TRUE`, keep the full
+  [fair_assessment](https://choxos.github.io/rfair/reference/fair_assessment.md)
+  objects, named by identifier, in the `"assessments"` attribute of the
+  result.
+
+- previous:
+
+  Optional result of an earlier `assess_fair_batch()` call. Identifiers
+  it already scored without an error (for the same metric version) are
+  reused instead of assessed again, so an interrupted batch can be
+  resumed.
+
 - ...:
 
   Passed to
@@ -35,9 +66,10 @@ assess_fair_batch(ids, metric_version = "0.8", quiet = FALSE, ...)
 ## Value
 
 A data frame with one row per unique identifier: `identifier`,
-`metric_version`, `scheme`, `is_persistent`, `resolved_url`,
-`fair_percent`, `F`, `A`, `I`, `R`, `maturity`, `n_pass`, `n_metrics`,
-`error`.
+`metric_version`, `scheme`, `is_persistent`, `resolved` (did the
+identifier resolve; `NA` when `resolve = FALSE`), `http_status`,
+`resolved_url`, `fair_percent`, `F`, `A`, `I`, `R`, `maturity`,
+`n_pass`, `n_metrics`, `error`.
 
 ## See also
 
@@ -48,17 +80,22 @@ A data frame with one row per unique identifier: `identifier`,
 
 ``` r
 # \donttest{
-assess_fair_batch(c("https://doi.org/10.5281/zenodo.8347772", "geo:GSE12345"))
+res <- assess_fair_batch(c("https://doi.org/10.5281/zenodo.8347772", "geo:GSE12345"),
+                         keep = TRUE)
 #> [1/2] assessing https://doi.org/10.5281/zenodo.8347772
 #> [2/2] assessing geo:GSE12345
-#>                               identifier metric_version scheme is_persistent
-#> 1 https://doi.org/10.5281/zenodo.8347772            0.8    doi          TRUE
-#> 2                           geo:GSE12345            0.8    geo          TRUE
-#>                                                  resolved_url fair_percent
-#> 1                          https://zenodo.org/records/8347772        88.46
-#> 2 https://www.ncbi.nlm.nih.gov/geo/query/acc.cgi?acc=GSE12345        19.23
-#>        F      A     I     R maturity n_pass n_metrics error
-#> 1 100.00 100.00 66.67 83.33      2.5     15        17  <NA>
-#> 2  28.57  42.86  0.00  0.00      1.0      5        17  <NA>
+attr(res, "assessments")[[1]]
+#> <fair_assessment> https://doi.org/10.5281/zenodo.8347772
+#>   resolved: https://zenodo.org/records/8347772
+#>   metrics: v0.8 (17 metrics)
+#> 
+#>   FAIR     earned  percent  maturity
+#>   F           7/7   100.0%         3
+#>   A           7/7   100.0%         3
+#>   I           4/6    66.7%         2
+#>   R           5/6    83.3%         2
+#>   FAIR      23/26    88.5%       2.5
+#> 
+#>   reuse:    custom/unknown; open (software, permissive)
 # }
 ```

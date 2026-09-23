@@ -9,7 +9,7 @@ against the FAIRsFAIR metrics, entirely in R."></head><body>
 
     <a class="navbar-brand me-2" href="../index.html">rfair</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -57,7 +57,8 @@ against the FAIRsFAIR metrics, entirely in R.</p>
 <span>  test_debug <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  resolve <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  timeout <span class="op">=</span> <span class="fl">15</span>,</span>
-<span>  use_headless <span class="op">=</span> <span class="cn">FALSE</span></span>
+<span>  use_headless <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  max_time <span class="op">=</span> <span class="cn">Inf</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -108,6 +109,12 @@ metadata document, then RDF.</p></dd>
 <dd><p>If <code>TRUE</code> and the optional <code>chromote</code> package is
 installed, render JavaScript-heavy landing pages with a headless browser
 before harvesting embedded metadata.</p></dd>
+
+
+<dt id="arg-max-time">max_time<a class="anchor" aria-label="anchor" href="#arg-max-time"></a></dt>
+<dd><p>Time budget for the whole assessment, in seconds. Metadata
+sources not yet harvested when it runs out are skipped and listed in
+<code>harvest_errors</code>. The default, <code>Inf</code>, has no limit.</p></dd>
 
 </dl></div>
     <div class="section level2">

@@ -15,7 +15,8 @@ assess_fair(
   test_debug = FALSE,
   resolve = TRUE,
   timeout = 15,
-  use_headless = FALSE
+  use_headless = FALSE,
+  max_time = Inf
 )
 ```
 
@@ -67,6 +68,12 @@ assess_fair(
   If `TRUE` and the optional `chromote` package is installed, render
   JavaScript-heavy landing pages with a headless browser before
   harvesting embedded metadata.
+
+- max_time:
+
+  Time budget for the whole assessment, in seconds. Metadata sources not
+  yet harvested when it runs out are skipped and listed in
+  `harvest_errors`. The default, `Inf`, has no limit.
 
 ## Value
 

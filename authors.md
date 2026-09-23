@@ -16,17 +16,17 @@
 Source:
 [`inst/CITATION`](https://github.com/choxos/rfair/blob/main/inst/CITATION)
 
-Sofi-Mahmudi A, Neumann S (2026). *rfair: Native R FAIR Assessment
-Metrics*.
+Sofi-Mahmudi A (2026). *rfair: Assess the FAIRness of Research Data
+Objects and Software*.
 [doi:10.5281/zenodo.20775127](https://doi.org/10.5281/zenodo.20775127).
-R package version 0.1.0, <https://github.com/choxos/rfair>.
+R package version 0.2.0, <https://github.com/choxos/rfair>.
 
     @Manual{,
-      title = {rfair: Native R FAIR Assessment Metrics},
-      author = {Ahmad Sofi-Mahmudi and Steffen Neumann},
+      title = {{rfair}: Assess the FAIRness of Research Data Objects and Software},
+      author = {Ahmad Sofi-Mahmudi},
       year = {2026},
-      version = {0.1.0},
+      version = {0.2.0},
       doi = {10.5281/zenodo.20775127},
       url = {https://github.com/choxos/rfair},
-      note = {R package version 0.1.0},
+      note = {R package version 0.2.0},
     }

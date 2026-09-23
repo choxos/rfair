@@ -7,7 +7,7 @@
 
     <a class="navbar-brand me-2" href="../index.html">rfair</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.1.0</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.2.0</small>
 
 
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -38,6 +38,74 @@
       <small>Source: <a href="https://github.com/choxos/rfair/blob/main/NEWS.md" class="external-link"><code>NEWS.md</code></a></small>
     </div>
 
+    <div class="section level2">
+<h2 class="pkg-version" data-toc-text="0.2.0" id="rfair-020">rfair 0.2.0<a class="anchor" aria-label="anchor" href="#rfair-020"></a></h2>
+<p>Scores can differ from rfair 0.1.0: several fixes below change what counts as evidence, and new metadata sources find evidence that was missed before. Rerun assessments before comparing them with 0.1.0 results. Agreement with the reference F-UJI 4.0.0 service (metrics v0.8, five fixture DOIs, 85 metric comparisons) rose from 91.8% to 97.6%; see <code>tests/conformance/README.md</code>.</p>
+<div class="section level3">
+<h3 id="scoring-fixes-0-2-0">Scoring fixes<a class="anchor" aria-label="anchor" href="#scoring-fixes-0-2-0"></a></h3>
+<ul><li>
+<code><a href="../reference/id_parse.html">id_parse()</a></code> no longer treats a plain URL with a numeric path segment (for example <code>https://figshare.com/articles/dataset/foo/12345/1</code>) as a Handle. Such URLs were marked persistent and resolved through <code>hdl.handle.net</code> instead of their own page. The Handle pattern is now anchored at the start, as in F-UJI’s <code>verify_handle()</code>.</li>
+<li>An identifier that does not resolve is no longer reported or scored as resolved. <code>resolved_url</code> is <code>NA</code>, the new <code>resolution</code> element records the attempt (URL, HTTP status, error), and <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> shows it as unresolved. FsF-A1-02MD-1 (metadata retrievable) now requires a harvested metadata record, as F-UJI’s <code>testMetadataRetrievable</code> does; a page that resolves but offers no extractable metadata no longer earns it. A nonexistent DOI dropped from 17.3% to 13.5%; the remaining points (identifier scheme, HTTP protocol) are the ones F-UJI also awards.</li>
+<li>FsF-A1-02MD-2 (data retrievable) now requires a data link that answers with a 2xx status, as in F-UJI. Up to five links are probed with a GET that is closed once the headers arrive; HEAD hung on repositories that build files on request.</li>
+<li>schema.org <code>isAccessibleForFree</code> is read as an access statement, as F-UJI does (FsF-A1-01M, <code><a href="../reference/classify_access.html">classify_access()</a></code>).</li>
+<li>RDF graph metadata (Turtle, RDF/XML) was never harvested: the query used SPARQL 1.1 property paths, which librdf rejects. Triples are now mapped in R, creator nodes resolve to names, and predicate namespaces feed the semantic vocabulary and community standard metrics. Scores can rise for repositories that serve RDF.</li>
+<li>Metadata sources that fail are recorded in the new <code>harvest_errors</code> element. API rate limits (GitHub, GitLab, Codeberg, repository APIs) are also raised as an <code>rfair_rate_limit</code> warning and stop further calls to that API for the assessment, instead of silently lowering software scores.</li>
+<li>
+<code><a href="../reference/license_reuse.html">license_reuse()</a></code> recognizes the OGL, Etalab, CDLA, DL-DE, and NLOD open data licenses, and classes MPL as copyleft.</li>
+<li>Link headers split only between links, so URLs containing commas survive.</li>
+<li>FsF-I2-01M (semantic vocabularies) checks namespaces against F-UJI’s full linked-vocabulary index (5,160 registered namespaces from LOV, BioPortal, Bioregistry, SeaDataNet, and others) instead of a curated list of 20, and also counts vocabulary terms used as metadata values (for example an SPDX license URL), as F-UJI does. XML metadata keeps its declared namespaces.</li>
+<li>Assessments record the version of the bundled reference data in <code>reference_data</code>.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="new-metadata-sources-0-2-0">New metadata sources<a class="anchor" aria-label="anchor" href="#new-metadata-sources-0-2-0"></a></h3>
+<ul><li>DOIs registered outside DataCite (Crossref, mEDRA, JaLC, KISTI) are harvested through CSL JSON content negotiation: title, authors, publisher, dates, abstract, subjects, licenses, Crossref text-mining links, and relations. The registration agency is looked up (bundled prefix table, then <code>https://doi.org/ra/</code>), and the DataCite requests are skipped for DOIs registered elsewhere. CSL metadata does not satisfy FsF-F4-01M-2, which is specific to DataCite.</li>
+<li>When no data links were found, the file list is read from the repository API: Zenodo, figshare, Dataverse, and Dryad.</li>
+<li>schema.org metadata embedded as microdata or RDFa is harvested, next to JSON-LD, and counts as embedded metadata for FsF-F4-01M and FsF-I1-01M. As in F-UJI, only CreativeWork types count (not Organization or BreadcrumbList).</li>
+</ul></div>
+<div class="section level3">
+<h3 id="software-assessment-0-2-0">Software assessment<a class="anchor" aria-label="anchor" href="#software-assessment-0-2-0"></a></h3>
+<ul><li>Code repositories on GitLab (API v4, nested groups) and Codeberg or any Forgejo/Gitea instance (API v1) are harvested, next to GitHub. Tokens are read from <code>GITHUB_PAT</code> (then <code>GITHUB_TOKEN</code>), <code>GITLAB_PAT</code>, and <code>CODEBERG_TOKEN</code>, and sent as a Bearer <code>Authorization</code> header, which libcurl does not forward when a redirect leaves the host.</li>
+<li>Under the software metrics, a DOI whose metadata links a repository (for example Zenodo’s <code>IsSupplementTo</code> link to GitHub) is bridged to it: the repository supplies the software signals and the DOI counts as the registry DOI. rfair’s own Zenodo concept DOI rose from 2.2% to 100%.</li>
+<li>Archiving is checked against Software Heritage and the language package registry (CRAN from <code>DESCRIPTION</code>, PyPI from <code>pyproject.toml</code> or <code>setup.cfg</code>), not only against text mentions.</li>
+<li>The harvested repository signals are returned as <code>a$software</code>.</li>
+<li>FRSM results are labeled <code>evidence_type = "heuristic"</code>, and <code><a href="https://rdrr.io/r/base/print.html" class="external-link">print()</a></code> says so: the scores come from repository signals that have not been validated against expert judgement. <code><a href="../reference/frsm_agreement.html">frsm_agreement()</a></code> compares them with expert ratings (percent agreement and Cohen’s kappa per test, plus agreement between raters), and <code>inst/extdata/frsm_validation_template.csv</code> is a rating sheet for all 45 FRSM tests. The validation study itself is still to be done.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="guidance-0-2-0">Guidance<a class="anchor" aria-label="anchor" href="#guidance-0-2-0"></a></h3>
+<ul><li>
+<code><a href="../reference/fair_recommendations.html">fair_recommendations()</a></code> lists every failed test with one concrete action, largest score gain first (the gain allows for each metric’s cap). The Shiny app shows it in a “How to improve” tab.</li>
+<li>
+<code><a href="../reference/fair_compare.html">fair_compare()</a></code> reports per-metric or per-test changes between two assessments.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="machine-readable-results-0-2-0">Machine-readable results<a class="anchor" aria-label="anchor" href="#machine-readable-results-0-2-0"></a></h3>
+<ul><li>
+<code><a href="../reference/as_rdf.html">as_rdf()</a></code> adds one DQV quality measurement per metric and one FAIR Test Result per metric test in the OSTrails FAIR Testing Resource vocabulary (<a href="https://w3id.org/ftr/" class="external-link uri">https://w3id.org/ftr/</a>, version 1.3.0): pass or fail, completion, the evidence as a log, and for failed tests the <code><a href="../reference/fair_recommendations.html">fair_recommendations()</a></code> action as a suggestion. Turtle output now checks for the <code>jsonld</code> package it needs.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="batch-runs-and-http-0-2-0">Batch runs and HTTP<a class="anchor" aria-label="anchor" href="#batch-runs-and-http-0-2-0"></a></h3>
+<ul><li>
+<code><a href="../reference/assess_fair.html">assess_fair()</a></code> gains <code>max_time</code>, a time budget for the whole assessment.</li>
+<li>
+<code><a href="../reference/assess_fair_batch.html">assess_fair_batch()</a></code> and <code><a href="../reference/assess_data_code.html">assess_data_code()</a></code> gain <code>workers</code> (parallel assessment by forking; serial on Windows), <code>keep</code> (the full assessments in the <code>"assessments"</code> attribute), and <code>previous</code> (resume an interrupted run), plus <code>resolved</code> and <code>http_status</code> columns.</li>
+<li>All requests share one policy: retry on 429 and 503 with capped waits, a per-host rate limit (<code>options(rfair.rate_per_host)</code>), and an optional HTTP cache (<code>options(rfair.cache_dir)</code>). Bodies are decoded from their declared charset to UTF-8.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="security-0-2-0">Security<a class="anchor" aria-label="anchor" href="#security-0-2-0"></a></h3>
+<ul><li>
+<code>options(rfair.block_private_hosts = TRUE)</code> refuses non-http(s) URLs and hosts that resolve to loopback, private, link-local, or cloud metadata addresses. The request connects to the address that was checked (libcurl’s CURLOPT_RESOLVE), so DNS rebinding cannot swap it, and every redirect hop is checked, with credentials dropped when a redirect changes scheme, host, or port. The bundled Plumber API and Shiny app turn it on, since both fetch visitor-supplied URLs. Headless rendering (<code>use_headless</code>) runs in a browser outside this guard.</li>
+<li>The Plumber API refuses headless rendering unless the server sets <code>RFAIR_API_ALLOW_HEADLESS=true</code>.</li>
+</ul></div>
+<div class="section level3">
+<h3 id="package-metadata-and-tests-0-2-0">Package metadata and tests<a class="anchor" aria-label="anchor" href="#package-metadata-and-tests-0-2-0"></a></h3>
+<ul><li>
+<code>CITATION.cff</code>, <code>codemeta.json</code>, <code>.zenodo.json</code>, and <code>ro-crate-metadata.json</code> are generated from <code>DESCRIPTION</code> by <code>data-raw/07-build-metadata.R</code>, so title, authors, contributors, and dependencies agree. <code>citation("rfair")</code> reads the title and version from the package metadata. The CRAN DOI is recorded.</li>
+<li>The FAIR principles links point to the GO FAIR Foundation’s new address.</li>
+<li>Removed the unused suggested packages <code>httptest2</code>, <code>jqr</code>, <code>wand</code>, and <code>covr</code>. The documentation no longer mentions libmagic file sniffing, which was never implemented.</li>
+<li>The harvesters are tested end to end offline, with canned responses served through <code><a href="https://httr2.r-lib.org/reference/with_mocked_responses.html" class="external-link">httr2::local_mocked_responses()</a></code>.</li>
+<li>A scheduled workflow compares rfair with the F-UJI Docker image monthly.</li>
+</ul></div>
+</div>
     <div class="section level2">
 <h2 class="pkg-version" data-toc-text="0.1.0" id="rfair-010">rfair 0.1.0<a class="anchor" aria-label="anchor" href="#rfair-010"></a></h2><p class="text-muted">CRAN release: 2026-07-01</p>
 <p>First release. <code>rfair</code> is a native R implementation of the F-UJI / FAIRsFAIR research data object assessment metrics and the FRSM (FAIR for Research Software) metrics. It performs the entire assessment in R, with no external server.</p>
