@@ -218,18 +218,12 @@ software_spdx_ids <- function(x) {
 #' @noRd
 github_json <- function(url, token = "", timeout = 15, ctx = NULL) {
   if (isTRUE(ctx$github_rate_limited)) return(NULL)
-  req <- httr2::request(url)
-  req <- httr2::req_headers(req, Accept = "application/vnd.github+json",
-                            `X-GitHub-Api-Version` = "2022-11-28")
-  req <- httr2::req_user_agent(req, "rfair R package")
-  req <- httr2::req_timeout(req, timeout)
-  req <- httr2::req_error(req, is_error = function(resp) FALSE)
+  req <- rfair_request(url, timeout = timeout, accept = "application/vnd.github+json",
+                       user_agent = "rfair R package", retry = FALSE)
+  req <- httr2::req_headers(req, `X-GitHub-Api-Version` = "2022-11-28")
   if (nzchar(token)) req <- httr2::req_auth_bearer_token(req, token)
-  resp <- tryCatch(httr2::req_perform(req), error = function(e) {
-    add_harvest_error(ctx, "github", url, conditionMessage(e))
-    NULL
-  })
-  if (is.null(resp)) return(NULL)
+  resp <- rfair_perform(req, ctx = ctx, source = "github")
+  if (!is_response(resp)) return(NULL)
   status <- httr2::resp_status(resp)
   if (status %in% c(403L, 429L) &&
       (status == 429L || identical(httr2::resp_header(resp, "x-ratelimit-remaining"), "0"))) {

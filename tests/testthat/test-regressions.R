@@ -65,3 +65,11 @@ test_that("collect_metadata_service is a no-op without an endpoint", {
   expect_silent(collect_metadata_service(ctx))
   expect_length(ctx$metadata_sources, 0L)
 })
+
+test_that("parse_link_header keeps URLs that contain commas intact", {
+  h <- '<https://ex.org/a,b.csv>; rel="item"; type="text/csv", <https://ex.org/meta>; rel="describedby"'
+  links <- parse_link_header(h)
+  expect_length(links, 2L)
+  expect_equal(links[[1]]$url, "https://ex.org/a,b.csv")
+  expect_equal(links[[2]]$rel, "describedby")
+})

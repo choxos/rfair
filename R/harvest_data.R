@@ -16,20 +16,13 @@ harvest_data <- function(ctx, timeout = 10, limit = 3) {
     entry <- if (is.list(it)) it else list(url = url)
     if (is_nonempty_string(url) && probed < limit) {
       probed <- probed + 1L
-      info <- tryCatch({
-        req <- httr2::request(url)
-        req <- httr2::req_method(req, "HEAD")
-        req <- httr2::req_timeout(req, timeout)
-        req <- httr2::req_error(req, is_error = function(resp) FALSE)
-        req <- httr2::req_user_agent(req, "F-UJI (rfair R package)")
-        resp <- httr2::req_perform(req)
-        if (httr2::resp_status(resp) >= 400L) {
-          NULL  # an error page's content-type/length is not the data file's
-        } else {
-          list(type = tryCatch(httr2::resp_content_type(resp), error = function(e) NA_character_),
-               size = httr2::resp_header(resp, "content-length"))
-        }
-      }, error = function(e) NULL)
+      resp <- rfair_perform(rfair_request(url, timeout = timeout, method = "HEAD"),
+                            ctx = ctx, source = "data")
+      # an error page's content-type/length is not the data file's
+      info <- if (is_response(resp) && httr2::resp_status(resp) < 400L) {
+        list(type = tryCatch(httr2::resp_content_type(resp), error = function(e) NA_character_),
+             size = httr2::resp_header(resp, "content-length"))
+      }
       if (!is.null(info)) {
         if (is.null(entry$type) && is_nonempty_string(info$type)) entry$type <- info$type
         if (is.null(entry$size) && is_nonempty_string(info$size)) entry$size <- info$size

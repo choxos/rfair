@@ -6,6 +6,12 @@ library(shiny)
 library(bslib)
 library(rfair)
 
+# The app fetches whatever URL a visitor types. Refuse loopback, private, and
+# link-local hosts (cloud metadata endpoints included) so a hosted copy cannot
+# be used to reach internal services. Set the option to FALSE before
+# launch_rfair() to assess intranet resources from a local session.
+if (is.null(getOption("rfair.block_private_hosts"))) options(rfair.block_private_hosts = TRUE)
+
 `%||%` <- function(x, y) if (is.null(x) || length(x) == 0L) y else x
 
 CAT_COLORS <- c(F = "#118AB2", A = "#06D6A0", I = "#FFD166", R = "#EF476F", FAIR = "#073B4C")

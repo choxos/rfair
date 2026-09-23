@@ -63,3 +63,13 @@ test_that("fair_principles returns the canonical 15 (sub)principles", {
   expect_true(all(c("F1", "A1.1", "R1.1") %in% fp$id))
   expect_match(principle_definition("FsF-R1.1-01M"), "license", ignore.case = TRUE)
 })
+
+test_that("government and community open-data licenses are classified as open", {
+  for (id in c("OGL-UK-3.0", "etalab-2.0", "CDLA-Permissive-2.0", "DL-DE-BY-2.0", "NLOD-2.0")) {
+    r <- license_reuse(id)
+    expect_true(r$is_open, info = id)
+    expect_identical(r$rdp_category, "permissive", info = id)
+  }
+  expect_identical(license_reuse("CDLA-Sharing-1.0")$rdp_category, "copyleft")
+  expect_identical(license_reuse("MPL-2.0")$rdp_category, "copyleft")
+})
