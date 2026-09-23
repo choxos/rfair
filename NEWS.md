@@ -94,7 +94,7 @@ comparisons) rose from 91.8% to 97.6%; see `tests/conformance/README.md`.
 
 * `as_rdf()` adds one DQV quality measurement per metric and one FAIR Test
   Result per metric test in the OSTrails FAIR Testing Resource vocabulary
-  (<https://w3id.org/ftr>, version 1.3.0): pass or fail, completion, the
+  (<https://w3id.org/ftr/>, version 1.3.0): pass or fail, completion, the
   evidence as a log, and for failed tests the `fair_recommendations()` action
   as a suggestion. Turtle output now checks for the `jsonld` package it needs.
 

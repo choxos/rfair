@@ -75,7 +75,7 @@ build_dqv <- function(x) {
 #' per FAIR category and one per metric) plus a schema.org Rating, the
 #' machine-readable form the F-UJI service publishes, and one FAIR Test Result
 #' per metric test using the OSTrails FAIR Testing Resource vocabulary
-#' (<https://w3id.org/ftr>, version 1.3.0): `prov:value` pass or fail,
+#' (<https://w3id.org/ftr/>, version 1.3.0): `prov:value` pass or fail,
 #' `ftr:completion`, the evidence as `ftr:log`, and for failed tests the
 #' [fair_recommendations()] action as an `ftr:suggestion`. Metrics and tests are
 #' identified within the metric specification (for example

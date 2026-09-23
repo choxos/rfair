@@ -20,7 +20,7 @@ Emits the assessment as W3C Data Quality Vocabulary quality measurements (one
 per FAIR category and one per metric) plus a schema.org Rating, the
 machine-readable form the F-UJI service publishes, and one FAIR Test Result
 per metric test using the OSTrails FAIR Testing Resource vocabulary
-(\url{https://w3id.org/ftr}, version 1.3.0): \code{prov:value} pass or fail,
+(\url{https://w3id.org/ftr/}, version 1.3.0): \code{prov:value} pass or fail,
 \code{ftr:completion}, the evidence as \code{ftr:log}, and for failed tests the
 \code{\link[=fair_recommendations]{fair_recommendations()}} action as an \code{ftr:suggestion}. Metrics and tests are
 identified within the metric specification (for example

@@ -75,6 +75,19 @@ references:
   doi: 10.32614/R.manuals
   version: '>= 4.1'
 - type: software
+  title: curl
+  abstract: 'curl: A Modern and Flexible Web Client for R'
+  notes: Imports
+  url: https://jeroen.r-universe.dev/curl
+  repository: https://CRAN.R-project.org/package=curl
+  authors:
+  - family-names: Ooms
+    given-names: Jeroen
+    email: jeroenooms@gmail.com
+    orcid: https://orcid.org/0000-0002-4035-0289
+  year: '2026'
+  doi: 10.32614/CRAN.package.curl
+- type: software
   title: digest
   abstract: 'digest: Create Compact Hash Digests of R Objects'
   notes: Imports
@@ -126,6 +139,19 @@ references:
     orcid: https://orcid.org/0000-0003-0645-5666
   year: '2026'
   doi: 10.32614/CRAN.package.mime
+- type: software
+  title: parallel
+  abstract: 'R: A Language and Environment for Statistical Computing'
+  notes: Imports
+  authors:
+  - name: R Core Team
+    website: https://ror.org/02zz1nj61
+  institution:
+    name: R Foundation for Statistical Computing
+    website: https://ror.org/05qewa988
+    address: Vienna, Austria
+  year: '2026'
+  doi: 10.32614/R.manuals
 - type: software
   title: rvest
   abstract: 'rvest: Easily Harvest (Scrape) Web Pages'
@@ -249,6 +275,19 @@ references:
   year: '2026'
   doi: 10.32614/CRAN.package.DT
 - type: software
+  title: jsonld
+  abstract: 'jsonld: JSON for Linking Data'
+  notes: Suggests
+  url: https://docs.ropensci.org/jsonld/
+  repository: https://CRAN.R-project.org/package=jsonld
+  authors:
+  - family-names: Ooms
+    given-names: Jeroen
+    email: jeroenooms@gmail.com
+    orcid: https://orcid.org/0000-0002-4035-0289
+  year: '2026'
+  doi: 10.32614/CRAN.package.jsonld
+- type: software
   title: knitr
   abstract: 'knitr: A General-Purpose Package for Dynamic Report Generation in R'
   notes: Suggests
@@ -261,6 +300,22 @@ references:
     orcid: https://orcid.org/0000-0003-0645-5666
   year: '2026'
   doi: 10.32614/CRAN.package.knitr
+- type: software
+  title: plumber
+  abstract: 'plumber: An API Generator for R'
+  notes: Suggests
+  url: https://www.rplumber.io
+  repository: https://CRAN.R-project.org/package=plumber
+  authors:
+  - family-names: Schloerke
+    given-names: Barret
+    email: barret@posit.co
+    orcid: https://orcid.org/0000-0001-9986-114X
+  - family-names: Allen
+    given-names: Jeff
+    email: cran@trestletech.com
+  year: '2026'
+  doi: 10.32614/CRAN.package.plumber
 - type: software
   title: rdflib
   abstract: 'rdflib: Tools to Manipulate and Query Semantic Data'

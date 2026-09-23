@@ -92,6 +92,18 @@
     },
     {
       "@type": "SoftwareApplication",
+      "identifier": "jsonld",
+      "name": "jsonld",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=jsonld"
+    },
+    {
+      "@type": "SoftwareApplication",
       "identifier": "knitr",
       "name": "knitr",
       "provider": {
@@ -185,6 +197,18 @@
     },
     "2": {
       "@type": "SoftwareApplication",
+      "identifier": "curl",
+      "name": "curl",
+      "provider": {
+        "@id": "https://cran.r-project.org",
+        "@type": "Organization",
+        "name": "Comprehensive R Archive Network (CRAN)",
+        "url": "https://cran.r-project.org"
+      },
+      "sameAs": "https://CRAN.R-project.org/package=curl"
+    },
+    "3": {
+      "@type": "SoftwareApplication",
       "identifier": "digest",
       "name": "digest",
       "provider": {
@@ -195,7 +219,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=digest"
     },
-    "3": {
+    "4": {
       "@type": "SoftwareApplication",
       "identifier": "httr2",
       "name": "httr2",
@@ -208,7 +232,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=httr2"
     },
-    "4": {
+    "5": {
       "@type": "SoftwareApplication",
       "identifier": "jsonlite",
       "name": "jsonlite",
@@ -220,7 +244,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=jsonlite"
     },
-    "5": {
+    "6": {
       "@type": "SoftwareApplication",
       "identifier": "mime",
       "name": "mime",
@@ -232,7 +256,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=mime"
     },
-    "6": {
+    "7": {
+      "@type": "SoftwareApplication",
+      "identifier": "parallel",
+      "name": "parallel"
+    },
+    "8": {
       "@type": "SoftwareApplication",
       "identifier": "rvest",
       "name": "rvest",
@@ -244,12 +273,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=rvest"
     },
-    "7": {
+    "9": {
       "@type": "SoftwareApplication",
       "identifier": "stats",
       "name": "stats"
     },
-    "8": {
+    "10": {
       "@type": "SoftwareApplication",
       "identifier": "stringdist",
       "name": "stringdist",
@@ -261,12 +290,12 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=stringdist"
     },
-    "9": {
+    "11": {
       "@type": "SoftwareApplication",
       "identifier": "utils",
       "name": "utils"
     },
-    "10": {
+    "12": {
       "@type": "SoftwareApplication",
       "identifier": "xml2",
       "name": "xml2",
@@ -278,7 +307,7 @@
       },
       "sameAs": "https://CRAN.R-project.org/package=xml2"
     },
-    "11": {
+    "13": {
       "@type": "SoftwareApplication",
       "identifier": "yaml",
       "name": "yaml",
@@ -292,7 +321,7 @@
     },
     "SystemRequirements": null
   },
-  "fileSize": "1152.842KB",
+  "fileSize": "1310.179KB",
   "citation": [
     {
       "@type": "SoftwareSourceCode",
